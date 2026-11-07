@@ -435,7 +435,6 @@
         .replace(/[^A-Za-z0-9 _.-]/g, '') || 'TOWER';
       var tdt = /\.tdt$/i.test(path);
       downloadBytes(base + (tdt ? '.TDT' : '.sav'), FS.readFile(path));
-      ctEvent(tdt ? 'export-tdt' : 'export-sav');
     } catch (e) { console.warn('export download failed', e); }
   };
 
@@ -513,7 +512,6 @@
   function exportSlot(name) {
     try {
       downloadBytes(name + '.sav', FS.readFile(slotPath(name)));
-      ctEvent('export-sav');
     } catch (e) {
       ctAlert('Export failed', 'Could not read that save: ' + e.message);
     }
@@ -534,7 +532,6 @@
         return;
       }
       downloadBytes(name + '.TDT', FS.readFile(p));
-      ctEvent('export-tdt');
     } catch (e) { ctAlert('Export failed', 'TDT export failed: ' + e.message); }
   }
   function renameSlot(name) {
@@ -582,7 +579,6 @@
               okLabel: 'Create' }).then(function (to) {
       if (!to) return;
       draftSlots.push(to);
-      ctEvent('new-tower');
       selectSlot(to);
     });
   });
@@ -601,7 +597,6 @@
                   okLabel: 'Import' }).then(function (slot) {
           if (!slot) return;
           pendingTdt = { slot: slot, bytes: bytes, src: f.name };
-          ctEvent('import-tdt');
           selectSlot(slot);
         });
         return;
@@ -626,7 +621,6 @@
         if (!slot) return;
         var write = function () {
           FS.writeFile(slotPath(slot), bytes);
-          ctEvent('import-sav');
           syncPersist(function () { selectSlot(slot); });
         };
         if (listSlotNames().indexOf(slot) >= 0) {
@@ -641,72 +635,6 @@
     });
   });
 
-  /* ---- Analytics (self-hosted) --------------------------------------
-   * Cookie-less pageview + gameplay-event tallies, kept in the same
-   * Cloudflare Worker/KV as the tower roster — nothing third-party
-   * (GoatCounter retired 2026-08-24). Public site only — localhost/
-   * dev/e2e hosts stay silent. Counters show on the roster page. */
-  var gcOn = /\.github\.io$/.test(location.hostname) ||
-             /(^|\.)kvetch\.io$/.test(location.hostname);
-  var EVENTS = 'https://conciliatower-roster.jonahss.workers.dev/event';
-  function ctEvent(name) {
-    if (!gcOn) return;
-    try {
-      /* String body = a CORS "simple request" — no preflight needed. */
-      fetch(EVENTS, { method: 'POST', body: JSON.stringify({ e: name }),
-                      mode: 'cors', keepalive: true })
-        .catch(function () {});
-    } catch (e) {}
-  }
-  ctEvent('pageview');
-
-  /* ---- Tower roster (Cloudflare Worker + KV) ------------------------
-   * Where GoatCounter counts anonymous aggregates, the roster keeps one
-   * record PER TOWER, keyed by a random per-browser player id + the
-   * slot name; partial state reports merge server-side.
-   * Roster page: https://conciliatower-roster.jonahss.workers.dev/
-   * Same public-site gate as GoatCounter; fire-and-forget, no cookies,
-   * nothing identifying beyond the self-minted random id. */
-  var ROSTER = 'https://conciliatower-roster.jonahss.workers.dev/report';
-  function ctPid() {
-    var id = null;
-    try { id = localStorage.getItem('ct-pid'); } catch (e) {}
-    if (!id) {
-      id = Math.random().toString(36).slice(2, 10);
-      try { localStorage.setItem('ct-pid', id); } catch (e) {}
-    }
-    return id;
-  }
-  function ctRoster(patch) {
-    if (!gcOn) return;
-    patch.k = ctPid() + '/' + (currentSlot || DEFAULT_SLOT);
-    try {
-      /* String body = a CORS "simple request" — no preflight needed. */
-      fetch(ROSTER, { method: 'POST', body: JSON.stringify(patch),
-                      mode: 'cors', keepalive: true })
-        .catch(function () {});
-    } catch (e) {}
-  }
-
-  /* Engine hook: game.c notify_star_up() reports each star promotion
-   * with the tower-day it landed, so the dashboard can chart the
-   * star funnel (filter "star-") and when stars are typically hit. */
-  window.ctStarEvent = function (star, day) {
-    ctEvent('star-' + (star >= 6 ? 'tower' : star) + '/d' + day);
-    ctRoster({ s: star, d: day });
-  };
-  /* Engine hook: population peak crossing a milestone (game.c
-   * notify_pop_milestones) — filter "pop-" for the growth funnel. */
-  window.ctPopEvent = function (pop, day) {
-    ctEvent('pop-' + pop + '/d' + day);
-    ctRoster({ p: pop, d: day });
-  };
-  /* Engine hook: complete state snapshot at each in-game dawn (game.c
-   * notify_day_report, the 4:59AM settle tick) — keeps the roster live
-   * through long sessions. */
-  window.ctDayEvent = function (day, pop, star, money) {
-    ctRoster({ n: currentSlot, d: day, p: pop, s: star, m: money });
-  };
   var Module = {
     canvas: document.getElementById('canvas'),
     noInitialRun: true,
@@ -733,13 +661,6 @@
   };
 
   startBtn.addEventListener('click', function () {
-    ctEvent('play');
-    /* Roster login: report this tower's saved vitals (fresh slots and
-     * staged imports have no readable save yet — name-only is fine). */
-    var rm = slotExists(currentSlot) ? slotMeta(currentSlot) : null;
-    ctRoster(rm && rm.exact
-      ? { n: currentSlot, d: rm.day, p: rm.pop, s: rm.stars, m: rm.money }
-      : { n: currentSlot });
     ENV.CT_MODE = String(Number(document.getElementById('sandbox').checked));
     if (pendingTdt && pendingTdt.slot === currentSlot) {
       /* Staged original-format tower: hand it to the engine's boot

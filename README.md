@@ -40,7 +40,7 @@ Run from the repository root so the game can find `data/tower.dat`. To open
 an existing tower:
 
 ```sh
-./simtower data/tower.dat mytower.tdt
+./simtower mytower.tdt
 ```
 
 ## Controls
@@ -56,7 +56,8 @@ an existing tower:
 
 The game ships its own graphics and synthesized sounds in `data/tower.dat`.
 It does not require an original executable. Resource sources, generation details
-and build instructions are documented in [data/README.md](data/README.md).
+and regeneration instructions are documented in [the art provenance](data/art/PROVENANCE.md)
+and [the audio provenance](data/RESOURCE-AUDIO.md).
 The browser landing illustration is documented in [web/art/README.md](web/art/README.md).
 
 The simulation reimplements SimTower mechanics in C. Historical research notes
