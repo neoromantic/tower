@@ -9,18 +9,6 @@ set -e
 cd "$(dirname "$0")/.."
 PROJECT_DIR="$(pwd)"
 
-# Locate SIMTOWER.EXE (assets). Override with $SIMTOWER_EXE, else try known paths.
-find_exe() {
-    local c
-    for c in "${SIMTOWER_EXE}" \
-             "${PROJECT_DIR}/../OpenSkyscraper/data/SIMTOWER.EXE" \
-             "${HOME}/.claude-agent/archive/openclaw/workspace/projects/OpenSkyscraper/data/SIMTOWER.EXE"; do
-        [[ -n "$c" && -f "$c" ]] && { echo "$c"; return 0; }
-    done
-    echo "ERROR: SIMTOWER.EXE not found. Set \$SIMTOWER_EXE." >&2
-    return 1
-}
-EXE_PATH="$(find_exe)" || exit 1
 DISPLAY_NUM=:99
 LOG="/tmp/simtower.log"
 
@@ -31,7 +19,7 @@ if [[ "$1" == "--rebuild" ]] || [[ ! -f "${PROJECT_DIR}/simtower" ]]; then
 fi
 
 # Kill any existing instance
-pkill -f "simtower.*SIMTOWER" 2>/dev/null && sleep 0.5 || true
+pkill -x simtower 2>/dev/null && sleep 0.5 || true
 
 # Ensure Xvfb is running
 if ! pgrep -f "Xvfb ${DISPLAY_NUM}" > /dev/null 2>&1; then
@@ -60,7 +48,7 @@ fi
 # Launch ConciliaTower
 echo "Launching ConciliaTower..."
 # stdbuf -oL forces line-buffered stdout so the log file gets written in real time
-DISPLAY=${DISPLAY_NUM} setsid nohup stdbuf -oL "${PROJECT_DIR}/simtower" "${EXE_PATH}" \
+DISPLAY=${DISPLAY_NUM} setsid nohup stdbuf -oL "${PROJECT_DIR}/simtower" \
     </dev/null >"${LOG}" 2>&1 &
 disown
 GAME_PID=$!
