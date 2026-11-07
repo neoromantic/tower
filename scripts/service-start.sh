@@ -18,19 +18,6 @@ GEOM="960x720x24"
 LOG="/tmp/simtower.log"
 export DISPLAY="${DISPLAY_NUM}"
 
-# Locate SIMTOWER.EXE (assets). Override with $SIMTOWER_EXE, else known paths.
-find_exe() {
-    local c
-    for c in "${SIMTOWER_EXE:-}" \
-             "${PROJECT_DIR}/../OpenSkyscraper/data/SIMTOWER.EXE" \
-             "${HOME}/.claude-agent/archive/openclaw/workspace/projects/OpenSkyscraper/data/SIMTOWER.EXE"; do
-        [[ -n "$c" && -f "$c" ]] && { echo "$c"; return 0; }
-    done
-    echo "ERROR: SIMTOWER.EXE not found. Set \$SIMTOWER_EXE." >&2
-    return 1
-}
-EXE_PATH="$(find_exe)" || exit 1
-
 # Build if the binary is missing (don't rebuild on every restart).
 [[ -x "${PROJECT_DIR}/simtower" ]] || make -j4
 
@@ -63,5 +50,5 @@ fi
 # CT_AUTOLOAD: load concilliatower.sav at boot so restarts resume the
 # player's tower instead of a fresh lot (2026-08-01 lost-tower incident).
 export CT_AUTOLOAD=1
-echo "Launching ConciliaTower on ${DISPLAY_NUM} (assets: ${EXE_PATH})"
-exec stdbuf -oL "${PROJECT_DIR}/simtower" "${EXE_PATH}" </dev/null >"${LOG}" 2>&1
+echo "Launching ConciliaTower on ${DISPLAY_NUM} (assets: data/tower.dat)"
+exec stdbuf -oL "${PROJECT_DIR}/simtower" </dev/null >"${LOG}" 2>&1

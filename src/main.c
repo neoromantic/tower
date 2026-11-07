@@ -9979,26 +9979,9 @@ static int g_sound_capture = 0;
 
 int main(int argc, char *argv[])
 {
-    const char *exe_path = NULL;
+    const char *resource_path = "data/tower.dat";
     int auto_screenshot = 0;
     const char *screenshot_path = "/tmp/simtower_screenshot.bmp";
-    
-    /* Find SIMTOWER.EXE */
-    const char *search_paths[] = {
-        "SIMTOWER.EXE",
-        "data/SIMTOWER.EXE",
-        "../OpenSkyscraper/data/SIMTOWER.EXE",
-        NULL
-    };
-    
-    /* --expand IN OUT: expand a KWAJ-compressed SIMTOWER.EX_ and exit
-     * (the same decompressor the web shell calls in-browser). */
-    if (argc == 4 && strcmp(argv[1], "--expand") == 0) {
-        extern int ct_kwaj_expand(const char *in_path, const char *out_path);
-        int err = ct_kwaj_expand(argv[2], argv[3]);
-        if (!err) printf("Expanded %s -> %s\n", argv[2], argv[3]);
-        return err ? 1 : 0;
-    }
 
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--screenshot") == 0) {
@@ -10008,71 +9991,21 @@ int main(int argc, char *argv[])
             }
         } else if (strncmp(argv[i], "--save=", 7) == 0) {
             save_path_override = argv[i] + 7;
-        } else if (argv[i][0] != '-') {
-            size_t n = strlen(argv[i]);
-            if (n > 4 && (!strcasecmp(argv[i] + n - 4, ".tdt") ||
-                          !strcasecmp(argv[i] + n - 4, ".twr")))
-                continue;   /* SimTower save — handled after init */
-            exe_path = argv[i];
         }
-    }
-    
-    if (!exe_path) {
-        for (int i = 0; search_paths[i]; i++) {
-            FILE *test = fopen(search_paths[i], "rb");
-            if (test) { fclose(test); exe_path = search_paths[i]; break; }
-        }
-    }
-    
-    if (!exe_path) {
-        fprintf(stderr, "Cannot find SIMTOWER.EXE. Pass path as argument.\n");
-        return 1;
     }
     
 #ifndef CT_BUILD_VERSION
 #define CT_BUILD_VERSION "dev"
 #endif
     printf("ConciliaTower — SimTower for Linux (build %s)\n", CT_BUILD_VERSION);
-    printf("Loading resources from: %s\n", exe_path);
+    printf("Loading resources from: %s\n", resource_path);
 
-    /* Load NE resources */
-    if (ne_load(&game.exe, exe_path) != 0) {
-        fprintf(stderr, "Failed to load %s\n", exe_path);
+    /* Load bundled NE resources */
+    if (ne_load(&game.exe, resource_path) != 0) {
+        fprintf(stderr, "Failed to load %s\n", resource_path);
         return 1;
     }
 
-    /* The Japanese original, The Tower for Windows (TOWER.EXE), carries 13
-     * custom resource types — two extras prepended shift every ordinal by
-     * +2, so our IDs would silently read the wrong tables. Detect, don't
-     * mis-load. */
-    if (ne_find_type(&game.exe, 0xFF0C) && ne_find_type(&game.exe, 0xFF0D)) {
-        fprintf(stderr, "%s looks like the Japanese original, The Tower for "
-                "Windows — its resource layout differs and it isn't "
-                "supported (yet). SimTower's SIMTOWER.EXE is.\n", exe_path);
-        return 1;
-    }
-
-    /* The game reads six resource types out of the EXE; a file that parses
-     * as NE but lacks them is some other Win16 program (SETUP.EXE, etc). */
-    {
-        static const struct { uint16_t type; const char *what; } need[] = {
-            { NE_RT_BITMAP,    "bitmaps" },
-            { NE_RT_SOUND,     "sounds" },
-            { NE_RT_PALETTE,   "palette" },
-            { NE_RT_RAWBITMAP, "sprite sheets" },
-            { 0xFF06,          "string tables" },
-            { 0x8005,          "dialog text" },
-        };
-        for (size_t i = 0; i < sizeof(need)/sizeof(need[0]); i++) {
-            if (!ne_find_type(&game.exe, need[i].type)) {
-                fprintf(stderr, "%s parses as a Windows 3.1 program but is "
-                        "missing SimTower's %s (resource type 0x%04x) — "
-                        "not a SimTower EXE we recognize.\n",
-                        exe_path, need[i].what, need[i].type);
-                return 1;
-            }
-        }
-    }
     exe_strings_init(&game.exe);   /* 0x7f06 string tables + dialog texts */
     
     /* Initialize SDL */

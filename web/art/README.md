@@ -12,10 +12,6 @@ then run through the 1994-ifier below — center-crop to 4:3, downscale to
 an indexed PNG. `hero-source.jpg` is a compressed copy of the source
 generation for future re-derivation.
 
-`hero.svg` is the earlier hand-drawn vector take on the same brief, kept
-as an editable fallback (its pipeline is in the git history of this
-README).
-
 Re-derive hero.png from a new source image (needs PIL + numpy):
 
     python3 - <<'PY'
@@ -32,3 +28,7 @@ Re-derive hero.png from a new source image (needs PIL + numpy):
     Image.open('/tmp/d.png').convert('RGB').quantize(96, dither=Image.Dither.NONE) \
         .save('web/hero.png', optimize=True)
     PY
+
+The landing illustration is separate from the bundled gameplay resources.
+See [data/README.md](../../data/README.md) for the generated graphics and
+synthesized sound provenance.
