@@ -32,6 +32,9 @@ web:
 	mkdir -p $(WEBDIR)
 	sed 's/__CT_VERSION__/$(CT_VERSION)/g' web/shell.html > $(WEBDIR)/.shell.gen.html
 	cp web/hero.png $(WEBDIR)/hero.png
+	cp -R web/experiments $(WEBDIR)/
+	mkdir -p $(WEBDIR)/docs
+	cp -R docs/experiments $(WEBDIR)/docs/
 	emcc $(SRC) -o $(WEBDIR)/index.html \
 	  -std=gnu11 -O2 -DCT_BUILD_VERSION='"$(CT_VERSION)"' \
 	  -sUSE_SDL=2 -sUSE_SDL_TTF=2 \

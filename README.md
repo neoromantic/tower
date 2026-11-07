@@ -20,6 +20,11 @@ Open <http://localhost:8611>. Graphics and sound are bundled; choose **New tower
 or **Play** to start. Check **Sandbox** to start a new tower with all buildings
 unlocked.
 
+The **Эксперименты** button opens the experiment menu over the current session.
+Switch visual proposals and read architecture concepts in place, then return to
+the game. These are prototypes and unapproved designs, not alternate engines.
+See [the discussion brief](docs/experiments/README.md).
+
 Saves stay in this browser. The title screen lets you rename, duplicate, delete,
 import and download towers. Import `.sav` browser backups or SimTower 1.1
 `.TDT` / `.TWR` files; export `.sav` backups or `.TDT` files. Use `.TDT` to move

@@ -1,0 +1,477 @@
+{
+  "status": "complete",
+  "observed_date": "2026-11-08",
+  "endpoint": "https://ai-gateway.vercel.sh/v1/images/generations",
+  "requested_model": "openai/gpt-image-2.6-flare",
+  "model_id_source": "https://developers.openai.com/api/docs/models/gpt-image-2.6-flare",
+  "sources": [
+    "https://openai.com/index/introducing-images-2-6/",
+    "https://vercel.com/docs/ai-gateway/modalities/image-generation/openai",
+    "https://ai-gateway.vercel.sh/v1/models"
+  ],
+  "discovery": {
+    "direct_api_flare": {
+      "http": 404,
+      "message": "That model does not exist",
+      "request_id": "60662bcc-bf75-46a7-9a36-26f36551402b"
+    },
+    "direct_api_sunburst": {
+      "http": 404,
+      "message": "That model does not exist",
+      "request_id": "dcac79fd-edcc-4c81-9ff0-022a2fc9966e"
+    },
+    "figma_supported_openai_model": "gpt-image-2.5-sunburst",
+    "builtin_model_identity": "not exposed; not used",
+    "gateway_catalog_contains_requested_model": true
+  },
+  "images": [
+    {
+      "file": "style-schematic.png",
+      "status": "generated",
+      "request": {
+        "model": "openai/gpt-image-2.6-flare",
+        "prompt": "Create an original tower management game visual comparison, one complete single scene, landscape 1536x1024. Fixed straight-on orthographic SIDE CUTAWAY camera, absolutely no isometric view, no perspective rotation. Identical composition: centered rectangular tower from x=160 to x=1376, roof at y=180, ground at y=900, four occupied levels of equal height 180. A continuous narrow central elevator shaft x=736..800 divides left and right wings. From TOP to BOTTOM: floor 4 left office with desks and monitors, right two hotel bedrooms with beds; floor 3 left apartments with sofa and plant, right restaurant with tables and kitchen; floor 2 left office, right apartments; ground floor left reception lobby with long desk, right cafe with counter. Thin floor slabs, visible tiny people on every level and a small queue beside the elevator at ground level. Pale neutral blue sky, minimal ground baseline. No text, captions, HUD, labels, logos or watermarks. Do not make a poster or a multi-panel comparison. Keep rooms instantly distinguishable by large furniture silhouettes; generous quiet space and restrained detail. STYLE: precise flat schematic architectural game art, crisp geometric filled shapes, uniform thin dark blue outlines, limited cream/navy/teal/coral palette, no texture, no realistic shading, no gradients. Tiny people are readable simple silhouettes. The priority is overview legibility and clear functional floor colors.",
+        "size": "1536x1024",
+        "quality": "medium",
+        "n": 1,
+        "output_format": "png"
+      },
+      "response": {
+        "created": 1794094318,
+        "usage": {
+          "total_tokens": 1431,
+          "input_tokens": 299,
+          "output_tokens": 1132,
+          "input_tokens_details": {
+            "text_tokens": 299,
+            "image_tokens": 0
+          }
+        },
+        "providerMetadata": {
+          "openai": {
+            "images": [
+              {
+                "imageTokens": 0,
+                "textTokens": 299,
+                "created": 1794094317,
+                "size": "1536x1024",
+                "quality": "medium",
+                "background": "opaque",
+                "outputFormat": "png"
+              }
+            ]
+          },
+          "gateway": {
+            "routing": {
+              "originalModelId": "openai/gpt-image-2.6-flare",
+              "resolvedProvider": "openai",
+              "fallbacksAvailable": [],
+              "canonicalSlug": "openai/gpt-image-2.6-flare",
+              "finalProvider": "openai",
+              "modelAttemptCount": 1,
+              "modelAttempts": [
+                {
+                  "canonicalSlug": "openai/gpt-image-2.6-flare",
+                  "success": true,
+                  "providerAttemptCount": 1,
+                  "providerAttempts": [
+                    {
+                      "provider": "openai",
+                      "credentialType": "system",
+                      "success": true,
+                      "startTime": 1794094309104,
+                      "endTime": 1794094318348,
+                      "statusCode": 200
+                    }
+                  ]
+                }
+              ],
+              "totalProviderAttemptCount": 1
+            },
+            "cost": "0.035455",
+            "marketCost": "0.035455",
+            "surchargeCost": "0",
+            "gatewayCost": "0.035455",
+            "inferenceCost": "0.035455",
+            "inputInferenceCost": "0",
+            "outputInferenceCost": "0.035455",
+            "generationId": "gen_01M6W5N7C0XV1V9F7YFR4F4QFG"
+          }
+        }
+      },
+      "response_headers": {
+        "content-type": "application/json",
+        "date": "Sat, 07 Nov 2026 23:31:58 GMT",
+        "x-vercel-id": "fra1::fra1::lph6n-1794094308696-3a18def44045"
+      },
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "590ceb4f46651d681c0c4a94747973490b55ecdbc9421f9bcfbdfffa7836ee1c"
+    },
+    {
+      "file": "style-modern-pixel.png",
+      "status": "generated",
+      "request": {
+        "model": "openai/gpt-image-2.6-flare",
+        "prompt": "Create an original tower management game visual comparison, one complete single scene, landscape 1536x1024. Fixed straight-on orthographic SIDE CUTAWAY camera, absolutely no isometric view, no perspective rotation. Identical composition: centered rectangular tower from x=160 to x=1376, roof at y=180, ground at y=900, four occupied levels of equal height 180. A continuous narrow central elevator shaft x=736..800 divides left and right wings. From TOP to BOTTOM: floor 4 left office with desks and monitors, right two hotel bedrooms with beds; floor 3 left apartments with sofa and plant, right restaurant with tables and kitchen; floor 2 left office, right apartments; ground floor left reception lobby with long desk, right cafe with counter. Thin floor slabs, visible tiny people on every level and a small queue beside the elevator at ground level. Pale neutral blue sky, minimal ground baseline. No text, captions, HUD, labels, logos or watermarks. Do not make a poster or a multi-panel comparison. Keep rooms instantly distinguishable by large furniture silhouettes; generous quiet space and restrained detail. STYLE: contemporary premium pixel art game, intentionally visible square pixel clusters, clean pixel outlines, controlled 24-color palette, sharp edge pixels, no blurry painting and no antialiased vector look. Warm light interiors against cool blue structure. Tiny expressive people and carefully simplified furniture, original contemporary design, not a copy of any existing game.",
+        "size": "1536x1024",
+        "quality": "medium",
+        "n": 1,
+        "output_format": "png"
+      },
+      "response": {
+        "created": 1794094344,
+        "usage": {
+          "total_tokens": 1438,
+          "input_tokens": 306,
+          "output_tokens": 1132,
+          "input_tokens_details": {
+            "text_tokens": 306,
+            "image_tokens": 0
+          }
+        },
+        "providerMetadata": {
+          "openai": {
+            "images": [
+              {
+                "imageTokens": 0,
+                "textTokens": 306,
+                "created": 1794094343,
+                "size": "1536x1024",
+                "quality": "medium",
+                "background": "opaque",
+                "outputFormat": "png"
+              }
+            ]
+          },
+          "gateway": {
+            "routing": {
+              "originalModelId": "openai/gpt-image-2.6-flare",
+              "resolvedProvider": "openai",
+              "fallbacksAvailable": [],
+              "canonicalSlug": "openai/gpt-image-2.6-flare",
+              "finalProvider": "openai",
+              "modelAttemptCount": 1,
+              "modelAttempts": [
+                {
+                  "canonicalSlug": "openai/gpt-image-2.6-flare",
+                  "success": true,
+                  "providerAttemptCount": 1,
+                  "providerAttempts": [
+                    {
+                      "provider": "openai",
+                      "credentialType": "system",
+                      "success": true,
+                      "startTime": 1794094336354,
+                      "endTime": 1794094344494,
+                      "statusCode": 200
+                    }
+                  ]
+                }
+              ],
+              "totalProviderAttemptCount": 1
+            },
+            "cost": "0.03549",
+            "marketCost": "0.03549",
+            "surchargeCost": "0",
+            "gatewayCost": "0.03549",
+            "inferenceCost": "0.03549",
+            "inputInferenceCost": "0",
+            "outputInferenceCost": "0.03549",
+            "generationId": "gen_01M6W5P299T144NCQQSKNRTZJ6"
+          }
+        }
+      },
+      "response_headers": {
+        "content-type": "application/json",
+        "date": "Sat, 07 Nov 2026 23:32:24 GMT",
+        "x-vercel-id": "fra1::fra1::x26wd-1794094336264-491bd7f97999"
+      },
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "69dd6a66a2221368a7306b6aae27345200981681c5015406e857dd52e4d83ffc"
+    },
+    {
+      "file": "style-warm-dollhouse.png",
+      "status": "generated",
+      "request": {
+        "model": "openai/gpt-image-2.6-flare",
+        "prompt": "Create an original tower management game visual comparison, one complete single scene, landscape 1536x1024. Fixed straight-on orthographic SIDE CUTAWAY camera, absolutely no isometric view, no perspective rotation. Identical composition: centered rectangular tower from x=160 to x=1376, roof at y=180, ground at y=900, four occupied levels of equal height 180. A continuous narrow central elevator shaft x=736..800 divides left and right wings. From TOP to BOTTOM: floor 4 left office with desks and monitors, right two hotel bedrooms with beds; floor 3 left apartments with sofa and plant, right restaurant with tables and kitchen; floor 2 left office, right apartments; ground floor left reception lobby with long desk, right cafe with counter. Thin floor slabs, visible tiny people on every level and a small queue beside the elevator at ground level. Pale neutral blue sky, minimal ground baseline. No text, captions, HUD, labels, logos or watermarks. Do not make a poster or a multi-panel comparison. Keep rooms instantly distinguishable by large furniture silhouettes; generous quiet space and restrained detail. STYLE: warm illustrated dollhouse cutaway, hand-painted gouache textures with simple clean silhouettes, warm terracotta, honey wood, sage green, creamy walls, soft lamplight. Charming tiny human characters, inviting lived-in rooms. Flat straight-on side camera retained exactly; no angled dollhouse perspective.",
+        "size": "1536x1024",
+        "quality": "medium",
+        "n": 1,
+        "output_format": "png"
+      },
+      "response": {
+        "created": 1794094346,
+        "usage": {
+          "total_tokens": 1432,
+          "input_tokens": 300,
+          "output_tokens": 1132,
+          "input_tokens_details": {
+            "text_tokens": 300,
+            "image_tokens": 0
+          }
+        },
+        "providerMetadata": {
+          "openai": {
+            "images": [
+              {
+                "imageTokens": 0,
+                "textTokens": 300,
+                "created": 1794094345,
+                "size": "1536x1024",
+                "quality": "medium",
+                "background": "opaque",
+                "outputFormat": "png"
+              }
+            ]
+          },
+          "gateway": {
+            "routing": {
+              "originalModelId": "openai/gpt-image-2.6-flare",
+              "resolvedProvider": "openai",
+              "fallbacksAvailable": [],
+              "canonicalSlug": "openai/gpt-image-2.6-flare",
+              "finalProvider": "openai",
+              "modelAttemptCount": 1,
+              "modelAttempts": [
+                {
+                  "canonicalSlug": "openai/gpt-image-2.6-flare",
+                  "success": true,
+                  "providerAttemptCount": 1,
+                  "providerAttempts": [
+                    {
+                      "provider": "openai",
+                      "credentialType": "system",
+                      "success": true,
+                      "startTime": 1794094336333,
+                      "endTime": 1794094346454,
+                      "statusCode": 200
+                    }
+                  ]
+                }
+              ],
+              "totalProviderAttemptCount": 1
+            },
+            "cost": "0.03546",
+            "marketCost": "0.03546",
+            "surchargeCost": "0",
+            "gatewayCost": "0.03546",
+            "inferenceCost": "0.03546",
+            "inputInferenceCost": "0",
+            "outputInferenceCost": "0.03546",
+            "generationId": "gen_01M6W5P28S07DWXETF5YTZZ8YA"
+          }
+        }
+      },
+      "response_headers": {
+        "content-type": "application/json",
+        "date": "Sat, 07 Nov 2026 23:32:26 GMT",
+        "x-vercel-id": "fra1::fra1::gsxnz-1794094336259-76e865eca84e"
+      },
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "d41fe1d681bb45dd88e77e89525a3d4fc3c7df29c54de81334b5f3b7308aefaf"
+    },
+    {
+      "file": "style-miniature-3d.png",
+      "status": "generated",
+      "request": {
+        "model": "openai/gpt-image-2.6-flare",
+        "prompt": "Create an original tower management game visual comparison, one complete single scene, landscape 1536x1024. Fixed straight-on orthographic SIDE CUTAWAY camera, absolutely no isometric view, no perspective rotation. Identical composition: centered rectangular tower from x=160 to x=1376, roof at y=180, ground at y=900, four occupied levels of equal height 180. A continuous narrow central elevator shaft x=736..800 divides left and right wings. From TOP to BOTTOM: floor 4 left office with desks and monitors, right two hotel bedrooms with beds; floor 3 left apartments with sofa and plant, right restaurant with tables and kitchen; floor 2 left office, right apartments; ground floor left reception lobby with long desk, right cafe with counter. Thin floor slabs, visible tiny people on every level and a small queue beside the elevator at ground level. Pale neutral blue sky, minimal ground baseline. No text, captions, HUD, labels, logos or watermarks. Do not make a poster or a multi-panel comparison. Keep rooms instantly distinguishable by large furniture silhouettes; generous quiet space and restrained detail. STYLE: stylized 3D clay miniature rendered as a straight-on orthographic side cutaway, rounded molded furniture, tactile matte materials, soft ambient occlusion, restrained pastel blue/sage/coral, gentle studio lighting. Large clean forms instead of photoreal clutter. Keep all floors perfectly horizontal and same side camera; do NOT rotate into isometric.",
+        "size": "1536x1024",
+        "quality": "medium",
+        "n": 1,
+        "output_format": "png"
+      },
+      "response": {
+        "created": 1794094344,
+        "usage": {
+          "total_tokens": 1443,
+          "input_tokens": 311,
+          "output_tokens": 1132,
+          "input_tokens_details": {
+            "text_tokens": 311,
+            "image_tokens": 0
+          }
+        },
+        "providerMetadata": {
+          "openai": {
+            "images": [
+              {
+                "imageTokens": 0,
+                "textTokens": 311,
+                "created": 1794094343,
+                "size": "1536x1024",
+                "quality": "medium",
+                "background": "opaque",
+                "outputFormat": "png"
+              }
+            ]
+          },
+          "gateway": {
+            "routing": {
+              "originalModelId": "openai/gpt-image-2.6-flare",
+              "resolvedProvider": "openai",
+              "fallbacksAvailable": [],
+              "canonicalSlug": "openai/gpt-image-2.6-flare",
+              "finalProvider": "openai",
+              "modelAttemptCount": 1,
+              "modelAttempts": [
+                {
+                  "canonicalSlug": "openai/gpt-image-2.6-flare",
+                  "success": true,
+                  "providerAttemptCount": 1,
+                  "providerAttempts": [
+                    {
+                      "provider": "openai",
+                      "credentialType": "system",
+                      "success": true,
+                      "startTime": 1794094336358,
+                      "endTime": 1794094344638,
+                      "statusCode": 200
+                    }
+                  ]
+                }
+              ],
+              "totalProviderAttemptCount": 1
+            },
+            "cost": "0.035515",
+            "marketCost": "0.035515",
+            "surchargeCost": "0",
+            "gatewayCost": "0.035515",
+            "inferenceCost": "0.035515",
+            "inputInferenceCost": "0",
+            "outputInferenceCost": "0.035515",
+            "generationId": "gen_01M6W5P29GN38VAEADRFP9CJ6N"
+          }
+        }
+      },
+      "response_headers": {
+        "content-type": "application/json",
+        "date": "Sat, 07 Nov 2026 23:32:24 GMT",
+        "x-vercel-id": "fra1::fra1::qlr7s-1794094336261-6ff60e44aa80"
+      },
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "5ddc3f39d9072ebd601d73a936f0ccdf627d4045096cb7b4db5ff7c0a1f27758"
+    },
+    {
+      "file": "elevator-loop-sheet.png",
+      "status": "generated",
+      "request": {
+        "model": "openai/gpt-image-2.6-flare",
+        "prompt": "Create a single original animation sprite sheet for a seamless looping GIF of a warm dollhouse tower game elevator landing. Exactly SIX sequential frames in a precise THREE COLUMNS by TWO ROWS grid, read left-to-right then top-to-bottom. Entire image 1536x1024; each panel exactly 512x512. No gutters, borders, panel numbers, text, labels, watermarks. Fixed straight-on orthographic side cutaway camera, identical architecture, camera, lighting and registration in all panels. An elevator cabin centered in every panel, a person in a coral coat standing to the left, sage wall and cream floor. The elevator remains on the SAME floor, only the two sliding doors animate. Frame 1 doors fully closed; frame 2 doors one-third open; frame 3 doors two-thirds open; frame 4 doors fully open; frame 5 doors two-thirds open; frame 6 doors one-third open. Door panels slide horizontally into their pockets. Person stays motionless, same size, silhouette and position throughout. Warm illustrated dollhouse style, clean simplified forms, honey wood, terracotta and sage palette, gentle gouache surface. Each panel is a separate complete square view of exactly the same landing. Final frame transitions naturally back to frame 1. This is a production sprite sheet, never a comic.",
+        "size": "1536x1024",
+        "quality": "medium",
+        "n": 1,
+        "output_format": "png"
+      },
+      "response": {
+        "created": 1794094345,
+        "usage": {
+          "total_tokens": 1405,
+          "input_tokens": 273,
+          "output_tokens": 1132,
+          "input_tokens_details": {
+            "text_tokens": 273,
+            "image_tokens": 0
+          }
+        },
+        "providerMetadata": {
+          "openai": {
+            "images": [
+              {
+                "imageTokens": 0,
+                "textTokens": 273,
+                "created": 1794094344,
+                "size": "1536x1024",
+                "quality": "medium",
+                "background": "opaque",
+                "outputFormat": "png"
+              }
+            ]
+          },
+          "gateway": {
+            "routing": {
+              "originalModelId": "openai/gpt-image-2.6-flare",
+              "resolvedProvider": "openai",
+              "fallbacksAvailable": [],
+              "canonicalSlug": "openai/gpt-image-2.6-flare",
+              "finalProvider": "openai",
+              "modelAttemptCount": 1,
+              "modelAttempts": [
+                {
+                  "canonicalSlug": "openai/gpt-image-2.6-flare",
+                  "success": true,
+                  "providerAttemptCount": 1,
+                  "providerAttempts": [
+                    {
+                      "provider": "openai",
+                      "credentialType": "system",
+                      "success": true,
+                      "startTime": 1794094336383,
+                      "endTime": 1794094345334,
+                      "statusCode": 200
+                    }
+                  ]
+                }
+              ],
+              "totalProviderAttemptCount": 1
+            },
+            "cost": "0.035325",
+            "marketCost": "0.035325",
+            "surchargeCost": "0",
+            "gatewayCost": "0.035325",
+            "inferenceCost": "0.035325",
+            "inputInferenceCost": "0",
+            "outputInferenceCost": "0.035325",
+            "generationId": "gen_01M6W5P2A7HMQMSN4QGSR69GA3"
+          }
+        }
+      },
+      "response_headers": {
+        "content-type": "application/json",
+        "date": "Sat, 07 Nov 2026 23:32:25 GMT",
+        "x-vercel-id": "fra1::fra1::2j58b-1794094336259-a3af8286b863"
+      },
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "c7ce9c548970c041d2aef2ad8d18518b29f9b7d8df3b40076d8bee5788fa4fa6"
+    }
+  ],
+  "animation": {
+    "file": "elevator-loop.gif",
+    "source": "elevator-loop-sheet.png",
+    "method": "Pillow: exact 512x512 crops of 3 columns x 2 rows, row-major, shared 256-color palette from source sheet, no dithering, 180ms/frame, disposal=2, optimize=False, loop=0",
+    "frame_count": 6,
+    "frame_size": [
+      512,
+      512
+    ],
+    "duration_ms_per_frame": 180,
+    "loop": 0,
+    "sha256": "20e9626e82f626849896cc2b23daf6b22a5cea807da57d5fd1744a3e3f285241",
+    "native_generated_gif": false,
+    "generated_content": "static PNG sprite sheet",
+    "assembled_content": "GIF from source-sheet crops only; no frame interpolation or redrawing"
+  },
+  "cost_usd_gateway_reported": "0.177245",
+  "visual_review": {
+    "performed": true,
+    "four_scenes": "all show matching four-floor side cutaway and same room categories; exact coordinates and furniture counts differ across independent generations",
+    "styles": "schematic is softened flat illustration rather than strict vector; modern pixel is visually distinct but not certified integer pixel grid; warm dollhouse is textured illustration; miniature is a rendered volumetric interpretation",
+    "animation": "six clear door positions with generally stable architecture and person; slight generated registration/shape drift remains; production cleanup required"
+  }
+}
