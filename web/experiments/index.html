@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tower — эксперименты</title>
+<style>
+  :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #161c21; color: #e9e7e1; }
+  body { margin: 0 auto; max-width: 1050px; padding: 18px 24px; }
+  h1 { font-size: 28px; margin: 0; } h2 { font-size: 21px; }
+  p, li { line-height: 1.6; } .muted { color: #aab5bd; }
+  nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0; }
+  button, select { font: inherit; color: inherit; background: #25313a; border: 1px solid #4c5e6b; border-radius: 6px; padding: 9px 13px; cursor: pointer; }
+  button[aria-pressed="true"] { background: #d6b879; color: #171d21; border-color: #d6b879; }
+  a { color: #e7c580; } article { border-top: 1px solid #36434d; padding-top: 12px; }
+  img { display: block; max-width: 100%; margin: 20px auto; }
+  table { border-collapse: collapse; width: 100%; } td, th { padding: 10px; text-align: left; border-bottom: 1px solid #36434d; }
+  .notice { border-left: 3px solid #d6b879; padding-left: 16px; }
+</style>
+<h1>Tower / Лаборатория</h1>
+<p class="muted">Визуальные прототипы и концепции для обсуждения. Игра продолжает работать за этим окном.</p>
+<nav aria-label="Эксперименты">
+  <button aria-pressed="true" data-panel="styles">01 · Стили и движение</button>
+  <button aria-pressed="false" data-panel="modernize">02 · Современный экран</button>
+  <button aria-pressed="false" data-panel="renderer">03 · Новый рендерер</button>
+  <button aria-pressed="false" data-panel="core">04 · Игровое ядро</button>
+</nav>
+<!-- Future experiments: add one button above and its matching article below. -->
+<article id="styles">
+  <h2>Одна башня — четыре направления</h2>
+  <p class="notice">Сравнение отдельных сцен, не полная замена графики игры. Камера и набор комнат заданы одинаково; генерация может менять мелкие детали.</p>
+  <label for="style">Направление </label>
+  <select id="style">
+    <option value="style-schematic.png" data-note="Схема: простые силуэты и функциональные цвета. Хороша для обзора; нужна строгая сетка и ручная чистка геометрии.">Архитектурная схема</option>
+    <option value="style-modern-pixel.png" data-note="Pixel art: знакомый игровой ритм, чёткие края при целочисленном масштабе. Нужны единая пиксельная сетка и покадровая анимация.">Современный pixel art</option>
+    <option value="style-warm-dollhouse.png" data-note="Тёплый кукольный дом: уют и характер комнат. На дальнем плане детали сливаются; потребуются упрощённые силуэты и согласованность кадров.">Иллюстрированный дом</option>
+    <option value="style-miniature-3d.png" data-note="3D-миниатюра: объём и освещение, путь к настоящей 3D-сцене. Здесь показан только растровый концепт; модели и анимационный pipeline ещё предстоит создать.">Стилизованная 3D-миниатюра</option>
+    <option value="elevator-loop.gif" data-note="Двери лифта: GIF собран детерминированно из шести кадров сгенерированного листа. Это демонстрация, а не встроенная анимация движка. Для игры нужен атлас кадров.">Анимация · двери лифта</option>
+  </select>
+  <label><input id="small" type="checkbox"> Масштаб обзора · 384 px</label>
+  <img id="preview" src="assets/style-schematic.png" alt="Архитектурная схема">
+  <p id="style-note">Схема: простые силуэты и функциональные цвета. Хороша для обзора; нужна строгая сетка и ручная чистка геометрии.</p>
+  <p><a href="assets/elevator-loop-sheet.png" target="_blank">Исходный лист анимации ↗</a> · <a href="assets/provenance.json" target="_blank">Модель, запросы и provenance ↗</a> · <a href="../docs/experiments/styles.md" target="_blank">Разбор направлений ↗</a></p>
+</article>
+<article id="modernize" hidden>
+  <h2>Современный экран / концепция</h2>
+  <p>Сохранить C/SDL2 и симуляцию. Развести плотность пикселей, масштаб интерфейса и zoom мира: Retina делает текст чётче, широкий экран показывает больше башни, панели сохраняют удобный размер. Сейчас canvas — 960×720, zoom ещё не реализован. Предлагаемый порядок: согласовать буфер и координаты → отделить viewport мира → постепенно вынести браузерные панели в DOM. Изменение темпа симуляции и новые механики сюда не входят. Реализация не согласована.</p>
+  <p><a href="../docs/experiments/modernize.md" target="_blank">Исследование и первичные источники ↗</a></p>
+</article>
+<article id="renderer" hidden>
+  <h2>Новый рендерер / концепция</h2>
+  <p>При реальном намерении перейти к объёму предлагается THREE.js с ортографической камерой: сначала плоские помещения, позже геометрия в той же сцене. Для чистого 2D PixiJS ближе к нынешним спрайтам. В обоих случаях остаётся C/WASM-симуляция и появляется явная граница snapshots → view / commands → core. Уже сейчас браузер использует ускоренный SDL renderer; обещаний прироста FPS без измерений нет. Здесь нет работающего альтернативного движка; миграция не согласована.</p>
+  <p><a href="../docs/experiments/renderer.md" target="_blank">Сравнение и первичные источники ↗</a></p>
+</article>
+<article id="core" hidden>
+  <h2>Игровое ядро / концепция</h2>
+  <p>Выделить всю неинтерфейсную логику возможно, сохранив C. game.c, people.c и tower.c уже работают без SDL, но в main.c остаются правила строительства, цены и последствия действий. Дополнительные связи — глобальное состояние, общий rand(), звук/web hooks и ABI-зависимые saves. Предлагается небольшой контракт: команды, tick, read-only snapshots, события, save bytes и версия content/rules. Переносить правила по одному через старый UI, затем подключать новый. Это проект границы, реализация не согласована.</p>
+  <p><a href="../docs/experiments/core.md" target="_blank">Граница модуля и исходный код ↗</a></p>
+</article>
+<script>
+  document.querySelectorAll('nav button').forEach(button => {
+    button.onclick = () => {
+      document.querySelectorAll('nav button').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+      document.querySelectorAll('article').forEach(panel => { panel.hidden = panel.id !== button.dataset.panel; });
+    };
+  });
+  document.getElementById('style').onchange = event => {
+    const option = event.target.selectedOptions[0];
+    document.getElementById('preview').src = 'assets/' + option.value;
+    document.getElementById('preview').alt = option.textContent;
+    document.getElementById('style-note').textContent = option.dataset.note;
+  };
+  document.getElementById('small').onchange = event => {
+    document.getElementById('preview').style.width = '';
+    if (event.target.checked) document.getElementById('preview').style.width = '384px';
+  };
+</script>
+</html>
