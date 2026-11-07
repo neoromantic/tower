@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ConciliaTower - Play SimTower in the browser</title>
-<meta name="description" content="Play SimTower (1994) in your web browser. Bring your own SIMTOWER.EXE — parsed client-side, nothing uploaded.">
+<meta name="description" content="Build a tower in your browser with bundled original graphics and sound.">
 <meta property="og:title" content="ConciliaTower">
-<meta property="og:description" content="Play SimTower in your web browser. Bring your own SIMTOWER.EXE.">
+<meta property="og:description" content="Build a tower in your browser with bundled original graphics and sound.">
 <meta property="og:image" content="https://jonahss.github.io/concilia-tower/hero.png">
 <style>
   :root { color-scheme: dark; }
@@ -36,7 +36,7 @@
     padding: 0 0 28px; box-sizing: border-box;
   }
   /* The hero keeps its natural 4:3 size pinned to the top — a growing
-   * card (find-help open, long tower list) extends past its bottom onto
+   * card (long tower list) extends past its bottom onto
    * the plain page instead of re-zooming the image. */
   #hero {
     position: absolute; top: 0; left: 0; width: 100%;
@@ -62,7 +62,7 @@
     width: min(520px, calc(100vw - 24px));
     padding: 12px 20px 16px; text-align: center; box-sizing: border-box;
     /* Top-anchored below the CONCILIA TOWER sign (~y187 of 960x720):
-     * growing content (find-help open, tower list) extends the card
+     * growing content (tower list) extends the card
      * DOWN instead of re-centering it up over the sign. */
     margin-top: min(250px, 26vw);
   }
@@ -72,18 +72,16 @@
             text-align: left; }
   #menu a { color: #d8b06a; }
   input[type=file] { display: none; }
-  label.pick, button.start {
+  button.start {
     display: inline-block; cursor: pointer; margin: 8px 6px 0;
     background: #c08a44; color: #241708; border: 0; border-radius: 3px;
     padding: 10px 22px; font-size: 16px; font-family: inherit;
   }
-  label.pick:hover, button.start:hover { background: #d09a52; }
+  button.start:hover { background: #d09a52; }
   button.start[disabled] { background: rgba(120,115,108,.35);
                            color: #8d867c; cursor: default; }
   #status { font-size: 14px; color: #b5ada1; min-height: 18px;
             margin-top: 10px; text-align: left; }
-  #hashnote { font-size: 13px; color: #d8a95c; margin: 6px auto 0;
-              display: none; text-align: left; }
   #canvaswrap { display: none; position: relative; }
   canvas {
     display: block; image-rendering: pixelated;
@@ -146,25 +144,6 @@
   }
   #towerbtns button:hover, #towerbtns label:hover {
     border-color: #c08a44; color: #f0e9df; }
-  /* EXE line at the card's foot in towers mode: which copy is loaded,
-   * with quiet Change / Forget actions beside it. On the setup face the
-   * row is just a bare output line — no rule above it. */
-  #exerow { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
-  #menu.towers #exerow { margin-top: 12px;
-                         border-top: 1px solid rgba(196,183,168,.25);
-                         padding-top: 10px; }
-  #exerow #status { flex: 1 1 auto; margin-top: 0; }
-  .mini { background: none; border: 1px solid rgba(196,183,168,.35);
-          border-radius: 2px;
-          color: #b8b0a5; font-size: 12.5px; padding: 3px 9px;
-          cursor: pointer; font-family: inherit; flex: 0 0 auto; }
-  .mini:hover { border-color: #c08a44; color: #f0e9df; }
-  .mini.warn:hover { border-color: #b25a50; color: #d88a80; }
-  #findhelp { font-size: 14px; color: #c2bab0; text-align: left;
-              margin: 10px auto 0; }
-  #findhelp summary { cursor: pointer; color: #d8b06a; text-align: center; }
-  #findhelp ul { padding-left: 18px; line-height: 1.5;
-                 max-height: 34vh; overflow-y: auto; }
   #pagefoot { position: absolute; bottom: 0; left: 0; right: 0; z-index: 2;
               text-align: center; padding: 8px 12px 18px; }
   #pagefoot .privacy { font-size: 13px; color: #a29b91; margin: 2px 0;
@@ -223,63 +202,21 @@
     <div id="shade"></div>
     <h1>ConciliaTower</h1>
     <div id="menu">
-      <p class="tagline">Play <em>SimTower</em> in your web browser</p>
-      <input type="file" id="exefile" multiple>
-      <div id="setupmode">
-        <p>This is a faithful and accurate recreation of the original game.
-           All the SimTower code has been rewritten from scratch, but the
-           original game assets such as images and sound need to be loaded
-           from the 1994 release.</p>
-        <p>Insert your own copy of <b>SIMTOWER.EXE</b>, or the compressed
-           <b>SIMTOWER.EX_</b>. This page will parse it locally, extract
-           the assets, and let you play the game. Nothing is uploaded to a
-           server (besides a few analytics shown
-           <a href="https://conciliatower-roster.jonahss.workers.dev/"
-              target="_blank" rel="noopener">here</a>).</p>
-        <label class="pick" for="exefile">Load SimTower.EXE</label>
-        <details id="findhelp">
-          <summary>Where do I find SIMTOWER.EXE?</summary>
-          <ul>
-            <li><b>No copy?</b> Search the web for &ldquo;SimTower
-                download&rdquo;. The game hasn't been sold since the 90s and
-                preservation archives keep it; takes a minute. You'll get a
-                ZIP or a CD image. Open it (7-Zip handles both) and load
-                either <code>SIMTOWER.EXE</code> or <code>SIMTOWER.EX_</code>
-                from inside. Either works here as-is.</li>
-            <li><b>Installed folder?</b> Load <code>SIMTOWER.EXE</code>,
-                about 6&nbsp;MB.</li>
-            <li><b>CD or CD image?</b> The disc has it compressed as
-                <code>SIMTOWER.EX_</code> (underscore). Load that directly;
-                this page unpacks it.</li>
-            <li><b>Floppies?</b> Disks 2 and 3 hold
-                <code>SIMTOWER.E1_</code> and <code>SIMTOWER.E2_</code>.
-                Select both at once.</li>
-            <li>Windows releases only (1.0 and 1.1b). The Mac version
-                won't work.</li>
-          </ul>
-        </details>
-      </div>
-      <div id="towersmode" style="display:none">
+      <p class="tagline">Build your tower</p>
+      <div id="towersmode">
         <div id="towers">
           <h2>Your towers</h2>
           <div id="slotlist"></div>
         </div>
+        <label><input type="checkbox" id="sandbox"> Sandbox — all buildings unlocked</label>
         <button class="start" id="startbtn" disabled>Play</button>
         <div id="towerbtns">
           <button id="newslotbtn" type="button">New tower</button>
-          <label for="importfile">Import .sav / .TDT</label>
+          <label for="importfile">Import .sav / .TDT / .TWR</label>
           <input type="file" id="importfile" accept=".sav,.tdt,.twr">
         </div>
       </div>
-      <div id="exerow">
-        <div id="status"></div>
-        <label class="mini" for="exefile" id="changebtn"
-               style="display:none"
-               title="Load a different SIMTOWER.EXE">Change</label>
-        <button class="mini warn" id="forgetbtn" style="display:none"
-                title="Remove the remembered copy from this browser">Forget</button>
-      </div>
-      <div id="hashnote"></div>
+      <div id="status">Loading engine…</div>
     </div>
     </div>
     <div id="pagefoot">
@@ -321,24 +258,8 @@
   </div></div>
 
 <script>
-  var exeBytes = null;
   var statusEl = document.getElementById('status');
   var startBtn = document.getElementById('startbtn');
-  var forgetBtn = document.getElementById('forgetbtn');
-  var changeBtn = document.getElementById('changebtn');
-  var hashNote = document.getElementById('hashnote');
-
-  /* The menu card has two faces: setup (get an EXE in) and towers
-   * (manage + play). The EXE gates the switch — upload up front, then
-   * tower management. */
-  function setMenuMode(towers) {
-    document.getElementById('setupmode').style.display =
-      towers ? 'none' : 'block';
-    document.getElementById('towersmode').style.display =
-      towers ? 'block' : 'none';
-    document.getElementById('menu').classList.toggle('towers', !!towers);
-    changeBtn.style.display = towers ? 'inline-block' : 'none';
-  }
 
   /* ---- In-page dialog, replacing prompt()/confirm()/alert(). ----
    * ctModal returns a Promise: the input's value (or true when there is
@@ -412,228 +333,6 @@
     if (ev.target === modalEl) modalClose(null);
   });
 
-  /* Known builds, by SHA-256. 'verified' = the build every mechanic was
-   * byte-verified against; 'working' = structure-checked and boot-tested.
-   * Grows via PRs — see docs/SUPPORTED-BUILDS.md in the repo. */
-  var KNOWN_BUILDS = {
-    '801f2ba4c1b4d1ae2c1c9a032c5d37cff861f04deaa9542c2521c0a6a4ccd618':
-      { label: 'SimTower 1.1b (US, official patch)', status: 'verified' },
-    '2825a3c53f77945c63b6d72e26faa7dde5ddd56c31ca668e67a12576d7feca96':
-      { label: 'SimTower 1.0 (US, 1995 CD/floppy pressing)', status: 'working' },
-    'ecb91df191336e94efb95f4828970b6bc3cfaad802ee671902ab695f38490a42':
-      { label: 'SimTower 1.0 (US, original 1994 CD pressing)', status: 'working' }
-  };
-
-  /* --- structural check: is this file actually a SimTower EXE? ---
-   * Mirrors src/ne_resource.c: walk the Win16 NE resource table and
-   * require the six resource types the engine reads. Everything users
-   * grab by mistake (ZIPs, CD images, installers, the Mac version) gets
-   * a specific, helpful rejection instead of a mystery crash. */
-  var NEED_TYPES = [0x8002, 0xFF0A, 0xFF03, 0xFF02, 0xFF06, 0x8005];
-  function ascii(bytes, off, n) {
-    var s = '';
-    for (var i = 0; i < n && off + i < bytes.length; i++)
-      s += String.fromCharCode(bytes[off + i]);
-    return s;
-  }
-  function sniffExe(bytes) {
-    var rej = function (m) { return { ok: false, message: m }; };
-    if (bytes.length < 0x40)
-      return rej('That file is only a few bytes long — not a program at all.');
-    var m2 = ascii(bytes, 0, 2), m4 = ascii(bytes, 0, 4);
-    if (m4 === 'KWAJ')
-      return { ok: false, kwaj: true };
-    if (m4 === 'SZDD')
-      return rej('That’s an MS-compressed file (SZDD flavor). On Windows, ' +
-                 '`expand file.ex_ SIMTOWER.EXE` decompresses it; then ' +
-                 'bring the result here.');
-    if (m2 === 'PK')
-      return rej('That’s a ZIP archive, not the EXE itself. Unzip it, then ' +
-                 'pick the SIMTOWER.EXE — or the compressed SIMTOWER.EX_, ' +
-                 'which works here too — from inside.');
-    if (m4 === 'Rar!' || (bytes[0] === 0x37 && bytes[1] === 0x7A))
-      return rej('That’s a compressed archive. Extract it first, then ' +
-                 'pick the SIMTOWER.EXE from inside.');
-    if (bytes[0] === 0x1F && bytes[1] === 0x8B)
-      return rej('That’s a gzip archive. Extract it first, then pick ' +
-                 'the SIMTOWER.EXE from inside.');
-    if (m4 === 'MSCF')
-      return rej('That’s a Windows installer cabinet (.cab). The game ' +
-                 'file itself is usually right next to it — look for ' +
-                 'SIMTOWER.EXE, about 6 MB.');
-    if (ascii(bytes, 0x8001, 5) === 'CD001' || ascii(bytes, 0x9001, 5) === 'CD001')
-      return rej('That’s a CD image. Open it (7-Zip and most unarchivers ' +
-                 'can) and pick the SIMTOWER.EX_ from inside — yes, with ' +
-                 'the underscore; this page expands it for you.');
-    if (ascii(bytes, 0, 8) === 'StuffIt ' || m4 === 'SIT!' ||
-        ascii(bytes, 0, 39).indexOf('BinHex') >= 0)
-      return rej('That looks like the Macintosh release. Its art is stored ' +
-                 'differently and can’t work here — you need the ' +
-                 'Windows SIMTOWER.EXE.');
-    if (m2 !== 'MZ')
-      return rej('That doesn’t look like a Windows program file. ' +
-                 'You’re after SIMTOWER.EXE, about 6 MB.');
-    var dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-    var offNe = dv.getUint32(0x3C, true);
-    if (offNe + 0x40 > bytes.length)
-      return rej('That’s a DOS-era program, not SimTower for Windows.');
-    var sig = ascii(bytes, offNe, 2);
-    if (sig === 'PE')
-      return rej('That’s a modern 32-bit program — probably an installer ' +
-                 'or the wrong EXE. SimTower itself is a 16-bit program ' +
-                 'named SIMTOWER.EXE, about 6 MB.');
-    if (sig !== 'NE')
-      return rej('That’s a DOS-era program, not SimTower for Windows.');
-    /* Walk the NE resource table, tallying resources per type. */
-    try {
-      var offRt = dv.getUint16(offNe + 0x24, true);
-      var lsa = dv.getUint16(offNe + 0x32, true);
-      if (!offRt || lsa > 16) throw 0;
-      /* Some pressings name their custom types (ALRT..YEN) instead of
-       * using ordinals 0xFF01..0xFF0B — same types, same order. Resolve
-       * names back to the canonical ordinals, like the engine does. */
-      var NAMED = { ALRT:0xFF01, CGPK:0xFF02, CLUT:0xFF03, DTMP:0xFF04,
-                    PART:0xFF05, STRL:0xFF06, TABL:0xFF07, TABM:0xFF08,
-                    TEXT:0xFF09, WAVE:0xFF0A, YEN:0xFF0B };
-      var p = offNe + offRt + 2, types = {}, total = 0;
-      for (;;) {
-        var type = dv.getUint16(p, true);
-        if (!type) break;
-        var count = dv.getUint16(p + 2, true);
-        if (!(type & 0x8000)) {
-          var nameOff = offNe + offRt + type;
-          var nameLen = bytes[nameOff];
-          var name = ascii(bytes, nameOff + 1, nameLen);
-          type = NAMED[name] || 0;   /* unknown named type: don't tally */
-        }
-        if (type) {
-          types[type] = (types[type] || 0) + count;
-          total += count;
-        }
-        p += 8;
-        for (var i = 0; i < count; i++, p += 12) {
-          /* Every resource's data must actually be inside the file —
-           * catches truncated copies whose table survived the cut. */
-          var dOff = dv.getUint16(p, true) << lsa;
-          var dLen = dv.getUint16(p + 2, true) << lsa;
-          if (dOff + dLen > bytes.length)
-            return rej('That copy of SIMTOWER.EXE is truncated — its ' +
-                       'contents stop partway through. Re-extract or ' +
-                       're-download it (the full file is about 6 MB).');
-        }
-        if (p > bytes.length) throw 0;
-      }
-      if (types[0xFF0C] && types[0xFF0D])
-        return rej('That’s the Japanese original — The Tower for Windows ' +
-                   '(TOWER.EXE). Its resources are laid out differently ' +
-                   'and it isn’t supported yet; SimTower’s SIMTOWER.EXE is.');
-      var missing = NEED_TYPES.filter(function (t) { return !types[t]; });
-      if (missing.length)
-        return rej('It’s a Windows 3.1 program, but not SimTower — it ' +
-                   'lacks the game’s art and sound resources. (Did you ' +
-                   'pick SETUP.EXE? Look for SIMTOWER.EXE, about 6 MB.)');
-      return { ok: true, resources: total };
-    } catch (e) {
-      return rej('That file’s resource table is damaged — the copy may ' +
-                 'be truncated. Try re-extracting it.');
-    }
-  }
-
-  /* --- tiny IndexedDB keeper for the uploaded EXE (upload once) --- */
-  function exeDb() {
-    return new Promise(function (res, rej) {
-      var rq = indexedDB.open('ct-exe', 1);
-      rq.onupgradeneeded = function () { rq.result.createObjectStore('files'); };
-      rq.onsuccess = function () { res(rq.result); };
-      rq.onerror = function () { rej(rq.error); };
-    });
-  }
-  function exeStore(bytes) {
-    return exeDb().then(function (db) {
-      return new Promise(function (res, rej) {
-        var tx = db.transaction('files', 'readwrite');
-        tx.objectStore('files').put(bytes, 'SIMTOWER.EXE');
-        tx.oncomplete = res; tx.onerror = function () { rej(tx.error); };
-      });
-    });
-  }
-  function exeLoad() {
-    return exeDb().then(function (db) {
-      return new Promise(function (res) {
-        var rq = db.transaction('files').objectStore('files').get('SIMTOWER.EXE');
-        rq.onsuccess = function () { res(rq.result || null); };
-        rq.onerror = function () { res(null); };
-      });
-    });
-  }
-  function exeForget() {
-    return exeDb().then(function (db) {
-      return new Promise(function (res) {
-        var tx = db.transaction('files', 'readwrite');
-        tx.objectStore('files').delete('SIMTOWER.EXE');
-        tx.oncomplete = res; tx.onerror = res;
-      });
-    });
-  }
-
-  /* Hash lookup against the known-builds registry — advisory labeling
-   * only; the structure check above is what gates acceptance.
-   * crypto.subtle needs a secure context (https / localhost); on plain-
-   * http dev serving we just skip the lookup. */
-  function checkHash(bytes) {
-    if (!(window.crypto && crypto.subtle)) return Promise.resolve(null);
-    return crypto.subtle.digest('SHA-256', bytes).then(function (buf) {
-      return Array.from(new Uint8Array(buf))
-        .map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
-    }).catch(function () { return null; });
-  }
-
-  function acceptExe(bytes, label, persisted) {
-    exeBytes = bytes;
-    startBtn.disabled = false;
-    forgetBtn.style.display = persisted ? 'inline-block' : 'none';
-    setMenuMode(true);
-    checkHash(bytes).then(function (hash) {
-      var known = hash && KNOWN_BUILDS[hash];
-      var mark = '';
-      if (known && known.status === 'verified') {
-        hashNote.style.display = 'none';
-        mark = ' ✓ verified — ' + known.label;
-      } else if (known) {
-        hashNote.style.display = 'block';
-        hashNote.textContent = 'Recognized: ' + known.label + '. Mechanics ' +
-          'were byte-verified against the 1994 Maxis release; this build ' +
-          'plays fine — tiny differences are possible.';
-        mark = ' ✓ recognized';
-      } else if (hash) {
-        hashNote.style.display = 'block';
-        hashNote.textContent = 'This copy passes the SimTower structure ' +
-          'check but isn’t in our known-builds list yet — it should play ' +
-          'fine. If anything looks off, tell us and mention build id ' +
-          hash.slice(0, 12) + '.';
-      } else {
-        hashNote.style.display = 'none';
-      }
-      statusEl.textContent = label + ' (' + (bytes.length / 1024 | 0) +
-        ' KB)' + mark;
-    });
-  }
-
-  /* A rejected file never overwrites a remembered good copy. */
-  function rejectExe(message) {
-    hashNote.style.display = 'block';
-    hashNote.textContent = message;
-    statusEl.textContent = exeBytes
-      ? statusEl.textContent
-      : 'That wasn’t it — see the note below.';
-  }
-
-  /* --- KWAJ expansion (SIMTOWER.EX_ off the CD / floppy media) ---
-   * The original media never ships a plain EXE — it carries SIMTOWER.EX_
-   * in MS-Compress KWAJ form that modern tools can't expand. The engine
-   * wasm bundles libmspack's decompressor; we call it file-to-file on
-   * MEMFS. Floppy sets split it in two independent streams (.E1_/.E2_):
-   * expand each, then concatenate the OUTPUTS. */
   function readFileBytes(f) {
     return new Promise(function (res, rej2) {
       var r = new FileReader();
@@ -642,94 +341,6 @@
       r.readAsArrayBuffer(f);
     });
   }
-  function whenEngineReady() {
-    return new Promise(function (res) {
-      if (Module.engineReady) return res();
-      var t = setInterval(function () {
-        if (Module.engineReady) { clearInterval(t); res(); }
-      }, 100);
-    });
-  }
-  function expandKwaj(bytes) {
-    return whenEngineReady().then(function () {
-      FS.writeFile('/expand.in', bytes);
-      var err = Module.ccall('ct_kwaj_expand', 'number',
-                             ['string', 'string'], ['/expand.in', '/expand.out']);
-      if (err) throw new Error('decompressor error ' + err);
-      var out = FS.readFile('/expand.out');
-      FS.unlink('/expand.in'); FS.unlink('/expand.out');
-      return out;
-    });
-  }
-
-  /* Accept first, persist in the background — playability must never
-   * wait on IndexedDB (slow disk, private mode, quota). The forget
-   * button appears only once the copy is actually remembered. */
-  function finish(bytes, label) {
-    var v = sniffExe(bytes);
-    if (!v.ok) { rejectExe(v.message || 'Unexpected file — tell us.'); return; }
-    acceptExe(bytes, label, false);
-    exeStore(bytes).then(function () {
-      forgetBtn.style.display = 'inline-block';
-    }).catch(function () {});
-  }
-  function ingest(fileList) {
-    var files = Array.prototype.slice.call(fileList || []);
-    if (!files.length) return;
-    Promise.all(files.map(readFileBytes)).then(function (all) {
-      var e1 = null, e2 = null;
-      files.forEach(function (f, i) {
-        if (/\.e1_$/i.test(f.name)) e1 = all[i];
-        if (/\.e2_$/i.test(f.name)) e2 = all[i];
-      });
-      if (files.length === 2 && e1 && e2) {
-        statusEl.textContent = 'Floppy pair — expanding…';
-        return Promise.all([expandKwaj(e1), expandKwaj(e2)])
-          .then(function (parts) {
-            var joined = new Uint8Array(parts[0].length + parts[1].length);
-            joined.set(parts[0], 0);
-            joined.set(parts[1], parts[0].length);
-            finish(joined, 'SIMTOWER.E1_+E2_ (expanded)');
-          });
-      }
-      if (files.length !== 1) {
-        rejectExe('Drop one file (SIMTOWER.EXE or SIMTOWER.EX_) — or ' +
-                  'exactly two for the floppy pair SIMTOWER.E1_ + ' +
-                  'SIMTOWER.E2_.');
-        return;
-      }
-      if (e1 || e2) {
-        rejectExe('That’s one half of the floppy pair — select ' +
-                  'SIMTOWER.E1_ and SIMTOWER.E2_ together (from install ' +
-                  'disks 2 and 3) and drop both at once.');
-        return;
-      }
-      var name = files[0].name, bytes = all[0];
-      var v = sniffExe(bytes);
-      if (v.kwaj) {
-        statusEl.textContent = 'Compressed installer copy — expanding…';
-        return expandKwaj(bytes).then(function (out) {
-          finish(out, name + ' (expanded)');
-        });
-      }
-      finish(bytes, name);
-    }).catch(function (e) {
-      rejectExe('Expansion failed (' + e.message + ') — the file may be ' +
-                'damaged. Try re-extracting it from the CD image or ZIP.');
-    });
-  }
-
-  forgetBtn.addEventListener('click', function () {
-    exeForget().then(function () {
-      exeBytes = null;
-      startBtn.disabled = true;
-      forgetBtn.style.display = 'none';
-      hashNote.style.display = 'none';
-      setMenuMode(false);
-      statusEl.textContent = '';
-    });
-  });
-
   /* ---- Save-slot manager (web-plan C2-C4 + C6) ----------------------
    * A tower = one /persist/<name>.sav on IDBFS (plus the engine's
    * .1/.2/.3 crash-safety generations). The engine writes whatever
@@ -1030,35 +641,6 @@
     });
   });
 
-  /* Returning visitor: the remembered copy arms Play immediately and
-   * the menu goes straight to tower management. */
-  exeLoad().then(function (bytes) {
-    if (bytes && !exeBytes) acceptExe(bytes, 'Remembered SIMTOWER.EXE', true);
-  }).catch(function () {});
-
-  /* Dev hook: ?exe=NAME fetches the EXE from the server and auto-starts
-   * (headless testing). In production no such file is served — the
-   * fetch 404s and the normal upload flow stands. */
-  var devExe = new URLSearchParams(location.search).get('exe');
-  if (devExe && /^[A-Za-z0-9._-]+$/.test(devExe)) {
-    fetch(devExe).then(function (r) {
-      if (!r.ok) throw new Error('no dev exe');
-      return r.arrayBuffer();
-    }).then(function (buf) {
-      /* Run the real ingest pipeline (sniff + KWAJ expansion), then
-       * auto-start once it arms the button. */
-      ingest([new File([buf], devExe)]);
-      var wait = setInterval(function () {
-        if (!startBtn.disabled) { clearInterval(wait); startBtn.click(); }
-      }, 150);
-      setTimeout(function () { clearInterval(wait); }, 30000);
-    }).catch(function () {});
-  }
-
-  document.getElementById('exefile').addEventListener('change', function (e) {
-    ingest(e.target.files);
-  });
-
   /* ---- Analytics (self-hosted) --------------------------------------
    * Cookie-less pageview + gameplay-event tallies, kept in the same
    * Cloudflare Worker/KV as the tower roster — nothing third-party
@@ -1143,13 +725,14 @@
     onRuntimeInitialized: function () {
       Module.engineReady = true;
       renderSlots();    /* IDBFS is loaded (run dependency) — list towers */
+      startBtn.disabled = false;
+      statusEl.textContent = '';
     },
     print: function (t) { console.log(t); },
     printErr: function (t) { console.warn(t); }
   };
 
   startBtn.addEventListener('click', function () {
-    if (!exeBytes) return;
     ctEvent('play');
     /* Roster login: report this tower's saved vitals (fresh slots and
      * staged imports have no readable save yet — name-only is fine). */
@@ -1157,29 +740,19 @@
     ctRoster(rm && rm.exact
       ? { n: currentSlot, d: rm.day, p: rm.pop, s: rm.stars, m: rm.money }
       : { n: currentSlot });
-    var boot = function () {
-      FS.writeFile('/SIMTOWER.EXE', exeBytes);
-      var args = ['/SIMTOWER.EXE', '--save=' + slotPath(currentSlot)];
-      if (pendingTdt && pendingTdt.slot === currentSlot) {
-        /* Staged original-format tower: hand it to the engine's boot
-         * importer; the engine persists it into the slot immediately. */
-        FS.writeFile('/import.tdt', pendingTdt.bytes);
-        args.push('/import.tdt');
-        pendingTdt = null;
-      }
-      try { localStorage.setItem('ct-slot', currentSlot); } catch (e) {}
-      document.getElementById('stage').style.display = 'none';
-      document.getElementById('canvaswrap').style.display = 'block';
-      Module.callMain(args);
-      Module.canvas.focus();
-    };
-    if (Module.engineReady) boot();
-    else {
-      statusEl.textContent = 'Engine still loading…';
-      var wait = setInterval(function () {
-        if (Module.engineReady) { clearInterval(wait); boot(); }
-      }, 150);
+    ENV.CT_MODE = String(Number(document.getElementById('sandbox').checked));
+    if (pendingTdt && pendingTdt.slot === currentSlot) {
+      /* Staged original-format tower: hand it to the engine's boot
+       * importer; the engine persists it into the slot immediately. */
+      FS.writeFile('/import.tdt', pendingTdt.bytes);
+      ENV.CT_TWR = '/import.tdt';
+      pendingTdt = null;
     }
+    try { localStorage.setItem('ct-slot', currentSlot); } catch (e) {}
+    document.getElementById('stage').style.display = 'none';
+    document.getElementById('canvaswrap').style.display = 'block';
+    Module.callMain(['--save=' + slotPath(currentSlot)]);
+    Module.canvas.focus();
   });
 
   /* Audio gate — hidden tab OR the mute button suspends the Web Audio
@@ -1212,22 +785,6 @@
     if (document.fullscreenElement) document.exitFullscreen();
     else if (wrap.requestFullscreen) wrap.requestFullscreen();
     Module.canvas.focus();
-  });
-
-  /* Drag-and-drop the EXE anywhere on the title screen. */
-  var stageEl = document.getElementById('stage');
-  var menuEl = document.getElementById('menu');
-  stageEl.addEventListener('dragover', function (ev) {
-    ev.preventDefault();
-    menuEl.style.borderColor = '#c08a44';
-  });
-  stageEl.addEventListener('dragleave', function () {
-    menuEl.style.borderColor = 'rgba(196,183,168,.28)';
-  });
-  stageEl.addEventListener('drop', function (ev) {
-    ev.preventDefault();
-    menuEl.style.borderColor = 'rgba(196,183,168,.28)';
-    ingest(ev.dataTransfer.files);
   });
 
   /* Wasm abort → a readable apology instead of a frozen canvas (E5).
