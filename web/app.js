@@ -8,6 +8,12 @@ const canvas = Module.canvas;
 let playing = false;
 let saving = false;
 let tool = -3;
+let placing = false;
+let previewValid = false;
+let category = 'rooms';
+const catalog = document.getElementById('catalog');
+const inspector = document.getElementById('inspector');
+const styleNames = ['schematic', 'modern-pixel', 'warm-dollhouse', 'miniature-3d'];
 let installPrompt = null;
 const pointers = new Map();
 let gesture = false;
@@ -33,17 +39,68 @@ new ResizeObserver(resizeWorld).observe(world);
 window.addEventListener('resize', resizeWorld);
 function selectTool(value) {
   Module.ccall('ct_tool', null, ['number'], [value]);
-  const state = JSON.parse(Module.ccall('ct_ui_state', 'string', [], []));
-  tool = state.currentTool;
-  value = tool;
-  document.querySelectorAll('[data-tool]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.tool) === value)));
-  document.getElementById('buildbtn').setAttribute('aria-pressed', String(value > 0));
+  tool = JSON.parse(Module.ccall('ct_ui_state', 'string', [], [])).currentTool;
 }
-function changeZoom(value) {
+function renderCatalog() {
+  const state = JSON.parse(Module.ccall('ct_ui_state', 'string', [], []));
+  document.querySelectorAll('[data-category]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.category === category)));
+  document.getElementById('cards').replaceChildren(...buildings[category].map(([id, name]) => {
+    const card = document.createElement('button');
+    card.className = 'buildcard';
+    card.disabled = !state.unlocked.includes(id);
+    const image = document.createElement('img');
+    image.src = 'art/catalog/' + styleNames[state.style] + '/' + id + '.png';
+    image.alt = '';
+    const label = document.createElement('span');
+    label.textContent = name;
+    if (card.disabled) {
+      const lock = document.createElement('small');
+      lock.textContent = 'Unlock at a higher rating';
+      label.append(lock);
+    }
+    card.append(image, label);
+    card.onclick = () => {
+      selectTool(id);
+      if (tool !== id) { renderCatalog(); return; }
+      placing = true;
+      previewValid = false;
+      document.getElementById('normaltools').hidden = true;
+      document.getElementById('placement').hidden = false;
+      document.getElementById('placementname').textContent = name;
+      document.getElementById('placementhint').textContent = 'Tap or drag to position';
+      document.getElementById('placebtn').disabled = true;
+      catalog.close();
+      preview(world.clientWidth / 2, world.clientHeight / 2, world.clientWidth / 2, world.clientHeight / 2);
+    };
+    return card;
+  }));
+}
+function cancelPlacement() {
+  Module.ccall('ct_cancel_preview', null, [], []);
+  placing = false;
+  previewValid = false;
+  document.getElementById('normaltools').hidden = false;
+  document.getElementById('placement').hidden = true;
+  selectTool(-3);
+}
+function preview(x1, y1, x2, y2) {
+  previewValid = Boolean(Module.ccall('ct_preview', 'number', ['number', 'number', 'number', 'number'], [x1, y1, x2, y2]));
+  document.getElementById('placebtn').disabled = !previewValid;
+  document.getElementById('placementhint').textContent = 'Cannot build here — try another spot';
+  if (previewValid) document.getElementById('placementhint').textContent = 'Ready to place · drag to adjust';
+}
+
+function changeZoom(value, x = world.clientWidth / 2, y = world.clientHeight / 2) {
   zoom.value = String(Math.min(3, Math.max(0.5, value)));
   document.getElementById('zoomvalue').textContent = Math.round(Number(zoom.value) * 100) + '%';
   localStorage.setItem('ct-zoom', zoom.value);
-  Module.ccall('ct_set_zoom', null, ['number'], [Number(zoom.value)]);
+  Module.ccall('ct_set_zoom_at', null, ['number', 'number', 'number'], [Number(zoom.value), x, y]);
+  if (placing) {
+    Module.ccall('ct_cancel_preview', null, [], []);
+    previewValid = false;
+    document.getElementById('placebtn').disabled = true;
+    document.getElementById('placementhint').textContent = 'Tap or drag to position';
+  }
 }
 function saveTower() {
   if (!playing) return Promise.resolve(false);
@@ -71,29 +128,48 @@ function ctStartShell() {
     ctAlert('Style unavailable', 'The selected graphics could not be loaded.');
     style.value = String(JSON.parse(Module.ccall('ct_ui_state', 'string', [], [])).style);
   }
+  resizeWorld();
   changeZoom(Number(zoom.value));
   Module.ccall('ct_set_ui_scale', null, ['number'], [Number(uiScale.value)]);
-  resizeWorld();
   selectTool(-3);
   saveTower();
 }
-document.getElementById('category').onchange = () => {
-  const select = document.getElementById('building');
-  select.replaceChildren(...buildings[document.getElementById('category').value].map(([id, name]) => new Option(name, id)));
-  if (playing && tool > 0) selectTool(Number(select.value));
+for (const [key, label] of [['structure', 'Structure'], ['rooms', 'Rooms'], ['transport', 'Transport'], ['services', 'Services']]) {
+  const button = document.createElement('button');
+  button.textContent = label;
+  button.dataset.category = key;
+  button.onclick = () => { category = key; renderCatalog(); };
+  document.getElementById('categories').append(button);
+}
+document.getElementById('buildbtn').onclick = () => { renderCatalog(); catalog.showModal(); };
+document.getElementById('cancelbuild').onclick = cancelPlacement;
+document.getElementById('placebtn').onclick = () => {
+  if (!previewValid) return;
+  if (Module.ccall('ct_place', 'number', [], [])) { cancelPlacement(); return; }
+  previewValid = false;
+  document.getElementById('placebtn').disabled = true;
+  document.getElementById('placementhint').textContent = 'Cannot build here — try another spot';
 };
-document.getElementById('category').onchange();
-document.getElementById('building').onchange = event => selectTool(Number(event.target.value));
-document.getElementById('buildbtn').onclick = () => selectTool(Number(document.getElementById('building').value));
-document.querySelectorAll('[data-tool]').forEach(button => { button.onclick = () => selectTool(Number(button.dataset.tool)); });
+document.getElementById('useobject').onclick = () => {
+  inspector.close();
+  Module.ccall('ct_use_selected', null, [], []);
+};
+document.getElementById('deleteobject').onclick = async () => {
+  const name = document.getElementById('objectname').textContent;
+  inspector.close();
+  if (!await ctConfirm({title: 'Delete ' + name + '?', body: 'Remove this object from your tower? This cannot be undone.', okLabel: 'Delete', danger: true})) return;
+  if (!Module.ccall('ct_delete_selected', 'number', [], [])) ctAlert('Could not delete', 'This object cannot be removed right now.');
+};
 document.getElementById('speed').onchange = event => Module.ccall('ct_control', null, ['number'], [Number(event.target.value)]);
 document.getElementById('savebtn').onclick = saveTower;
-document.getElementById('menubtn').onclick = () => Module.ccall('ct_menu', null, ['number'], [0]);
 document.getElementById('openmenubtn').onclick = () => {
   settings.close();
   Module.ccall('ct_menu', null, ['number'], [Number(document.getElementById('gamemenu').value)]);
 };
-document.getElementById('settingsbtn').onclick = () => settings.showModal();
+document.getElementById('settingsbtn').onclick = () => {
+  if (placing) cancelPlacement();
+  settings.showModal();
+};
 style.onchange = () => {
   localStorage.setItem('ct-style', style.value);
   if (!Module.ccall('ct_set_style', 'number', ['number'], [Number(style.value)])) {
@@ -134,6 +210,12 @@ canvas.addEventListener('pointerdown', event => {
     pinching = true;
     const [a, b] = [...pointers.values()];
     pinchDistance = Math.hypot(a.x - b.x, a.y - b.y);
+    if (placing) {
+      Module.ccall('ct_cancel_preview', null, [], []);
+      previewValid = false;
+      document.getElementById('placebtn').disabled = true;
+      document.getElementById('placementhint').textContent = 'Tap or drag to position';
+    }
   }
 });
 canvas.addEventListener('pointermove', event => {
@@ -143,15 +225,20 @@ canvas.addEventListener('pointermove', event => {
   const dy = event.clientY - previous.y;
   previous.x = event.clientX;
   previous.y = event.clientY;
+  if (JSON.parse(Module.ccall('ct_ui_state', 'string', [], [])).modal) return;
+  const rect = canvas.getBoundingClientRect();
   if (pointers.size === 2) {
-    if (JSON.parse(Module.ccall('ct_ui_state', 'string', [], [])).modal) return;
     const [a, b] = [...pointers.values()];
     const distance = Math.hypot(a.x - b.x, a.y - b.y);
-    if (pinchDistance > 0) changeZoom(Number(zoom.value) * distance / pinchDistance);
+    const x = (a.x + b.x) / 2 - rect.left;
+    const y = (a.y + b.y) / 2 - rect.top;
+    Module.ccall('ct_pan', null, ['number', 'number'], [dx / 2, dy / 2]);
+    if (pinchDistance > 0) changeZoom(Number(zoom.value) * distance / pinchDistance, x, y);
     pinchDistance = distance;
-  } else {
+  } else if (!pinching) {
     if (Math.hypot(previous.x - previous.startX, previous.y - previous.startY) > 8) gesture = true;
-    if (gesture && tool <= 0 && !JSON.parse(Module.ccall('ct_ui_state', 'string', [], [])).modal) Module.ccall('ct_pan', null, ['number', 'number'], [dx, dy]);
+    if (placing) preview(previous.startX - rect.left, previous.startY - rect.top, event.clientX - rect.left, event.clientY - rect.top);
+    else if (gesture) Module.ccall('ct_pan', null, ['number', 'number'], [dx, dy]);
   }
 });
 canvas.addEventListener('pointerup', event => {
@@ -159,29 +246,50 @@ canvas.addEventListener('pointerup', event => {
   const start = pointers.get(event.pointerId);
   pointers.delete(event.pointerId);
   if (pinching) return;
-  const modal = JSON.parse(Module.ccall('ct_ui_state', 'string', [], [])).modal;
-  if (!modal && tool === -3) return;
-  if (!modal && gesture && tool <= 0) return;
-  canvas.dispatchEvent(new MouseEvent('mousemove', {bubbles: true, clientX: start.startX, clientY: start.startY}));
-  canvas.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, clientX: start.startX, clientY: start.startY, button: 0, buttons: 1}));
-  canvas.dispatchEvent(new MouseEvent('mousemove', {bubbles: true, clientX: event.clientX, clientY: event.clientY, buttons: 1}));
+  const state = JSON.parse(Module.ccall('ct_ui_state', 'string', [], []));
+  const rect = canvas.getBoundingClientRect();
+  if (!state.modal) {
+    if (placing) {
+      preview(start.startX - rect.left, start.startY - rect.top, event.clientX - rect.left, event.clientY - rect.top);
+      return;
+    }
+    if (gesture) return;
+    const object = JSON.parse(Module.ccall('ct_inspect', 'string', ['number', 'number'], [event.clientX - rect.left, event.clientY - rect.top]));
+    if (!object.name) return;
+    document.getElementById('objectname').textContent = object.name;
+    document.getElementById('objectdetails').textContent = object.details;
+    document.getElementById('deleteobject').hidden = !object.canDelete;
+    document.getElementById('useobject').hidden = !object.canUse;
+    inspector.showModal();
+    return;
+  }
+  if (gesture) return;
+  canvas.dispatchEvent(new MouseEvent('mousemove', {bubbles: true, clientX: event.clientX, clientY: event.clientY}));
+  canvas.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, clientX: event.clientX, clientY: event.clientY, button: 0, buttons: 1}));
   canvas.dispatchEvent(new MouseEvent('mouseup', {bubbles: true, clientX: event.clientX, clientY: event.clientY, button: 0}));
 });
-canvas.addEventListener('pointercancel', event => { pointers.delete(event.pointerId); pinching = true; });
+canvas.addEventListener('pointercancel', event => {
+  pointers.delete(event.pointerId);
+  pinching = true;
+  if (placing) {
+    Module.ccall('ct_cancel_preview', null, [], []);
+    previewValid = false;
+    document.getElementById('placebtn').disabled = true;
+  }
+});
 canvas.addEventListener('wheel', event => {
   event.preventDefault();
   if (JSON.parse(Module.ccall('ct_ui_state', 'string', [], [])).modal) return;
-  changeZoom(Number(zoom.value) * Math.exp(-event.deltaY * 0.001));
+  const rect = canvas.getBoundingClientRect();
+  changeZoom(Number(zoom.value) * Math.exp(-event.deltaY * 0.001), event.clientX - rect.left, event.clientY - rect.top);
 }, {passive: false});
 setInterval(() => {
   if (!playing) return;
   const state = JSON.parse(Module.ccall('ct_ui_state', 'string', [], []));
   tool = state.currentTool;
-  if (state.paused) document.getElementById('speed').value = '0';
-  else if (document.getElementById('speed').value === '0') document.getElementById('speed').value = '1';
-  document.querySelectorAll('[data-tool]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.tool) === tool)));
-  document.getElementById('buildbtn').setAttribute('aria-pressed', String(tool > 0));
-  document.getElementById('towerstats').textContent = fmtMoney(state.money) + ' · ' + starsTxt(state.stars) + ' · ' + state.population + ' people · Day ' + (state.day + 1) + ' ' + String(state.hour).padStart(2, '0') + ':' + String(state.minute).padStart(2, '0');
+  document.getElementById('speed').value = String(state.speed);
+  document.getElementById('money').textContent = fmtMoney(state.money);
+  document.getElementById('clock').textContent = starsTxt(state.stars) + ' · ' + state.population + ' people · Day ' + (state.day + 1) + ' ' + String(state.hour).padStart(2, '0') + ':' + String(state.minute).padStart(2, '0');
   if (state.saveBlocked) saveState.textContent = 'Saving blocked — export a backup';
 }, 100);
 setInterval(saveTower, 30000);
@@ -214,7 +322,7 @@ modalEl.addEventListener('keydown', event => {
     controls[(index + controls.length) % controls.length].focus();
   }
 });
-for (const dialog of [settings, modalEl]) {
+for (const dialog of [settings, catalog, inspector, modalEl]) {
   for (const type of ['keydown', 'keyup']) dialog.addEventListener(type, event => event.stopPropagation());
 }
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(error => console.warn('Offline setup failed', error));

@@ -1095,7 +1095,7 @@ static void lobby_mirror_upper_rows(Tower *tower, int left, int right)
     }
 }
 
-uint16_t tower_place(Tower *tower, ItemType type, int floor, int x)
+static uint16_t place_item(Tower *tower, ItemType type, int floor, int x, int preview)
 {
     /* The floor tool builds deck cells, no tenant record — success
      * returns a sentinel id that maps to no tenant. */
@@ -1110,7 +1110,7 @@ uint16_t tower_place(Tower *tower, ItemType type, int floor, int x)
     if (!tower_can_place(tower, type, floor, x)) {
         /* log real (clicked) refusals only — the every-frame ghost
          * preview stays quiet (see set_reject) */
-        if (last_reject[0])
+        if (last_reject[0] && !preview)
             printf("  [reject] %s (%s f%d x%d)\n", last_reject,
                    tower_item_name(type), floor, x);
         return 0;
@@ -1181,7 +1181,7 @@ uint16_t tower_place(Tower *tower, ItemType type, int floor, int x)
             if (charge > 0) {
                 tower->money -= charge;
                 tower->built_value += charge;
-                printf("Extended lobby on F%d: now x=%d w=%d (+%d cells, cost $%ld, balance $%ld)\n",
+                if (!preview) printf("Extended lobby on F%d: now x=%d w=%d (+%d cells, cost $%ld, balance $%ld)\n",
                        floor, final_left, existing_lobby->width, new_cells, charge, tower->money);
             }
             if (tower->lobby_height == 0) tower->lobby_height = 1;
@@ -1256,7 +1256,7 @@ uint16_t tower_place(Tower *tower, ItemType type, int floor, int x)
      * defaults, 2026-07-11 vacancy referee: armed=1, category=0xFF) */
     t->demand_armed = 1;
     t->demand_category = 0xFF;
-    if (type == ITEM_CINEMA)          t->movie_id = (uint8_t)(rand() % 14);
+    if (type == ITEM_CINEMA && !preview) t->movie_id = (uint8_t)(rand() % 14);
     else if (type == ITEM_PARTY_HALL) t->movie_id = 0xFF;  /* Average until JudgeT moves it */
     /* Art style from the per-type rotation. (EXE quirk not kept: it
      * advances the counter even when placement FAILS — invisible, and
@@ -1310,7 +1310,7 @@ uint16_t tower_place(Tower *tower, ItemType type, int floor, int x)
             fill_floor_gaps(tower, f);
     }
 
-    printf("Placed %s at floor %d, x=%d (cost $%ld, balance $%ld)\n",
+    if (!preview) printf("Placed %s at floor %d, x=%d (cost $%ld, balance $%ld)\n",
            tower_item_name(type), floor, x, charged, tower->money);
 
     /* First build locks the lobby-height choice at 1 if the UI didn't
@@ -1320,6 +1320,17 @@ uint16_t tower_place(Tower *tower, ItemType type, int floor, int x)
         lobby_mirror_upper_rows(tower, x, x + width);
 
     return id;
+}
+
+uint16_t tower_place(Tower *tower, ItemType type, int floor, int x)
+{
+    return place_item(tower, type, floor, x, 0);
+}
+
+/* Mutate a caller-owned trial Tower without consuming the live random stream. */
+uint16_t tower_preview_place(Tower *trial, ItemType type, int floor, int x)
+{
+    return place_item(trial, type, floor, x, 1);
 }
 
 int tower_remove(Tower *tower, uint16_t tenant_id)

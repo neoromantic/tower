@@ -1,5 +1,8 @@
 const cacheName = 'tower-__CT_VERSION__';
-const assets = ['./', 'index.html', 'index.js', 'index.wasm', 'hero.png', 'app.js', 'app.css', 'manifest.webmanifest', 'art/icon-192.png', 'art/icon-512.png'];
+const assets = ['./', 'index.html', 'index.js', 'index.wasm', 'index.data', 'hero.png', 'app.js', 'app.css', 'manifest.webmanifest', 'art/icon-192.png', 'art/icon-512.png'];
+for (const style of ['schematic', 'modern-pixel', 'warm-dollhouse', 'miniature-3d']) {
+  for (let type = 1; type <= 25; type++) assets.push('art/catalog/' + style + '/' + type + '.png');
+}
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(cacheName).then(cache => cache.addAll(assets.map(asset => new Request(asset, {cache: 'reload'})))));
 });

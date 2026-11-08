@@ -13,6 +13,13 @@
 #define MAX_SPRITES 512
 
 typedef struct {
+    SDL_Rect logical;
+    int page, x, y;
+} SpriteRegion;
+
+typedef struct {
+    SpriteRegion *regions;
+    int region_count;
     uint16_t     id;        /* Resource ID (e.g., 0x8568 = lobby) */
     uint16_t     type;      /* Resource type (0x8002 = DIB, 0xFF02 = raw) */
     SDL_Texture *texture;   /* GPU texture for rendering */
@@ -20,6 +27,9 @@ typedef struct {
 } Sprite;
 
 typedef struct {
+    SDL_Texture **pages;
+    int page_count, hd_scale;
+    unsigned hd_bytes;
     Sprite   sprites[MAX_SPRITES];
     int      count;
     
@@ -70,6 +80,11 @@ int sprites_compose_h(SpriteAtlas *atlas, SDL_Renderer *renderer,
  * The new sprite is stored with new_id. Returns 0 on success. */
 int sprites_compose_v(SpriteAtlas *atlas, SDL_Renderer *renderer,
                       uint16_t id_top, uint16_t id_bottom, uint16_t new_id);
+
+/* HD metadata uses logical rectangles; pages contain physical pixels per logical unit from the pack header. */
+int sprites_load_hd(SpriteAtlas *atlas, SDL_Renderer *renderer, const char *path);
+void sprites_copy(SDL_Renderer *renderer, SpriteAtlas *atlas, Sprite *sprite,
+                  const SDL_Rect *src, const SDL_Rect *dst);
 
 /* Free all textures */
 void sprites_free(SpriteAtlas *atlas);
