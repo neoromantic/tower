@@ -75,7 +75,13 @@ for style in ['schematic', 'modern-pixel', 'warm-dollhouse', 'miniature-3d']:
             continue
         w, h = rec['width'], rec['height']
         category = rec['source']
-        if 0x8384 <= rid < 0x8388:
+        if rid == 0x83E8:
+            wall = cells['rooms'][12].convert('RGB')
+            wall = wall.crop((0, 0, wall.width, min(16, wall.height)))
+            image = fit(wall, w, h, True)
+            joist = fit(cells['exterior-effects'][5].convert('RGB'), w, 12, True)
+            image.alpha_composite(joist, (0, 0))
+        elif 0x8384 <= rid < 0x8388:
             row_h = h // 4
             image = Image.new('RGBA', (w * SCALE, h * SCALE))
             cloud = fit(cells['exterior-effects'][3], w, row_h)
