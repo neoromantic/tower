@@ -554,6 +554,14 @@ typedef struct {
 } Game;
 
 static Game game;
+#ifdef __EMSCRIPTEN__
+static int web_visual, web_ghost, web_end_floor, web_end_cell;
+static int web_ghost_x, web_ghost_floor, web_ghost_width, web_ghost_height, web_ghost_valid, web_ghost_count;
+static long web_ghost_cost;
+static char web_ghost_reason[160];
+EM_JS(void, web_sound, (int id), { window.ctSound(id); });
+EM_JS(void, web_sound_loop, (int id, int on), { window.ctSoundLoop(id, on); });
+#endif
 
 /* Route-loss confirmation (defined with the other modals below; the
  * stop-toggle and demolish paths above them need the entry points). */
@@ -716,7 +724,7 @@ static const MenuItem menu_file[] = {
     { NULL, ITEM_NONE, ACT_NONE },     /* separator */
     { "Quit\tQ",           ITEM_NONE,  ACT_QUIT },
 };
-#define MENU_FILE_COUNT 10
+#define MENU_FILE_COUNT 11
 
 /* Options menu — the original's Animation/Sound toggle block (menu ids
  * 40009-40013) plus Call Fire Rescue (40008): the EXE's hidden mid-fire
@@ -8276,6 +8284,9 @@ static void find_dialog_click(int mx, int my, int clicks)
 
 static void render(void)
 {
+#ifdef __EMSCRIPTEN__
+    if (web_visual) return;
+#endif
     /* Cursor follows the active tool: crosshair while bulldozing, else arrow. */
     SDL_Cursor *want = game.demolish_mode ? game.cursor_demolish : game.cursor_arrow;
     if (want && SDL_GetCursor() != want) SDL_SetCursor(want);
@@ -9139,6 +9150,9 @@ static void cap_drag_track(void)
 /* ---------- Input handling ---------- */
 static void handle_event(SDL_Event *ev)
 {
+#ifdef __EMSCRIPTEN__
+    if (web_visual && ev->type != SDL_QUIT && ev->type != SDL_WINDOWEVENT) return;
+#endif
     if (ev->type == SDL_MOUSEMOTION) {
         ev->motion.x /= game.dpr * game.ui_scale;
         ev->motion.y /= game.dpr * game.ui_scale;
@@ -10007,6 +10021,9 @@ static void sound_shim(int wav_id)
                wav_id == AMB_SEASON_SANTA ||
                (wav_id >= 0xA329 && wav_id <= 0xA337));   /* cinema soundtracks */
     if (amb ? !game.snd_bg : sound_muted(wav_id)) return;
+#ifdef __EMSCRIPTEN__
+    if (web_visual) { web_sound(wav_id); return; }
+#endif
     audio_play((uint16_t)wav_id, amb ? 0.35f : 0.55f);
 }
 
@@ -10678,6 +10695,7 @@ void ct_tool(int tool)
 {
     if (tool >= ITEM_TYPE_COUNT || tool < -3) return;
     if (tool > 0 && !item_unlocked(tool)) return;
+    web_ghost = 0;
     game.build_type = ITEM_NONE;
     if (tool > 0) game.build_type = tool;
     game.demolish_mode = tool == -1;
@@ -10730,16 +10748,17 @@ const char *ct_ui_state(void)
     snprintf(state, sizeof state,
         "{\"money\":%ld,\"day\":%d,\"hour\":%d,\"minute\":%d,"
         "\"stars\":%d,\"population\":%d,\"paused\":%d,\"currentTool\":%d,"
-        "\"style\":%d,\"zoom\":%.3f,\"saveBlocked\":%d,\"modal\":%d}",
+        "\"style\":%d,\"zoom\":%.3f,\"speed\":%d,\"running\":%d,\"mapMode\":%d,\"debug\":%d,\"saveBlocked\":%d,\"modal\":%d}",
         game.tower.money, game.tower.day, game.sim.hour, game.sim.minute,
         game.tower.star_rating, game.tower.population, game.sim.speed == SPEED_PAUSED,
-        tool, game.style, game.zoom, game.autosave_blocked,
+        tool, game.style, game.zoom, game.sim.speed, game.running, game.map_mode, game.show_debug, game.autosave_blocked,
         game.quit_confirm || game.route_confirm || game.notice_modal ||
         game.disaster_modal || game.find_open || game.name_edit_open ||
         game.movie_dlg_open || game.elv_open || game.inspect_open || game.person_open ||
         game.fin_open || game.menu_open >= 0);
     return state;
 }
+#include "web_view.inc"
 #endif
 
 int main(int argc, char *argv[])
@@ -10825,6 +10844,10 @@ int main(int argc, char *argv[])
      * CT_SOUND_CAPTURE=<path> renders a WAV headless (no device) instead of
      * playing live. Event->sound map: referee_sound_events_2026-07-13.md. */
     g_sound_capture = getenv("CT_SOUND_CAPTURE") != NULL;
+#ifdef __EMSCRIPTEN__
+    if (web_visual) { g_sound_hook = sound_shim; play_snd(SND_STARTUP); }
+    else
+#endif
     if (g_sound_capture ? (audio_init_capture() == 0) : (audio_init() == 0)) {
         int nclips = audio_load_from_ne(&game.exe);
         printf("Audio: %d sound effects loaded%s\n", nclips,
@@ -11242,8 +11265,16 @@ int main(int argc, char *argv[])
                                             build_origin_floor(game.build_type,
                                                                game.mouse_floor),
                                             build_origin_cell(game.mouse_cell)));
-            if (drag_now && !prev_drag)      audio_start_loop(SND_BUILD_DRAG, 0.5f);
-            else if (!drag_now && prev_drag) audio_stop_loop();
+#ifdef __EMSCRIPTEN__
+            if (web_visual) {
+                if (drag_now && !prev_drag) web_sound_loop(SND_BUILD_DRAG, 1);
+                else if (!drag_now && prev_drag) web_sound_loop(SND_BUILD_DRAG, 0);
+            } else
+#endif
+            {
+                if (drag_now && !prev_drag) audio_start_loop(SND_BUILD_DRAG, 0.5f);
+                else if (!drag_now && prev_drag) audio_stop_loop();
+            }
             prev_drag = drag_now;
         }
 
@@ -11314,9 +11345,18 @@ int main(int argc, char *argv[])
                  * fire burned silently (Jonah, 2026-08-12). */
                 int want = (game.sim.event.active &&
                             game.sim.event.type == EVENT_FIRE) ? 1 : 0;
+#ifdef __EMSCRIPTEN__
+                if (web_visual && sound_muted(SND_FIRE_LOOP)) want = 0;
+#endif
                 if (want != prev_loop) {
-                    audio_stop_loop();
-                    if (want == 1) audio_start_loop(SND_FIRE_LOOP, 0.5f);
+#ifdef __EMSCRIPTEN__
+                    if (web_visual) web_sound_loop(SND_FIRE_LOOP, want);
+                    else
+#endif
+                    {
+                        audio_stop_loop();
+                        if (want == 1) audio_start_loop(SND_FIRE_LOOP, 0.5f);
+                    }
                     prev_loop = want;
                 }
                 /* #10014 is the BOMB-HUNT search tick (census: guard

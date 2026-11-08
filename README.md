@@ -1,21 +1,23 @@
 # ConciliaTower
 
-A tower-building simulation in C and SDL2, with a WebAssembly browser build.
+A tower-building simulation with a C/WebAssembly core, a Three.js browser view
+and a native SDL2 frontend.
 Based on [ConciliaTower by Jonahss](https://github.com/Jonahss/concilia-tower),
 the original C/SDL browser port.
 Build offices, homes, hotels and transport, manage tenants and finances, and
 advance through the star ratings. Sandbox mode unlocks every building.
 
-![Gameplay with bundled original resources](screenshots/original-gameplay.png)
+![Example tower in the Three.js browser view](screenshots/three-gameplay.png)
 
 Play at [tower.sergeybaus.com](https://tower.sergeybaus.com).
 
 ## Browser
 
 Requires [Emscripten](https://emscripten.org/docs/getting_started/downloads.html)
-and Python 3. From the repository root:
+Bun, Python 3 and uv. From the repository root:
 
 ```sh
+bun install --frozen-lockfile
 make web
 python3 -m http.server 8611 --directory web/dist
 ```
@@ -35,8 +37,10 @@ Safari's toolbar itself. Progress and settings are local to this browser and
 origin. A completed save message means the IndexedDB sync finished; export a
 backup for a copy outside browser storage. See [mobile play](docs/mobile.md).
 
-Architecture concepts remain [discussion documents](docs/experiments/README.md),
-not game settings or implemented alternative engines.
+This branch implements the [Three.js browser presentation](docs/three-renderer.md):
+source-resolution art, smooth DPR rendering, shallow geometry and camera parallax,
+DOM menus/panels and Web Audio synthesis. Native SDL remains available.
+The experimental branch does not replace the production deployment.
 
 Saves stay in this browser. The title screen lets you rename, duplicate, delete,
 import and download towers. Import `.sav` browser backups or SimTower 1.1
@@ -79,9 +83,9 @@ and regeneration instructions are documented in [the art provenance](data/art/PR
 and [the audio provenance](data/RESOURCE-AUDIO.md).
 The new splash is documented in [its provenance](web/art/splash-provenance.json).
 The four complete style packs and source mappings are documented in
-[style packs](docs/style-packs.md). New generated source sheets use explicitly
-selected Images 2.6 Flare with model-routing metadata; deterministic packing
-keeps the engine resource geometry, states and synthesized audio.
+[style packs](docs/style-packs.md). Existing source sheets retain their historical model-routing metadata.
+The Three.js migration uses only deterministic crops of those existing sources;
+it makes no image-generation requests.
 
 The simulation reimplements SimTower mechanics in C. Historical research notes
 remain in [docs/](docs/), including

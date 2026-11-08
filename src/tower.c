@@ -10,7 +10,9 @@
  * Every refusal in tower_can_place/tower_remove records the original game's
  * placement-error text here; the UI shows it when a click actually fails.
  * Module-static (not in Tower) so the save format stays free of UI state. */
-static char last_reject[160];
+int tower_preview;
+static char reject_text[2][160];
+#define last_reject reject_text[!!tower_preview]
 
 const char *tower_reject_reason(void)
 {
@@ -330,7 +332,7 @@ int tower_extend_deck(Tower *tower, int floor, int x1, int x2)
     }
     tower->money -= cost;
     tower->built_value += cost;
-    printf("Extended deck on floor %d to x=%d..%d (cost $%ld, balance $%ld)\n",
+    if (!tower_preview) printf("Extended deck on floor %d to x=%d..%d (cost $%ld, balance $%ld)\n",
            floor, u1, u2, cost, tower->money);
     return 1;
 }
@@ -1110,7 +1112,7 @@ uint16_t tower_place(Tower *tower, ItemType type, int floor, int x)
     if (!tower_can_place(tower, type, floor, x)) {
         /* log real (clicked) refusals only — the every-frame ghost
          * preview stays quiet (see set_reject) */
-        if (last_reject[0])
+        if (!tower_preview && last_reject[0])
             printf("  [reject] %s (%s f%d x%d)\n", last_reject,
                    tower_item_name(type), floor, x);
         return 0;
@@ -1181,7 +1183,7 @@ uint16_t tower_place(Tower *tower, ItemType type, int floor, int x)
             if (charge > 0) {
                 tower->money -= charge;
                 tower->built_value += charge;
-                printf("Extended lobby on F%d: now x=%d w=%d (+%d cells, cost $%ld, balance $%ld)\n",
+                if (!tower_preview) printf("Extended lobby on F%d: now x=%d w=%d (+%d cells, cost $%ld, balance $%ld)\n",
                        floor, final_left, existing_lobby->width, new_cells, charge, tower->money);
             }
             if (tower->lobby_height == 0) tower->lobby_height = 1;
@@ -1256,7 +1258,7 @@ uint16_t tower_place(Tower *tower, ItemType type, int floor, int x)
      * defaults, 2026-07-11 vacancy referee: armed=1, category=0xFF) */
     t->demand_armed = 1;
     t->demand_category = 0xFF;
-    if (type == ITEM_CINEMA)          t->movie_id = (uint8_t)(rand() % 14);
+    if (type == ITEM_CINEMA && !tower_preview) t->movie_id = (uint8_t)(rand() % 14);
     else if (type == ITEM_PARTY_HALL) t->movie_id = 0xFF;  /* Average until JudgeT moves it */
     /* Art style from the per-type rotation. (EXE quirk not kept: it
      * advances the counter even when placement FAILS — invisible, and
@@ -1310,7 +1312,7 @@ uint16_t tower_place(Tower *tower, ItemType type, int floor, int x)
             fill_floor_gaps(tower, f);
     }
 
-    printf("Placed %s at floor %d, x=%d (cost $%ld, balance $%ld)\n",
+    if (!tower_preview) printf("Placed %s at floor %d, x=%d (cost $%ld, balance $%ld)\n",
            tower_item_name(type), floor, x, charged, tower->money);
 
     /* First build locks the lobby-height choice at 1 if the UI didn't

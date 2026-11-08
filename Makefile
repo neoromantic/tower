@@ -1,5 +1,6 @@
 CC = gcc
 CT_VERSION := $(shell git describe --always --dirty 2>/dev/null || echo unknown)
+WEB_VERSION := $(CT_VERSION)-$(shell cat web/*.js web/*.css web/shell.html src/*.c src/*.h src/*.inc | shasum | cut -c1-10)
 CFLAGS = -Wall -Wextra -std=c11 -O2 -DCT_BUILD_VERSION='"$(CT_VERSION)"' $(shell pkg-config --cflags sdl2 SDL2_ttf)
 LDFLAGS = $(shell pkg-config --libs sdl2 SDL2_ttf) -lm
 
@@ -30,10 +31,12 @@ run: $(BIN)
 WEBDIR = web/dist
 web:
 	mkdir -p $(WEBDIR)
-	sed 's/__CT_VERSION__/$(CT_VERSION)/g' web/shell.html > $(WEBDIR)/.shell.gen.html
+	sed 's/__CT_VERSION__/$(WEB_VERSION)/g' web/shell.html > $(WEBDIR)/.shell.gen.html
 	cp web/hero.png $(WEBDIR)/hero.png
-	cp web/app.js web/app.css web/manifest.webmanifest $(WEBDIR)/
-	sed 's/__CT_VERSION__/$(CT_VERSION)/g' web/sw.js > $(WEBDIR)/sw.js
+	cp web/app.js web/app.css web/audio.js web/manifest.webmanifest $(WEBDIR)/
+	bun run build:view
+	uv run --with pillow==12.0.0 python tools/prepare_web_art.py
+	sed 's/__CT_VERSION__/$(WEB_VERSION)/g' web/sw.js > $(WEBDIR)/sw.js
 	cp -R web/art $(WEBDIR)/
 	emcc $(SRC) -o $(WEBDIR)/index.html \
 	  -std=gnu11 -O2 -DCT_BUILD_VERSION='"$(CT_VERSION)"' \
@@ -50,6 +53,7 @@ web:
 	  --embed-file data/styles/warm-dollhouse/tower.dat@/data/styles/warm-dollhouse/tower.dat \
 	  --embed-file data/styles/miniature-3d/tower.dat@/data/styles/miniature-3d/tower.dat
 	rm -f $(WEBDIR)/.shell.gen.html
+	python3 -c 'import json,pathlib; p=pathlib.Path("$(WEBDIR)"); (p/"offline.json").write_text(json.dumps([str(f.relative_to(p)) for f in p.rglob("*") if f.is_file() and not f.name.startswith(".") and f.name != "offline.json" and not f.name.startswith("fixture-")]))'
 
 webserve: web
 	@echo "Serving on http://$$(hostname -I | cut -d' ' -f1):8611 (and Tailscale IP)"

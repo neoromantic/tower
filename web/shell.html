@@ -44,20 +44,27 @@
   </div>
   <main id="canvaswrap" hidden>
     <header id="hud"><strong>Tower</strong><output id="towerstats"></output><button id="menubtn">Game</button><button id="settingsbtn">Settings</button></header>
-    <div id="world"><canvas id="canvas" width="960" height="720" tabindex="-1" aria-label="Tower world. Tap to use tool; drag to pan; pinch to zoom."></canvas></div>
+    <div id="world"><canvas id="canvas" tabindex="0" aria-label="Tower world. Tap to use tool; drag to pan; pinch to zoom."></canvas></div>
     <nav id="toolbar" aria-label="Tower tools">
-      <div class="toolrow"><label>Build <select id="category"><option value="structure">Structure</option><option value="rooms">Rooms</option><option value="transport">Transport</option><option value="services">Services</option></select></label><select id="building" aria-label="Building type"></select><button id="buildbtn" aria-pressed="false">Build</button></div>
-      <div class="toolrow"><button data-tool="0" aria-pressed="false">Use</button><button data-tool="-2" aria-pressed="false">Inspect</button><button data-tool="-1" aria-pressed="false">Bulldoze</button><button data-tool="-3" aria-pressed="true">Pan</button><label>Speed <select id="speed"><option value="0">Paused</option><option value="1" selected>Normal</option><option value="2">Fast</option></select></label><button id="savebtn">Save</button><output id="savestate" role="status">Not saved yet</output></div>
+      <div class="toolrow" id="normaltools"><button id="buildbtn" aria-pressed="false">Build</button><button data-tool="0" aria-pressed="false">Use</button><button data-tool="-2" aria-pressed="false">Inspect</button><button data-tool="-1" aria-pressed="false">Bulldoze</button><button data-tool="-3" aria-pressed="true">Pan</button><button id="shaftbtn" aria-pressed="false">Edit shaft</button><output id="toolhint">Drag to explore your tower</output></div>
+      <div class="toolrow" id="placement" hidden><strong id="placementname"></strong><output id="placementhint" role="status">Tap or drag to position</output><button id="placebtn" disabled>Place</button><button id="cancelplacebtn">Cancel</button></div>
+      <div class="toolrow"><label>Speed <select id="speed"><option value="0">Paused</option><option value="1" selected>Normal</option><option value="2">Fast</option></select></label><button id="savebtn">Save</button><output id="savestate" role="status">Not saved yet</output></div>
     </nav>
+    <details id="events"><summary>Events</summary><ol id="eventlist"></ol></details>
   </main>
-  <dialog id="settings">
-    <form method="dialog" class="dialoghead"><h2>Settings</h2><button>Done</button></form>
-    <label>Gameplay style <select id="style"><option value="0">Architectural schematic</option><option value="1">Modern pixel art</option><option value="2">Warm dollhouse</option><option value="3">Miniature</option></select></label>
+  <canvas id="engine-canvas" hidden tabindex="-1" aria-hidden="true"></canvas>
+  <dialog id="catalog" aria-labelledby="catalogtitle"><form method="dialog" class="dialoghead"><h2 id="catalogtitle">Build your tower</h2><button>Done</button></form><label>Find a building <input id="catalogsearch" type="search" placeholder="Rooms, transport, services…"></label><div id="catalogitems"></div></dialog>
+  <dialog id="gamemenus" aria-labelledby="menutitle"><form method="dialog" class="dialoghead"><h2 id="menutitle">Tower</h2><button>Done</button></form><div id="menuitems"></div></dialog>
+  <dialog id="panels" aria-labelledby="paneltitle"><div class="dialoghead"><h2 id="paneltitle"></h2><button id="panelclose" aria-label="Close panel">Close</button></div><div id="panelcontent"></div></dialog>
+  <dialog id="settings" aria-labelledby="settingstitle">
+    <form method="dialog" class="dialoghead"><h2 id="settingstitle">Settings</h2><button>Done</button></form>
+    <label>Gameplay style <select id="style"><option value="0">Architectural schematic</option><option value="1">Modern pixel art</option><option value="2" selected>Warm dollhouse</option><option value="3">Miniature</option></select></label>
     <label>Camera zoom <input id="zoom" type="range" min="0.5" max="3" step="0.05" value="1"><output id="zoomvalue">100%</output></label>
     <label>Interface size <input id="uiscale" type="range" min="0.85" max="1.3" step="0.05" value="1"></label>
     <div class="toolrow"><button id="fsbtn">Fullscreen</button><button id="mutebtn">Mute sound</button><button id="installbtn">Install app</button></div>
     <p id="installhelp" hidden></p>
-    <div class="toolrow"><label>Game menu <select id="gamemenu"><option value="0">Game</option><option value="1">Build residential</option><option value="2">Build commercial</option><option value="3">Transport</option><option value="4">Services</option><option value="5">Speed</option><option value="6">Options / Rescue</option><option value="7">People / Windows</option><option value="8">Reports / View</option><option value="9">Help</option></select></label><button id="openmenubtn">Open</button></div>
+    <label>Sound volume <input id="volume" type="range" min="0" max="0.6" step="0.01" value="0.35"></label>
+    <div class="toolrow"><label><input id="audio-effects" type="checkbox" checked> Effects</label><label><input id="audio-ambient" type="checkbox" checked> Ambience</label><label><input id="audio-music" type="checkbox" checked> Music</label></div>
     <div class="toolrow"><button id="exportbtn">Export .sav</button><button id="exporttdtbtn">Export .TDT</button><button id="loadbtn">Towers / Load</button></div>
     <p>Based on <a href="https://github.com/Jonahss/concilia-tower" target="_blank" rel="noopener">ConciliaTower by Jonahss</a>.</p>
     <p>Automatic saves every 30 seconds and when leaving the game. Export a backup before clearing browser data.</p>
@@ -128,7 +135,7 @@
     modalState = null;
     modalEl.style.display = 'none';
     if (st) st.resolve(value);
-    if (playing) Module.canvas.focus();
+    if (playing) document.getElementById('canvas').focus();
   }
   function modalValidate() {
     if (!modalState || !modalState.hasInput) return null;
@@ -462,7 +469,7 @@
   });
 
   var Module = {
-    canvas: document.getElementById('canvas'),
+    canvas: document.getElementById('engine-canvas'),
     noInitialRun: true,
     preRun: [function () {
       /* Persistent save mount + env before main ever runs. */
@@ -476,15 +483,26 @@
         Module.removeRunDependency('idbfs');
       });
     }],
-    onRuntimeInitialized: function () {
+    onRuntimeInitialized: async function () {
       if (Module.persistError) {
         statusEl.textContent = 'Could not load saved towers. Reload to try again: ' + Module.persistError.message;
         return;
       }
       Module.engineReady = true;
       renderSlots();    /* IDBFS is loaded (run dependency) — list towers */
+      await ctViewReady;
+      await ctView.init(document.getElementById('canvas'), Module);
+      await ctView.style(Number(document.getElementById('style').value));
       startBtn.disabled = false;
       statusEl.textContent = '';
+      const newSlot = sessionStorage.getItem('ct-new-slot');
+      sessionStorage.removeItem('ct-new-slot');
+      if (newSlot) {
+        draftSlots.push(newSlot);
+        selectSlot(newSlot);
+        startBtn.click();
+        return;
+      }
       const pickTower = sessionStorage.getItem('ct-pick-tower');
       sessionStorage.removeItem('ct-pick-tower');
       if (!pickTower && slotExists(currentSlot)) startBtn.click();
@@ -494,47 +512,24 @@
   };
 
   startBtn.addEventListener('click', function () {
-    ENV.CT_MODE = String(Number(document.getElementById('sandbox').checked));
+    var args = ['--save=' + slotPath(currentSlot), '--campaign'];
+    if (document.getElementById('sandbox').checked) args[1] = '--sandbox';
     if (pendingTdt && pendingTdt.slot === currentSlot) {
       /* Staged original-format tower: hand it to the engine's boot
        * importer; the engine persists it into the slot immediately. */
       FS.writeFile('/import.tdt', pendingTdt.bytes);
-      ENV.CT_TWR = '/import.tdt';
+      args.push('/import.tdt');
       pendingTdt = null;
     }
     try { localStorage.setItem('ct-slot', currentSlot); } catch (e) {}
     document.getElementById('stage').style.display = 'none';
     document.getElementById('canvaswrap').hidden = false;
-    Module.callMain(['--save=' + slotPath(currentSlot)]);
+    ctAudio.unlock();
+    Module.ccall('ct_visual_enable', null, ['number'], [1]);
+    Module.callMain(args);
     ctStartShell();
-    Module.canvas.focus();
+    document.getElementById('canvas').focus();
   });
-
-  /* Audio gate — hidden tab OR the mute button suspends the Web Audio
-   * context; the sim keeps running either way (design D5). The SDL audio
-   * object lives at Module.SDL2 (emscripten scopes it there, NOT a global
-   * — the old `typeof SDL2` check never fired, hence tab-switching kept
-   * playing; Jonah's report 2026-08-10). */
-  var userMuted = false;
-  var muteBtn = document.getElementById('mutebtn');
-  function audioCtx() {
-    return (Module.SDL2 && Module.SDL2.audioContext) || null;
-  }
-  function applyAudioGate() {
-    var ctx = audioCtx();
-    if (!ctx) return;
-    if (userMuted || document.hidden) ctx.suspend();
-    else ctx.resume();
-    muteBtn.textContent = 'Mute sound';
-    if (userMuted) muteBtn.textContent = 'Unmute sound';
-    muteBtn.title = userMuted ? 'Unmute sound' : 'Mute sound';
-  }
-  muteBtn.addEventListener('click', function () {
-    userMuted = !userMuted;
-    applyAudioGate();
-    Module.canvas.focus();     /* give the keys back to the tower */
-  });
-  document.addEventListener('visibilitychange', applyAudioGate);
 
   /* Wasm abort → a readable apology instead of a frozen canvas (E5).
    * Saves are on IDBFS and synced at save-time, so a reload recovers. */
@@ -560,6 +555,8 @@
       ev.preventDefault();
   }, true);
 </script>
+<script src="audio.js"></script>
+<script>var ctViewReady = import('./view.js');</script>
 <script src="app.js"></script>
 {{{ SCRIPT }}}
 </body>

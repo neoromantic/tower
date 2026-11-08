@@ -422,6 +422,9 @@ typedef struct {
  * tenant per shaft-floor segment — 4096 overflowed on real saves. */
 #define MAX_TENANTS 8192
 
+/* Scratch placement preview suppresses RNG/logging and uses its own rejection text. */
+extern int tower_preview;
+
 /* The tower */
 typedef struct {
     TowerCell grid[TOWER_FLOOR_COUNT][TOWER_WIDTH];

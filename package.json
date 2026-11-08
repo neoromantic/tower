@@ -1,0 +1,5 @@
+{
+  "private": true,
+  "scripts": {"build:view": "bun build web/view.js --target browser --minify --outfile web/dist/view.js"},
+  "dependencies": {"three": "0.187.0"}
+}

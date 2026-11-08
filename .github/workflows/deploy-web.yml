@@ -32,6 +32,9 @@ jobs:
       - uses: emscripten-core/setup-emsdk@v14
         with:
           version: 6.0.6   # match the Pi's emsdk — same wasm we've been testing
+      - uses: oven-sh/setup-bun@v2
+      - uses: astral-sh/setup-uv@v7
+      - run: bun install --frozen-lockfile
       - run: make web
       - uses: actions/upload-pages-artifact@v3
         with:
