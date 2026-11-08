@@ -1,0 +1,686 @@
+{
+  "status": "complete",
+  "observed_date": "2026-11-07T23:51:43.847003+00:00",
+  "endpoint": "https://ai-gateway.vercel.sh/v1/images/generations",
+  "requested_model": "openai/gpt-image-2.6-flare",
+  "method": "Explicitly authorized direct Images API via Vercel AI Gateway; no bundled CLI modification; no original sprites or reference image inputs.",
+  "images": [
+    {
+      "file": "exterior-effects.png",
+      "status": "generated",
+      "request": {
+        "model": "openai/gpt-image-2.6-flare",
+        "prompt": "Use case: stylized-concept. Asset type: production sprite atlas for an original tower management game. STYLE: crisp architectural schematic illustration, precise flat geometric filled forms, cream #F5F0DF, navy #193447, teal #329B94, coral #E87965, uniform hard navy outlines, no textures, no gradients, no realistic shading. Extremely readable small silhouettes. Fixed straight-on orthographic SIDE elevation camera, absolutely no isometric or perspective. No text, letters, numbers, logos, watermark, labels, gutters, visible grid dividers, outer margins or panel captions. Each object and all its details must remain entirely inside its assigned cell. This is a sprite atlas of distinct functional assets, not one scene or poster. EXACT canvas 1536x1024. EXACT 4 columns x4 rows, each cell 384x256. x boundaries 0,384,768,1152,1536; y boundaries 0,256,512,768,1024. Flat pure white #FFFFFF background for cutouts except FIRST THREE sky cells which fill their entire cells with sky. Each other asset centered and entirely contained. EXACT row-major: row1 clear pale teal daytime sky; dusky coral sky; dark navy night sky with tiny cream stars; separate stylized cloud cluster. Row2 distant skyline side silhouette; horizontal floor/ceiling architectural strip; horizontal ground/roof trim; coral flame animation pose1. Row3 coral flame pose2; coral flame pose3; cathedral exterior day side elevation; cathedral ceremony side cutaway with tiny formal people. Row4 wedding decoration floral arch; medical cross emblem; warning triangle symbol without lettering; star badge. Flame poses same size and baseline, fully contained. All art flat and hard outlined, no textures. Exactly sixteen cells.",
+        "size": "1536x1024",
+        "quality": "high",
+        "n": 1,
+        "output_format": "png"
+      },
+      "response": {
+        "created": 1794095517,
+        "data": [
+          {}
+        ],
+        "usage": {
+          "total_tokens": 1724,
+          "input_tokens": 371,
+          "output_tokens": 1353,
+          "input_tokens_details": {
+            "text_tokens": 371,
+            "image_tokens": 0
+          }
+        },
+        "providerMetadata": {
+          "openai": {
+            "images": [
+              {
+                "imageTokens": 0,
+                "textTokens": 371,
+                "created": 1794095517,
+                "size": "1536x1024",
+                "quality": "high",
+                "background": "opaque",
+                "outputFormat": "png"
+              }
+            ]
+          },
+          "gateway": {
+            "routing": {
+              "originalModelId": "openai/gpt-image-2.6-flare",
+              "resolvedProvider": "openai",
+              "fallbacksAvailable": [],
+              "canonicalSlug": "openai/gpt-image-2.6-flare",
+              "finalProvider": "openai",
+              "modelAttemptCount": 1,
+              "modelAttempts": [
+                {
+                  "canonicalSlug": "openai/gpt-image-2.6-flare",
+                  "success": true,
+                  "providerAttemptCount": 1,
+                  "providerAttempts": [
+                    {
+                      "provider": "openai",
+                      "credentialType": "system",
+                      "success": true,
+                      "startTime": 1794095507164,
+                      "endTime": 1794095517763,
+                      "statusCode": 200
+                    }
+                  ]
+                }
+              ],
+              "totalProviderAttemptCount": 1
+            },
+            "cost": "0.042445",
+            "marketCost": "0.042445",
+            "surchargeCost": "0",
+            "gatewayCost": "0.042445",
+            "inferenceCost": "0.042445",
+            "inputInferenceCost": "0",
+            "outputInferenceCost": "0.042445",
+            "generationId": "gen_01M6W6SSND8HYY85M3CE048A0S"
+          }
+        }
+      },
+      "response_headers": {
+        "Content-Type": "application/json",
+        "Date": "Sat, 07 Nov 2026 23:51:57 GMT",
+        "X-Vercel-Id": "fra1::fra1::4bhc9-1794095507032-7ca69f6a6f5a"
+      },
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "grid": {
+        "columns": 4,
+        "rows": 4,
+        "cell_width": 384,
+        "cell_height": 256
+      },
+      "sha256": "1f27b0b22a75d06f4b31e22aa779ae7fa052d016b8c49dd66d36947d5ffbf2a3",
+      "generated_sha256": "3c37d3c20dfcec691426a57f3c7c9d7a85743b29929d8e37a47421efd76db037",
+      "normalization": {
+        "method": "ImageMagick per-cell crop, resize to exact cell dimensions, row append then column append. Remove generated separators and correct nonuniform row heights; no synthetic replacement art.",
+        "crop_rectangles_row_major": [
+          "378x249+3+3",
+          "378x249+387+3",
+          "378x249+771+3",
+          "378x249+1155+3",
+          "378x246+3+259",
+          "378x246+387+259",
+          "378x246+771+259",
+          "378x246+1155+259",
+          "378x243+3+513",
+          "378x243+387+513",
+          "378x243+771+513",
+          "378x243+1155+513",
+          "378x258+3+763",
+          "378x258+387+763",
+          "378x258+771+763",
+          "378x258+1155+763"
+        ],
+        "output_cell_dimensions": [
+          384,
+          256
+        ]
+      },
+      "visual_review": {
+        "reviewed": true,
+        "categories_complete": true,
+        "grid": "Exact final regular cells; see normalization metadata where present."
+      }
+    },
+    {
+      "file": "rooms.png",
+      "status": "generated",
+      "request": {
+        "model": "openai/gpt-image-2.6-flare",
+        "prompt": "Use case: stylized-concept. Asset type: production sprite atlas for an original tower management game. STYLE: crisp architectural schematic illustration, precise flat geometric filled forms, cream #F5F0DF, navy #193447, teal #329B94, coral #E87965, uniform hard navy outlines, no textures, no gradients, no realistic shading. Extremely readable small silhouettes. Fixed straight-on orthographic SIDE elevation camera, absolutely no isometric or perspective. No text, letters, numbers, logos, watermark, labels, gutters, visible grid dividers, outer margins or panel captions. Each object and all its details must remain entirely inside its assigned cell. This is a sprite atlas of distinct functional assets, not one scene or poster. EXACT canvas 1536x1024. EXACT 2 columns x 8 rows of 768x128 pixels each. Column boundaries x=0,768,1536; row boundaries y=0,128,256,384,512,640,768,896,1024. Sixteen WIDE LOW rooms, each fills its own 768x128 cell with cream wall and horizontal floor, consistent side cutaway. No outside spacing. Room architecture, ceiling, floor and furniture fully contained per cell. Each room distinct by furniture. Read row-major: row1 left office (desks/monitors), right condo (sofa/kitchen); row2 left hotel (bed/nightstands), right shop (shelves/counter); row3 left fast-food (counter/stools), right restaurant (dining tables/kitchen); row4 left medical (examination bed/cabinet), right security (monitor desk/lockers); row5 left housekeeping (cleaning carts/laundry), right party hall (banquet tables/balloons); row6 left cinema (screen/seats), right metro (platform/train); row7 left lobby (reception/plants), right parking (parked cars/columns); row8 left recycling (sorting bins/conveyor), right elevator machinery (motor/pulleys/control cabinet). No people in rooms. Each of all sixteen low wide cells is a complete room, not a tower. CRITICAL CORRECTION: previous attempt varied row heights; this destroys sprite extraction. Eight rows MUST BE EXACTLY 128 pixels tall with no gutters at all. Do not draw thick outer borders or separators. Each cream room fills exactly its 768x128 rectangle, including all walls and furniture. Row1 y=0..127 office/condo. Row2 y=128..255 hotel/shop. Row3 y=256..383 fast-food/restaurant. Row4 y=384..511 medical/security. Row5 y=512..639 housekeeping/party. Row6 y=640..767 cinema/metro. Row7 y=768..895 lobby/parking. Row8 y=896..1023 recycling/elevator engine. Horizontal furniture baseline at local y=116 in EVERY row. Every row equal height; do not enlarge upper rows. Flat solid fills only; zero texture or shading.",
+        "size": "1536x1024",
+        "quality": "high",
+        "n": 1,
+        "output_format": "png"
+      },
+      "response": {
+        "created": 1794095981,
+        "data": [
+          {}
+        ],
+        "usage": {
+          "total_tokens": 1981,
+          "input_tokens": 628,
+          "output_tokens": 1353,
+          "input_tokens_details": {
+            "text_tokens": 628,
+            "image_tokens": 0
+          }
+        },
+        "providerMetadata": {
+          "openai": {
+            "images": [
+              {
+                "imageTokens": 0,
+                "textTokens": 628,
+                "created": 1794095981,
+                "size": "1536x1024",
+                "quality": "high",
+                "background": "transparent",
+                "outputFormat": "png"
+              }
+            ]
+          },
+          "gateway": {
+            "routing": {
+              "originalModelId": "openai/gpt-image-2.6-flare",
+              "resolvedProvider": "openai",
+              "fallbacksAvailable": [],
+              "canonicalSlug": "openai/gpt-image-2.6-flare",
+              "finalProvider": "openai",
+              "modelAttemptCount": 1,
+              "modelAttempts": [
+                {
+                  "canonicalSlug": "openai/gpt-image-2.6-flare",
+                  "success": true,
+                  "providerAttemptCount": 1,
+                  "providerAttempts": [
+                    {
+                      "provider": "openai",
+                      "credentialType": "system",
+                      "success": true,
+                      "startTime": 1794095970385,
+                      "endTime": 1794095981609,
+                      "statusCode": 200
+                    }
+                  ]
+                }
+              ],
+              "totalProviderAttemptCount": 1
+            },
+            "cost": "0.04373",
+            "marketCost": "0.04373",
+            "surchargeCost": "0",
+            "gatewayCost": "0.04373",
+            "inferenceCost": "0.04373",
+            "inputInferenceCost": "0",
+            "outputInferenceCost": "0.04373",
+            "generationId": "gen_01M6W77Y0XT0PTW73G8PBG9Z6X"
+          }
+        }
+      },
+      "response_headers": {
+        "Content-Type": "application/json",
+        "Date": "Sat, 07 Nov 2026 23:59:41 GMT",
+        "X-Vercel-Id": "fra1::fra1::swszd-1794095970283-2746904b3c37"
+      },
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "grid": {
+        "columns": 2,
+        "rows": 8,
+        "cell_width": 768,
+        "cell_height": 128
+      },
+      "sha256": "7dd520624ccdddfe58e6e996cc2379aac1c0c4cb3c2ec76aa00e5395c0892fb2",
+      "generated_sha256": "7c14076962bb0bf486c4011248755217302d8a59a3192b77faeb97f28bbe4d2f",
+      "normalization": {
+        "method": "ImageMagick per-cell crop, resize to exact cell dimensions, row append then column append. Remove generated separators and correct nonuniform row heights; no synthetic replacement art.",
+        "crop_rectangles_row_major": [
+          "760x131+4+4",
+          "760x131+772+4",
+          "760x126+4+147",
+          "760x126+772+147",
+          "760x115+4+286",
+          "760x115+772+286",
+          "760x114+4+414",
+          "760x114+772+414",
+          "760x109+4+542",
+          "760x109+772+542",
+          "760x111+4+665",
+          "760x111+772+665",
+          "760x97+4+790",
+          "760x97+772+790",
+          "760x115+4+900",
+          "760x115+772+900"
+        ],
+        "output_cell_dimensions": [
+          768,
+          128
+        ]
+      },
+      "visual_review": {
+        "reviewed": true,
+        "categories_complete": true,
+        "grid": "Exact final regular cells; see normalization metadata where present."
+      }
+    },
+    {
+      "file": "ui.png",
+      "status": "generated",
+      "request": {
+        "model": "openai/gpt-image-2.6-flare",
+        "prompt": "Use case: stylized-concept. Asset type: production sprite atlas for an original tower management game. STYLE: crisp architectural schematic illustration, precise flat geometric filled forms, cream #F5F0DF, navy #193447, teal #329B94, coral #E87965, uniform hard navy outlines, no textures, no gradients, no realistic shading. Extremely readable small silhouettes. Fixed straight-on orthographic SIDE elevation camera, absolutely no isometric or perspective. No text, letters, numbers, logos, watermark, labels, gutters, visible grid dividers, outer margins or panel captions. Each object and all its details must remain entirely inside its assigned cell. This is a sprite atlas of distinct functional assets, not one scene or poster. EXACT canvas 1536x1024. EXACT 4 columns x4 rows, each cell 384x256. x boundaries 0,384,768,1152,1536; y boundaries 0,256,512,768,1024. Pure flat white #FFFFFF background. EXACT sixteen distinct centered UI icons/ornaments, one per cell with consistent scale, 160px tall silhouettes, same uniform navy outline and cream/teal/coral fills. No rounded button backgrounds. Row-major EXACT: row1 office (desk/monitor), home (house), hotel (bed), shop (shopping bag). Row2 dining (plate/fork), medical (cross), security (shield), housekeeping (broom/bucket). Row3 hall (banquet table), cinema (film projector), metro (train front), lobby (reception bell). Row4 parking (side car; no letter P), recycling (three arrow loop), elevator (closed cabin/up and down chevrons), stairs (stair-step silhouette). No text or letters anywhere. Exactly sixteen icons, all details contained in their cells.",
+        "size": "1536x1024",
+        "quality": "high",
+        "n": 1,
+        "output_format": "png"
+      },
+      "response": {
+        "created": 1794095517,
+        "data": [
+          {}
+        ],
+        "usage": {
+          "total_tokens": 1735,
+          "input_tokens": 382,
+          "output_tokens": 1353,
+          "input_tokens_details": {
+            "text_tokens": 382,
+            "image_tokens": 0
+          }
+        },
+        "providerMetadata": {
+          "openai": {
+            "images": [
+              {
+                "imageTokens": 0,
+                "textTokens": 382,
+                "created": 1794095516,
+                "size": "1536x1024",
+                "quality": "high",
+                "background": "opaque",
+                "outputFormat": "png"
+              }
+            ]
+          },
+          "gateway": {
+            "routing": {
+              "originalModelId": "openai/gpt-image-2.6-flare",
+              "resolvedProvider": "openai",
+              "fallbacksAvailable": [],
+              "canonicalSlug": "openai/gpt-image-2.6-flare",
+              "finalProvider": "openai",
+              "modelAttemptCount": 1,
+              "modelAttempts": [
+                {
+                  "canonicalSlug": "openai/gpt-image-2.6-flare",
+                  "success": true,
+                  "providerAttemptCount": 1,
+                  "providerAttempts": [
+                    {
+                      "provider": "openai",
+                      "credentialType": "system",
+                      "success": true,
+                      "startTime": 1794095507172,
+                      "endTime": 1794095517296,
+                      "statusCode": 200
+                    }
+                  ]
+                }
+              ],
+              "totalProviderAttemptCount": 1
+            },
+            "cost": "0.0425",
+            "marketCost": "0.0425",
+            "surchargeCost": "0",
+            "gatewayCost": "0.0425",
+            "inferenceCost": "0.0425",
+            "inputInferenceCost": "0",
+            "outputInferenceCost": "0.0425",
+            "generationId": "gen_01M6W6SSPM8PYKRCC066HVBKS9"
+          }
+        }
+      },
+      "response_headers": {
+        "Content-Type": "application/json",
+        "Date": "Sat, 07 Nov 2026 23:51:57 GMT",
+        "X-Vercel-Id": "fra1::fra1::lhpqk-1794095507086-2b403d04d581"
+      },
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "grid": {
+        "columns": 4,
+        "rows": 4,
+        "cell_width": 384,
+        "cell_height": 256
+      },
+      "sha256": "f2c86c0a172cbf1fdbb96692e5ab192231d8afe54e016a6dfbee2019455fbf36",
+      "visual_review": {
+        "reviewed": true,
+        "categories_complete": true,
+        "grid": "Exact final regular cells; see normalization metadata where present."
+      }
+    },
+    {
+      "file": "people.png",
+      "status": "generated",
+      "request": {
+        "model": "openai/gpt-image-2.6-flare",
+        "prompt": "Use case: stylized-concept. Asset type: production sprite atlas for an original tower management game. STYLE: crisp architectural schematic illustration, precise flat geometric filled forms, cream #F5F0DF, navy #193447, teal #329B94, coral #E87965, uniform hard navy outlines, no textures, no gradients, no realistic shading. Extremely readable small silhouettes. Fixed straight-on orthographic SIDE elevation camera, absolutely no isometric or perspective. No text, letters, numbers, logos, watermark, labels, gutters, visible grid dividers, outer margins or panel captions. Each object and all its details must remain entirely inside its assigned cell. This is a sprite atlas of distinct functional assets, not one scene or poster. EXACT canvas 1536x1024. EXACT 6 columns x4 rows, each cell 256x256. x boundaries 0,256,512,768,1024,1280,1536; y boundaries 0,256,512,768,1024. Pure flat white #FFFFFF background. Full-body SIDE-VIEW small schematic people, feet baseline local y=230 and head local y=30, body centered at local x=128 in every cell, no ground plane, no cast shadows. Each ROW is SIX consecutive walking/working animation poses of the SAME character with constant clothes, scale, face, baseline and center registration. Read left to right six walk cycle phases: left stride, left passing, feet together, right stride, right passing, feet together. Row1 business pedestrian in navy suit carrying teal briefcase. Row2 casual resident in coral top and teal trousers. Row3 maid in teal uniform with cream apron, coherent walking/working arm action. Row4 VIP/wedding guest in cream formal jacket and coral tie, same person six phases, can also act as emergency occupant. Exactly 24 separate complete people, six per row; no additional people or accessories outside cell.",
+        "size": "1536x1024",
+        "quality": "high",
+        "n": 1,
+        "output_format": "png"
+      },
+      "response": {
+        "created": 1794095516,
+        "data": [
+          {}
+        ],
+        "usage": {
+          "total_tokens": 1755,
+          "input_tokens": 402,
+          "output_tokens": 1353,
+          "input_tokens_details": {
+            "text_tokens": 402,
+            "image_tokens": 0
+          }
+        },
+        "providerMetadata": {
+          "openai": {
+            "images": [
+              {
+                "imageTokens": 0,
+                "textTokens": 402,
+                "created": 1794095516,
+                "size": "1536x1024",
+                "quality": "high",
+                "background": "opaque",
+                "outputFormat": "png"
+              }
+            ]
+          },
+          "gateway": {
+            "routing": {
+              "originalModelId": "openai/gpt-image-2.6-flare",
+              "resolvedProvider": "openai",
+              "fallbacksAvailable": [],
+              "canonicalSlug": "openai/gpt-image-2.6-flare",
+              "finalProvider": "openai",
+              "modelAttemptCount": 1,
+              "modelAttempts": [
+                {
+                  "canonicalSlug": "openai/gpt-image-2.6-flare",
+                  "success": true,
+                  "providerAttemptCount": 1,
+                  "providerAttempts": [
+                    {
+                      "provider": "openai",
+                      "credentialType": "system",
+                      "success": true,
+                      "startTime": 1794095507150,
+                      "endTime": 1794095516801,
+                      "statusCode": 200
+                    }
+                  ]
+                }
+              ],
+              "totalProviderAttemptCount": 1
+            },
+            "cost": "0.0426",
+            "marketCost": "0.0426",
+            "surchargeCost": "0",
+            "gatewayCost": "0.0426",
+            "inferenceCost": "0.0426",
+            "inputInferenceCost": "0",
+            "outputInferenceCost": "0.0426",
+            "generationId": "gen_01M6W6SSNCS8VYXP06GXA98P0H"
+          }
+        }
+      },
+      "response_headers": {
+        "Content-Type": "application/json",
+        "Date": "Sat, 07 Nov 2026 23:51:56 GMT",
+        "X-Vercel-Id": "fra1::fra1::pngr4-1794095507121-1338ace52868"
+      },
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "grid": {
+        "columns": 6,
+        "rows": 4,
+        "cell_width": 256,
+        "cell_height": 256
+      },
+      "sha256": "72d8b26815feed18e01fb707d5933eced45795f903940d55a2b7af6f2a1a9427",
+      "visual_review": {
+        "reviewed": true,
+        "categories_complete": true,
+        "grid": "Exact final regular cells; see normalization metadata where present."
+      }
+    },
+    {
+      "file": "transport.png",
+      "status": "generated",
+      "request": {
+        "model": "openai/gpt-image-2.6-flare",
+        "prompt": "Use case: stylized-concept. Asset type: production sprite atlas for an original tower management game. STYLE: crisp architectural schematic illustration, precise flat geometric filled forms, cream #F5F0DF, navy #193447, teal #329B94, coral #E87965, uniform hard navy outlines, no textures, no gradients, no realistic shading. Extremely readable small silhouettes. Fixed straight-on orthographic SIDE elevation camera, absolutely no isometric or perspective. No text, letters, numbers, logos, watermark, labels, gutters, visible grid dividers, outer margins or panel captions. Each object and all its details must remain entirely inside its assigned cell. This is a sprite atlas of distinct functional assets, not one scene or poster. EXACT canvas 1536x1024. EXACT 4 columns x4 rows, each cell 384x256. x boundaries 0,384,768,1152,1536; y boundaries 0,256,512,768,1024. Flat pure white #FFFFFF background. One centered self-contained SIDE-VIEW transport asset per cell, safe empty space within each cell, no ground shadows. Row-major EXACT: row1 lift cabin empty doors closed; lift partially full with 2 people doors opening; lift full with 4 people doors open; express lift with coral double-chevron emblem. Row2 engine machinery motor and pulley; lift shaft section with vertical guide rails; stairs ascending to right; stairs descending to right. Row3 escalator ascending to right; escalator descending to right; metro train side silhouette; parking car side silhouette. Row4 parking ramp side profile; service vehicle side silhouette; helicopter side silhouette; construction crane side elevation. Exactly sixteen cells; objects do not cross boundaries. Elevator frames same dimensions in first row.",
+        "size": "1536x1024",
+        "quality": "high",
+        "n": 1,
+        "output_format": "png"
+      },
+      "response": {
+        "created": 1794095515,
+        "data": [
+          {}
+        ],
+        "usage": {
+          "total_tokens": 1721,
+          "input_tokens": 368,
+          "output_tokens": 1353,
+          "input_tokens_details": {
+            "text_tokens": 368,
+            "image_tokens": 0
+          }
+        },
+        "providerMetadata": {
+          "openai": {
+            "images": [
+              {
+                "imageTokens": 0,
+                "textTokens": 368,
+                "created": 1794095514,
+                "size": "1536x1024",
+                "quality": "high",
+                "background": "opaque",
+                "outputFormat": "png"
+              }
+            ]
+          },
+          "gateway": {
+            "routing": {
+              "originalModelId": "openai/gpt-image-2.6-flare",
+              "resolvedProvider": "openai",
+              "fallbacksAvailable": [],
+              "canonicalSlug": "openai/gpt-image-2.6-flare",
+              "finalProvider": "openai",
+              "modelAttemptCount": 1,
+              "modelAttempts": [
+                {
+                  "canonicalSlug": "openai/gpt-image-2.6-flare",
+                  "success": true,
+                  "providerAttemptCount": 1,
+                  "providerAttempts": [
+                    {
+                      "provider": "openai",
+                      "credentialType": "system",
+                      "success": true,
+                      "startTime": 1794095507133,
+                      "endTime": 1794095515499,
+                      "statusCode": 200
+                    }
+                  ]
+                }
+              ],
+              "totalProviderAttemptCount": 1
+            },
+            "cost": "0.04243",
+            "marketCost": "0.04243",
+            "surchargeCost": "0",
+            "gatewayCost": "0.04243",
+            "inferenceCost": "0.04243",
+            "inputInferenceCost": "0",
+            "outputInferenceCost": "0.04243",
+            "generationId": "gen_01M6W6SSNB28HXQDRV33R5C9H6"
+          }
+        }
+      },
+      "response_headers": {
+        "Content-Type": "application/json",
+        "Date": "Sat, 07 Nov 2026 23:51:55 GMT",
+        "X-Vercel-Id": "fra1::fra1::gpfmm-1794095507122-8bc59d1df9b1"
+      },
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "grid": {
+        "columns": 4,
+        "rows": 4,
+        "cell_width": 384,
+        "cell_height": 256
+      },
+      "sha256": "e6149ad021ef94a4102f65b0356653c08b15b60d263e8abbf328cc8796992627",
+      "generated_sha256": "bb2e55ab43ee43c6446fec6a02946926cef4aae1e5bb981200bd4cfe8f81178c",
+      "normalization": {
+        "method": "ImageMagick per-cell crop, resize to exact cell dimensions, row append then column append. Remove generated separators and correct nonuniform row heights; no synthetic replacement art.",
+        "crop_rectangles_row_major": [
+          "378x251+3+3",
+          "378x251+387+3",
+          "378x251+771+3",
+          "378x251+1155+3",
+          "378x247+3+261",
+          "378x247+387+261",
+          "378x247+771+261",
+          "378x247+1155+261",
+          "378x232+3+515",
+          "378x232+387+515",
+          "378x232+771+515",
+          "378x232+1155+515",
+          "378x267+3+754",
+          "378x267+387+754",
+          "378x267+771+754",
+          "378x267+1155+754"
+        ],
+        "output_cell_dimensions": [
+          384,
+          256
+        ]
+      },
+      "visual_review": {
+        "reviewed": true,
+        "categories_complete": true,
+        "grid": "Exact final regular cells; see normalization metadata where present."
+      }
+    }
+  ],
+  "superseded_images": [
+    {
+      "file": "rooms.initial.png",
+      "status": "generated",
+      "request": {
+        "model": "openai/gpt-image-2.6-flare",
+        "prompt": "Use case: stylized-concept. Asset type: production sprite atlas for an original tower management game. STYLE: crisp architectural schematic illustration, precise flat geometric filled forms, cream #F5F0DF, navy #193447, teal #329B94, coral #E87965, uniform hard navy outlines, no textures, no gradients, no realistic shading. Extremely readable small silhouettes. Fixed straight-on orthographic SIDE elevation camera, absolutely no isometric or perspective. No text, letters, numbers, logos, watermark, labels, gutters, visible grid dividers, outer margins or panel captions. Each object and all its details must remain entirely inside its assigned cell. This is a sprite atlas of distinct functional assets, not one scene or poster. EXACT canvas 1536x1024. EXACT 2 columns x 8 rows of 768x128 pixels each. Column boundaries x=0,768,1536; row boundaries y=0,128,256,384,512,640,768,896,1024. Sixteen WIDE LOW rooms, each fills its own 768x128 cell with cream wall and horizontal floor, consistent side cutaway. No outside spacing. Room architecture, ceiling, floor and furniture fully contained per cell. Each room distinct by furniture. Read row-major: row1 left office (desks/monitors), right condo (sofa/kitchen); row2 left hotel (bed/nightstands), right shop (shelves/counter); row3 left fast-food (counter/stools), right restaurant (dining tables/kitchen); row4 left medical (examination bed/cabinet), right security (monitor desk/lockers); row5 left housekeeping (cleaning carts/laundry), right party hall (banquet tables/balloons); row6 left cinema (screen/seats), right metro (platform/train); row7 left lobby (reception/plants), right parking (parked cars/columns); row8 left recycling (sorting bins/conveyor), right elevator machinery (motor/pulleys/control cabinet). No people in rooms. Each of all sixteen low wide cells is a complete room, not a tower.",
+        "size": "1536x1024",
+        "quality": "high",
+        "n": 1,
+        "output_format": "png"
+      },
+      "response": {
+        "created": 1794095519,
+        "data": [
+          {}
+        ],
+        "usage": {
+          "total_tokens": 1798,
+          "input_tokens": 445,
+          "output_tokens": 1353,
+          "input_tokens_details": {
+            "text_tokens": 445,
+            "image_tokens": 0
+          }
+        },
+        "providerMetadata": {
+          "openai": {
+            "images": [
+              {
+                "imageTokens": 0,
+                "textTokens": 445,
+                "created": 1794095518,
+                "size": "1536x1024",
+                "quality": "high",
+                "background": "transparent",
+                "outputFormat": "png"
+              }
+            ]
+          },
+          "gateway": {
+            "routing": {
+              "originalModelId": "openai/gpt-image-2.6-flare",
+              "resolvedProvider": "openai",
+              "fallbacksAvailable": [],
+              "canonicalSlug": "openai/gpt-image-2.6-flare",
+              "finalProvider": "openai",
+              "modelAttemptCount": 1,
+              "modelAttempts": [
+                {
+                  "canonicalSlug": "openai/gpt-image-2.6-flare",
+                  "success": true,
+                  "providerAttemptCount": 1,
+                  "providerAttempts": [
+                    {
+                      "provider": "openai",
+                      "credentialType": "system",
+                      "success": true,
+                      "startTime": 1794095507214,
+                      "endTime": 1794095519481,
+                      "statusCode": 200
+                    }
+                  ]
+                }
+              ],
+              "totalProviderAttemptCount": 1
+            },
+            "cost": "0.042815",
+            "marketCost": "0.042815",
+            "surchargeCost": "0",
+            "gatewayCost": "0.042815",
+            "inferenceCost": "0.042815",
+            "inputInferenceCost": "0",
+            "outputInferenceCost": "0.042815",
+            "generationId": "gen_01M6W6SSQB0ZR82WD571316XD3"
+          }
+        }
+      },
+      "response_headers": {
+        "Content-Type": "application/json",
+        "Date": "Sat, 07 Nov 2026 23:51:59 GMT",
+        "X-Vercel-Id": "fra1::fra1::c24g6-1794095507120-9bfdde7e5dc9"
+      },
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "grid": {
+        "columns": 2,
+        "rows": 8,
+        "cell_width": 768,
+        "cell_height": 128
+      },
+      "sha256": "ef5aec515209626a9ca96a817f8e4706e9747900df87be04cc1780813d599c4e"
+    }
+  ],
+  "production_limitations": [
+    "Opaque white cutout backgrounds require packer white-to-alpha conversion; near-white antialias fringes possible.",
+    "Generated fills contain subtle tonal shading despite flat-fill prompt; palette and hard outlines are coherent, but not mathematically flat vector art.",
+    "People have small pose-to-pose registration drift and partially repeated walk silhouettes; not hand-rigged animation. Fourth row is one formal VIP/wedding guest, reused for emergency occupants; no dedicated paramedic or bridal sprites.",
+    "Room source includes one incidental parking P glyph despite no-text prompt. No labels or captions added.",
+    "Room ceilings/floors are trimmed to preserve contained furniture during equal-cell normalization; packer supplies engine floor structure.",
+    "No packed sprite or live engine verification performed; final downsampling, alpha, animation timing and resource coverage must be checked by integration owner."
+  ]
+}

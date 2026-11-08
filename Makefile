@@ -1,7 +1,7 @@
 CC = gcc
 CT_VERSION := $(shell git describe --always --dirty 2>/dev/null || echo unknown)
 CFLAGS = -Wall -Wextra -std=c11 -O2 -DCT_BUILD_VERSION='"$(CT_VERSION)"' $(shell pkg-config --cflags sdl2 SDL2_ttf)
-LDFLAGS = $(shell pkg-config --libs sdl2 SDL2_ttf) -lm
+LDFLAGS = $(shell pkg-config --libs sdl2 SDL2_ttf) -lm -lz
 
 SRC = src/main.c src/ne_resource.c src/sprites.c src/tower.c src/game.c src/people.c src/twr.c src/audio.c src/sound_hook.c src/strings.c
 OBJ = $(SRC:.c=.o)
@@ -32,20 +32,27 @@ web:
 	mkdir -p $(WEBDIR)
 	sed 's/__CT_VERSION__/$(CT_VERSION)/g' web/shell.html > $(WEBDIR)/.shell.gen.html
 	cp web/hero.png $(WEBDIR)/hero.png
-	cp -R web/experiments $(WEBDIR)/
-	mkdir -p $(WEBDIR)/docs
-	cp -R docs/experiments $(WEBDIR)/docs/
+	cp web/app.js web/app.css web/manifest.webmanifest $(WEBDIR)/
+	sed 's/__CT_VERSION__/$(CT_VERSION)/g' web/sw.js > $(WEBDIR)/sw.js
+	cp -R web/art $(WEBDIR)/
 	emcc $(SRC) -o $(WEBDIR)/index.html \
 	  -std=gnu11 -O2 -DCT_BUILD_VERSION='"$(CT_VERSION)"' \
-	  -sUSE_SDL=2 -sUSE_SDL_TTF=2 \
+	  -sUSE_SDL=2 -sUSE_SDL_TTF=2 -sUSE_ZLIB=1 \
 	  -sALLOW_MEMORY_GROWTH -sASYNCIFY -sASYNCIFY_STACK_SIZE=32768 \
 	  -sSTACK_SIZE=2097152 \
 	  -sINVOKE_RUN=0 -sEXIT_RUNTIME=0 \
 	  -sEXPORTED_RUNTIME_METHODS=callMain,FS,IDBFS,ENV,addRunDependency,removeRunDependency,ccall \
 	  -lidbfs.js \
 	  --shell-file $(WEBDIR)/.shell.gen.html \
-	  --embed-file web/fonts@/fonts \
-	  --embed-file data/tower.dat@/data/tower.dat
+	  --preload-file web/fonts@/fonts \
+	  --preload-file data/styles/schematic/tower.dat@/data/styles/schematic/tower.dat \
+	  --preload-file data/styles/modern-pixel/tower.dat@/data/styles/modern-pixel/tower.dat \
+	  --preload-file data/styles/warm-dollhouse/tower.dat@/data/styles/warm-dollhouse/tower.dat \
+	  --preload-file data/styles/miniature-3d/tower.dat@/data/styles/miniature-3d/tower.dat \
+	  --preload-file data/styles/schematic/hd@/data/styles/schematic/hd \
+	  --preload-file data/styles/modern-pixel/hd@/data/styles/modern-pixel/hd \
+	  --preload-file data/styles/warm-dollhouse/hd@/data/styles/warm-dollhouse/hd \
+	  --preload-file data/styles/miniature-3d/hd@/data/styles/miniature-3d/hd
 	rm -f $(WEBDIR)/.shell.gen.html
 
 webserve: web

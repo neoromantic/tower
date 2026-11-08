@@ -1,0 +1,1133 @@
+{
+  "status": "source-contract-corrected-ready-for-packing-review",
+  "observed_date": "2026-11-07T23:51:33.522617+00:00",
+  "endpoint": "https://ai-gateway.vercel.sh/v1/images/generations",
+  "requested_model": "openai/gpt-image-2.6-flare",
+  "method": "Explicitly authorized direct Images API request; prior successful experiment request shape reused. No input sprites or reference images.",
+  "images": [
+    {
+      "file": "rooms.png",
+      "grid": {
+        "columns": 2,
+        "rows": 8,
+        "cell_width": 768,
+        "cell_height": 128
+      },
+      "items": [
+        "office with desks and monitors",
+        "condo with sofa, kitchenette and plant",
+        "hotel bedroom with bed and bedside lamps",
+        "shop with shelves and checkout",
+        "fast-food counter with stools",
+        "restaurant with tables and kitchen",
+        "medical clinic with examination bed",
+        "security office with monitor desk",
+        "housekeeping with linen shelves and cart",
+        "party hall with festive tables",
+        "cinema with screen and seats",
+        "metro platform with train doors",
+        "lobby with reception and seating",
+        "parking garage with parked car",
+        "recycling room with bins",
+        "elevator machinery room with motor and pulley"
+      ],
+      "request": {
+        "model": "openai/gpt-image-2.6-flare",
+        "prompt": "CRITICAL GRID GEOMETRY: render exactly eight IDENTICAL HEIGHT horizontal rows, each exactly 128px high. Put horizontal floor edges at y=128,256,384,512,640,768,896,1024, never approximate. No ceiling decorations or furnishings may cross these boundaries. x=768 is the sole column split. All 16 independent rooms must occupy exactly 768x128 pixels, fully rectangular, orthographic elevation, simplified large furniture, much less decoration. No signs or written marks. Original warm illustrated dollhouse game art. Gentle hand-painted gouache surface, honey wood, terracotta, sage green, creamy walls, soft cozy lamplight; simple clean readable silhouettes, restrained detail, inviting handcrafted character. Fixed perfectly straight-on orthographic SIDE camera; no isometric rotation or perspective convergence. No text, labels, numbers, logos, lettering or watermarks. Create ONE production sprite sheet, exact size 1536x1024. EXACT regular invisible grid of 2 COLUMNS by 8 ROWS; 16 cells of 768x128 pixels. Vertical boundaries at [0, 768, 1536]; horizontal boundaries at [0, 128, 256, 384, 512, 640, 768, 896, 1024]. NO gutters, grid lines, borders, outer margins or labels. Never alter the grid to fit subjects. Each cell is a complete independent very wide low room vignette, room walls and furniture fully contained inside its 768x128 cell. Every cell has its own ceiling at top and floor at bottom, rooms never span cells. All rooms same camera, scale and lighting. No people. Do not make a tower scene. Each room is a broad panoramic game tile. Fill each cell edge to edge with its room, no outer margin. Cells in exact ROW-MAJOR order (left to right, then next row): row 1 column 1: office with desks and monitors; row 1 column 2: condo with sofa, kitchenette and plant; row 2 column 1: hotel bedroom with bed and bedside lamps; row 2 column 2: shop with shelves and checkout; row 3 column 1: fast-food counter with stools; row 3 column 2: restaurant with tables and kitchen; row 4 column 1: medical clinic with examination bed; row 4 column 2: security office with monitor desk; row 5 column 1: housekeeping with linen shelves and cart; row 5 column 2: party hall with festive tables; row 6 column 1: cinema with screen and seats; row 6 column 2: metro platform with train doors; row 7 column 1: lobby with reception and seating; row 7 column 2: parking garage with parked car; row 8 column 1: recycling room with bins; row 8 column 2: elevator machinery room with motor and pulley.",
+        "size": "1536x1024",
+        "quality": "high",
+        "n": 1,
+        "output_format": "png"
+      },
+      "response_headers": {
+        "Content-Type": "application/json",
+        "Date": "Sat, 07 Nov 2026 23:58:52 GMT",
+        "X-Vercel-Id": "fra1::fra1::shzz2-1794095921563-51a805513ac7"
+      },
+      "http_status": 200,
+      "response": {
+        "created": 1794095932,
+        "data": [
+          {}
+        ],
+        "usage": {
+          "total_tokens": 1961,
+          "input_tokens": 608,
+          "output_tokens": 1353,
+          "input_tokens_details": {
+            "text_tokens": 608,
+            "image_tokens": 0
+          }
+        },
+        "providerMetadata": {
+          "openai": {
+            "images": [
+              {
+                "imageTokens": 0,
+                "textTokens": 608,
+                "created": 1794095931,
+                "size": "1536x1024",
+                "quality": "high",
+                "background": "opaque",
+                "outputFormat": "png"
+              }
+            ]
+          },
+          "gateway": {
+            "routing": {
+              "originalModelId": "openai/gpt-image-2.6-flare",
+              "resolvedProvider": "openai",
+              "fallbacksAvailable": [],
+              "canonicalSlug": "openai/gpt-image-2.6-flare",
+              "finalProvider": "openai",
+              "modelAttemptCount": 1,
+              "modelAttempts": [
+                {
+                  "canonicalSlug": "openai/gpt-image-2.6-flare",
+                  "success": true,
+                  "providerAttemptCount": 1,
+                  "providerAttempts": [
+                    {
+                      "provider": "openai",
+                      "credentialType": "system",
+                      "success": true,
+                      "startTime": 1794095921661,
+                      "endTime": 1794095932396,
+                      "statusCode": 200
+                    }
+                  ]
+                }
+              ],
+              "totalProviderAttemptCount": 1
+            },
+            "cost": "0.04363",
+            "marketCost": "0.04363",
+            "surchargeCost": "0",
+            "gatewayCost": "0.04363",
+            "inferenceCost": "0.04363",
+            "inputInferenceCost": "0",
+            "outputInferenceCost": "0.04363",
+            "generationId": "gen_01M6W76EE5EDN1KX53Q7QQRFCJ"
+          }
+        }
+      },
+      "sha256": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "status": "deterministically-normalized",
+      "visual_review": {
+        "ready_for_exact_grid_crop": true,
+        "findings": [
+          "All sixteen room categories personally inspected in normalized contact sheet; no cross-row content.",
+          "Parking index13 and machinery index15 stretched horizontally from their narrow observed cells.",
+          "Real generated recycling bins, baler and sorting bench at index14; separate generation compressed vertically, more detailed than other rooms.",
+          "Original fast-food pictorial menu markings remain."
+        ]
+      },
+      "original_file": "rooms.generated.png",
+      "original_sha256": "990008c569dd44ddf0edc3c2050ac3119fa301e3fa9f01e01330896904b32445",
+      "request_response_scope": "Original generated sheet retained as rooms.generated.png; normalized final hash differs. Recycling generation is recorded separately.",
+      "prior_visual_review": {
+        "ready_for_exact_grid_crop": false,
+        "findings": [
+          "Correction produced seven illustrated room rows instead of eight; recycling room missing.",
+          "Rooms remain recognizable and coherent but exact 128px row crops would cut across room boundaries.",
+          "Final bottom row has parking left and elevator machinery right; machinery is intended for row eight.",
+          "Minor pictorial menu markings remain in fast-food room."
+        ]
+      }
+    },
+    {
+      "file": "people.png",
+      "grid": {
+        "columns": 6,
+        "rows": 4,
+        "cell_width": 256,
+        "cell_height": 256
+      },
+      "items": [
+        "business pedestrian in sage suit carrying briefcase",
+        "casual resident in terracotta sweater",
+        "maid in cream apron over sage uniform",
+        "VIP wedding guest in honey jacket with small boutonniere"
+      ],
+      "request": {
+        "model": "openai/gpt-image-2.6-flare",
+        "prompt": "Original warm illustrated dollhouse game art. Gentle hand-painted gouache surface, honey wood, terracotta, sage green, creamy walls, soft cozy lamplight; simple clean readable silhouettes, restrained detail, inviting handcrafted character. Fixed perfectly straight-on orthographic SIDE camera; no isometric rotation or perspective convergence. No text, labels, numbers, logos, lettering or watermarks. Create ONE production sprite sheet, exact size 1536x1024. EXACT regular invisible grid of 6 COLUMNS by 4 ROWS; 24 cells of 256x256 pixels. Vertical boundaries at [0, 256, 512, 768, 1024, 1280, 1536]; horizontal boundaries at [0, 256, 512, 768, 1024]. NO gutters, grid lines, borders, outer margins or labels. Never alter the grid to fit subjects. Exactly 24 full-body figures, one per 256x256 cell, facing right in side profile. Each ROW is six coherent sequential walking/working poses of exactly the same person with identical clothes, face, proportions, size and registration. Row subjects listed below. Six columns are a full walk cycle: left foot forward, passing, right foot forward, passing, left heel lifted, neutral working gesture. Feet baseline at local y=228 in every cell, head near local y=35, body horizontally centered. Absolutely flat pure white #ffffff background throughout; no ground shadows or colored background, no intercell overlap. Hands, feet and accessories entirely contained in their own cell. Row subjects TOP TO BOTTOM: row 1: business pedestrian in sage suit carrying briefcase; row 2: casual resident in terracotta sweater; row 3: maid in cream apron over sage uniform; row 4: VIP wedding guest in honey jacket with small boutonniere.",
+        "size": "1536x1024",
+        "quality": "high",
+        "n": 1,
+        "output_format": "png"
+      },
+      "response_headers": {
+        "Content-Type": "application/json",
+        "Date": "Sat, 07 Nov 2026 23:51:45 GMT",
+        "X-Vercel-Id": "fra1::fra1::5wwqt-1794095496332-f7c1f47afb44"
+      },
+      "http_status": 200,
+      "response": {
+        "created": 1794095506,
+        "data": [
+          {}
+        ],
+        "usage": {
+          "total_tokens": 1737,
+          "input_tokens": 384,
+          "output_tokens": 1353,
+          "input_tokens_details": {
+            "text_tokens": 384,
+            "image_tokens": 0
+          }
+        },
+        "providerMetadata": {
+          "openai": {
+            "images": [
+              {
+                "imageTokens": 0,
+                "textTokens": 384,
+                "created": 1794095505,
+                "size": "1536x1024",
+                "quality": "high",
+                "background": "opaque",
+                "outputFormat": "png"
+              }
+            ]
+          },
+          "gateway": {
+            "routing": {
+              "originalModelId": "openai/gpt-image-2.6-flare",
+              "resolvedProvider": "openai",
+              "fallbacksAvailable": [],
+              "canonicalSlug": "openai/gpt-image-2.6-flare",
+              "finalProvider": "openai",
+              "modelAttemptCount": 1,
+              "modelAttempts": [
+                {
+                  "canonicalSlug": "openai/gpt-image-2.6-flare",
+                  "success": true,
+                  "providerAttemptCount": 1,
+                  "providerAttempts": [
+                    {
+                      "provider": "openai",
+                      "credentialType": "system",
+                      "success": true,
+                      "startTime": 1794095496366,
+                      "endTime": 1794095506001,
+                      "statusCode": 200
+                    }
+                  ]
+                }
+              ],
+              "totalProviderAttemptCount": 1
+            },
+            "cost": "0.04251",
+            "marketCost": "0.04251",
+            "surchargeCost": "0",
+            "gatewayCost": "0.04251",
+            "inferenceCost": "0.04251",
+            "inputInferenceCost": "0",
+            "outputInferenceCost": "0.04251",
+            "generationId": "gen_01M6W6SF4WNQCXEZRKQFH32R40"
+          }
+        }
+      },
+      "sha256": "4c80b525f341424cfcf7b1a9a87d9e8c5c495baddf46722b3762df2045925bfe",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "status": "generated",
+      "visual_review": {
+        "ready_for_exact_grid_crop": true,
+        "findings": [
+          "All 24 full-body figures present in six columns and four rows, white background, no ground shadows.",
+          "Same person and coherent outfit maintained within each row; some cycle poses are near duplicates.",
+          "Generated baselines are near cell bottom, not precisely the prompted y=228; production registration still requires packing review.",
+          "Fourth row represents wedding/VIP character, not a distinct emergency responder."
+        ]
+      }
+    },
+    {
+      "file": "transport.png",
+      "grid": {
+        "columns": 4,
+        "rows": 4,
+        "cell_width": 384,
+        "cell_height": 256
+      },
+      "items": [
+        "lift empty doors closed",
+        "lift partially full doors opening",
+        "lift full doors open",
+        "express lift",
+        "engine machinery",
+        "lift shaft",
+        "stairs ascending right",
+        "stairs descending right",
+        "escalator ascending right",
+        "escalator descending right",
+        "metro train",
+        "parking car",
+        "parking ramp",
+        "service vehicle",
+        "helicopter",
+        "construction crane"
+      ],
+      "request": {
+        "model": "openai/gpt-image-2.6-flare",
+        "prompt": "Original warm illustrated dollhouse game art. Gentle hand-painted gouache surface, honey wood, terracotta, sage green, creamy walls, soft cozy lamplight; simple clean readable silhouettes, restrained detail, inviting handcrafted character. Fixed perfectly straight-on orthographic SIDE camera; no isometric rotation or perspective convergence. No text, labels, numbers, logos, lettering or watermarks. Create ONE production sprite sheet, exact size 1536x1024. EXACT regular invisible grid of 4 COLUMNS by 4 ROWS; 16 cells of 384x256 pixels. Vertical boundaries at [0, 384, 768, 1152, 1536]; horizontal boundaries at [0, 256, 512, 768, 1024]. NO gutters, grid lines, borders, outer margins or labels. Never alter the grid to fit subjects. Exactly one isolated complete object in each 384x256 cell, centered with consistent scale by category. Flat pure white #ffffff background, no cast shadows or ground. Keep every object fully within its cell with a little breathing room. Lift variants share identical cabin design, position and size; people only inside occupied lifts. Stairs and escalators have recognizable opposed ascent/descent silhouettes. Cells in exact ROW-MAJOR order (left to right, then next row): row 1 column 1: lift empty doors closed; row 1 column 2: lift partially full doors opening; row 1 column 3: lift full doors open; row 1 column 4: express lift; row 2 column 1: engine machinery; row 2 column 2: lift shaft; row 2 column 3: stairs ascending right; row 2 column 4: stairs descending right; row 3 column 1: escalator ascending right; row 3 column 2: escalator descending right; row 3 column 3: metro train; row 3 column 4: parking car; row 4 column 1: parking ramp; row 4 column 2: service vehicle; row 4 column 3: helicopter; row 4 column 4: construction crane.",
+        "size": "1536x1024",
+        "quality": "high",
+        "n": 1,
+        "output_format": "png"
+      },
+      "response_headers": {
+        "Content-Type": "application/json",
+        "Date": "Sat, 07 Nov 2026 23:51:46 GMT",
+        "X-Vercel-Id": "fra1::fra1::2f85n-1794095496338-17f249cb80df"
+      },
+      "http_status": 200,
+      "response": {
+        "created": 1794095506,
+        "data": [
+          {}
+        ],
+        "usage": {
+          "total_tokens": 1799,
+          "input_tokens": 446,
+          "output_tokens": 1353,
+          "input_tokens_details": {
+            "text_tokens": 446,
+            "image_tokens": 0
+          }
+        },
+        "providerMetadata": {
+          "openai": {
+            "images": [
+              {
+                "imageTokens": 0,
+                "textTokens": 446,
+                "created": 1794095505,
+                "size": "1536x1024",
+                "quality": "high",
+                "background": "opaque",
+                "outputFormat": "png"
+              }
+            ]
+          },
+          "gateway": {
+            "routing": {
+              "originalModelId": "openai/gpt-image-2.6-flare",
+              "resolvedProvider": "openai",
+              "fallbacksAvailable": [],
+              "canonicalSlug": "openai/gpt-image-2.6-flare",
+              "finalProvider": "openai",
+              "modelAttemptCount": 1,
+              "modelAttempts": [
+                {
+                  "canonicalSlug": "openai/gpt-image-2.6-flare",
+                  "success": true,
+                  "providerAttemptCount": 1,
+                  "providerAttempts": [
+                    {
+                      "provider": "openai",
+                      "credentialType": "system",
+                      "success": true,
+                      "startTime": 1794095496410,
+                      "endTime": 1794095506412,
+                      "statusCode": 200
+                    }
+                  ]
+                }
+              ],
+              "totalProviderAttemptCount": 1
+            },
+            "cost": "0.04282",
+            "marketCost": "0.04282",
+            "surchargeCost": "0",
+            "gatewayCost": "0.04282",
+            "inferenceCost": "0.04282",
+            "inputInferenceCost": "0",
+            "outputInferenceCost": "0.04282",
+            "generationId": "gen_01M6W6SF5VQGAKMT6XA2N21ZK2"
+          }
+        }
+      },
+      "sha256": "4b8f22470b3ffa3b49984574182181ffca8a9e1ee607268169652411a17ad659",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "status": "generated",
+      "visual_review": {
+        "ready_for_exact_grid_crop": true,
+        "findings": [
+          "All 16 categories present, evenly spaced four by four, white background, silhouettes contained.",
+          "Partially opening second lift has no visible passengers, so partial occupancy is not represented.",
+          "Lift cabin designs differ slightly across variants; no pixel-registered door animation guarantee.",
+          "Parking ramp includes perspective depth; other major objects retain side/front view."
+        ]
+      }
+    },
+    {
+      "file": "exterior-effects.png",
+      "grid": {
+        "columns": 4,
+        "rows": 4,
+        "cell_width": 384,
+        "cell_height": 256
+      },
+      "items": [
+        "clear pale blue sky patch",
+        "warm dusk sky patch",
+        "deep indigo night sky patch",
+        "soft clouds",
+        "distant warm town skyline",
+        "horizontal floor and ceiling strip",
+        "horizontal ground and roof trim",
+        "small warm orange flame pose 1",
+        "same flame pose 2",
+        "same flame pose 3",
+        "cathedral exterior in daylight",
+        "cathedral ceremony with couple",
+        "wedding flower arch decoration",
+        "medical emblem cross",
+        "warning triangle symbol",
+        "star badge"
+      ],
+      "request": {
+        "model": "openai/gpt-image-2.6-flare",
+        "prompt": "CRITICAL BACKGROUND OVERRIDE: only cells row1 col1,col2,col3 contain full sky colors. EVERY OTHER CELL, including clouds, must have solid pure white RGB(255,255,255) background and white corners. No beige, gray, brown, gradients, vignette, scenery behind cutout objects, paper texture or glow on the background. Texture/warm light only INSIDE subject silhouettes. No grid divider lines. White space between subjects is background within cells, never a gutter. Floor/ceiling and ground/roof assets are thin isolated horizontal strips on white, not full room scenes. Original warm illustrated dollhouse game art. Gentle hand-painted gouache surface, honey wood, terracotta, sage green, creamy walls, soft cozy lamplight; simple clean readable silhouettes, restrained detail, inviting handcrafted character. Fixed perfectly straight-on orthographic SIDE camera; no isometric rotation or perspective convergence. No text, labels, numbers, logos, lettering or watermarks. Create ONE production sprite sheet, exact size 1536x1024. EXACT regular invisible grid of 4 COLUMNS by 4 ROWS; 16 cells of 384x256 pixels. Vertical boundaries at [0, 384, 768, 1152, 1536]; horizontal boundaries at [0, 256, 512, 768, 1024]. NO gutters, grid lines, borders, outer margins or labels. Never alter the grid to fit subjects. Each 384x256 cell contains exactly its listed complete asset. First three sky cells fill their own cell edge to edge; every other cell has pure flat white #ffffff background and no ground shadows. Isolate the remaining objects with generous breathing room. Flame poses share same position, scale and palette for animation. Cathedral exterior and ceremony remain tiny complete side-view compositions contained inside their own cells. Cells in exact ROW-MAJOR order (left to right, then next row): row 1 column 1: clear pale blue sky patch; row 1 column 2: warm dusk sky patch; row 1 column 3: deep indigo night sky patch; row 1 column 4: soft clouds; row 2 column 1: distant warm town skyline; row 2 column 2: horizontal floor and ceiling strip; row 2 column 3: horizontal ground and roof trim; row 2 column 4: small warm orange flame pose 1; row 3 column 1: same flame pose 2; row 3 column 2: same flame pose 3; row 3 column 3: cathedral exterior in daylight; row 3 column 4: cathedral ceremony with couple; row 4 column 1: wedding flower arch decoration; row 4 column 2: medical emblem cross; row 4 column 3: warning triangle symbol; row 4 column 4: star badge.",
+        "size": "1536x1024",
+        "quality": "high",
+        "n": 1,
+        "output_format": "png"
+      },
+      "response_headers": {
+        "Content-Type": "application/json",
+        "Date": "Sat, 07 Nov 2026 23:58:50 GMT",
+        "X-Vercel-Id": "fra1::fra1::lph6n-1794095921650-6502d88e4ba8"
+      },
+      "http_status": 200,
+      "response": {
+        "created": 1794095930,
+        "data": [
+          {}
+        ],
+        "usage": {
+          "total_tokens": 1948,
+          "input_tokens": 595,
+          "output_tokens": 1353,
+          "input_tokens_details": {
+            "text_tokens": 595,
+            "image_tokens": 0
+          }
+        },
+        "providerMetadata": {
+          "openai": {
+            "images": [
+              {
+                "imageTokens": 0,
+                "textTokens": 595,
+                "created": 1794095930,
+                "size": "1536x1024",
+                "quality": "high",
+                "background": "transparent",
+                "outputFormat": "png"
+              }
+            ]
+          },
+          "gateway": {
+            "routing": {
+              "originalModelId": "openai/gpt-image-2.6-flare",
+              "resolvedProvider": "openai",
+              "fallbacksAvailable": [],
+              "canonicalSlug": "openai/gpt-image-2.6-flare",
+              "finalProvider": "openai",
+              "modelAttemptCount": 1,
+              "modelAttempts": [
+                {
+                  "canonicalSlug": "openai/gpt-image-2.6-flare",
+                  "success": true,
+                  "providerAttemptCount": 1,
+                  "providerAttempts": [
+                    {
+                      "provider": "openai",
+                      "credentialType": "system",
+                      "success": true,
+                      "startTime": 1794095921707,
+                      "endTime": 1794095930837,
+                      "statusCode": 200
+                    }
+                  ]
+                }
+              ],
+              "totalProviderAttemptCount": 1
+            },
+            "cost": "0.043565",
+            "marketCost": "0.043565",
+            "surchargeCost": "0",
+            "gatewayCost": "0.043565",
+            "inferenceCost": "0.043565",
+            "inputInferenceCost": "0",
+            "outputInferenceCost": "0.043565",
+            "generationId": "gen_01M6W76EG7RS2W79CRP8SQ6F0P"
+          }
+        }
+      },
+      "sha256": "200943773a0ff4a091784a8a2dce4d049ef4d47ee47eb2716fbedab7c630303f",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "status": "deterministically-normalized",
+      "visual_review": {
+        "ready_for_exact_grid_crop": true,
+        "findings": [
+          "All sixteen cells present; exact 4x4 preserved.",
+          "Sky cells0-2 fully opaque and pixel-identical; clouds/emblem interiors retain actual art.",
+          "Exterior cutouts use binary alpha; soft glow discarded, some edge halos/coarse polygon outlines remain.",
+          "Wall/trim assets retain complete illustrated walls; wedding arch retains original cream interior backdrop.",
+          "Ceremony silhouette preserves spires via observed polygon; small background wedges remain between architecture."
+        ]
+      },
+      "original_file": "exterior-effects.generated.png",
+      "original_sha256": "aac97bf4f73794ac8acb8172a41fab8b61bd5772d861ca1d200f12f8ac5cb063",
+      "request_response_scope": "Original generated sheet retained as exterior-effects.generated.png; normalized final hash differs. Recycling generation is recorded separately.",
+      "prior_visual_review": {
+        "ready_for_exact_grid_crop": true,
+        "findings": [
+          "All 16 categories present in four by four layout.",
+          "Cutout backgrounds are colored/gradient rather than requested flat white, even after one targeted correction.",
+          "Cloud tile is opaque and floor/ceiling and roof/ground assets include broad wall context.",
+          "Usable as opaque source tiles; not production-ready transparent effects, flames or clouds.",
+          "Flame silhouettes vary but have slight registration and scale differences."
+        ]
+      }
+    },
+    {
+      "file": "ui.png",
+      "grid": {
+        "columns": 4,
+        "rows": 4,
+        "cell_width": 384,
+        "cell_height": 256
+      },
+      "items": [
+        "office desk and monitor",
+        "home house and sofa",
+        "hotel bed",
+        "shop bag and storefront",
+        "dining plate and fork",
+        "medical cross and case",
+        "security shield",
+        "housekeeping brush and bucket",
+        "party hall bunting",
+        "cinema clapper and reel",
+        "metro train front",
+        "lobby reception bell",
+        "parking car",
+        "recycling arrows and bin",
+        "elevator doors",
+        "stairs"
+      ],
+      "request": {
+        "model": "openai/gpt-image-2.6-flare",
+        "prompt": "CRITICAL BACKGROUND OVERRIDE: the ENTIRE canvas background must be solid pure white RGB(255,255,255). No colored gradients, vignette, brown backdrop, room, paper texture, cast shadows or warm light on background. Gouache texture and warm colors apply ONLY inside the icon silhouettes. Every cell must have pure WHITE background corners, easy to remove for a game cutout. Keep each icon at least 24 pixels from cell boundaries, complete and isolated. Original warm illustrated dollhouse game art. Gentle hand-painted gouache surface, honey wood, terracotta, sage green, creamy walls, soft cozy lamplight; simple clean readable silhouettes, restrained detail, inviting handcrafted character. Fixed perfectly straight-on orthographic SIDE camera; no isometric rotation or perspective convergence. No text, labels, numbers, logos, lettering or watermarks. Create ONE production sprite sheet, exact size 1536x1024. EXACT regular invisible grid of 4 COLUMNS by 4 ROWS; 16 cells of 384x256 pixels. Vertical boundaries at [0, 384, 768, 1152, 1536]; horizontal boundaries at [0, 256, 512, 768, 1024]. NO gutters, grid lines, borders, outer margins or labels. Never alter the grid to fit subjects. Exactly 16 coherent UI icons/ornaments, one centered icon per 384x256 cell. Flat pure white #ffffff background, no cast shadows. Identical visual weight, centered, strong silhouettes recognizable at tiny game toolbar sizes. No written symbols, letters or numerals. Warm painted honey-wood rounded frames and sage/terracotta highlights. Every icon entirely contained within its own cell. Cells in exact ROW-MAJOR order (left to right, then next row): row 1 column 1: office desk and monitor; row 1 column 2: home house and sofa; row 1 column 3: hotel bed; row 1 column 4: shop bag and storefront; row 2 column 1: dining plate and fork; row 2 column 2: medical cross and case; row 2 column 3: security shield; row 2 column 4: housekeeping brush and bucket; row 3 column 1: party hall bunting; row 3 column 2: cinema clapper and reel; row 3 column 3: metro train front; row 3 column 4: lobby reception bell; row 4 column 1: parking car; row 4 column 2: recycling arrows and bin; row 4 column 3: elevator doors; row 4 column 4: stairs.",
+        "size": "1536x1024",
+        "quality": "high",
+        "n": 1,
+        "output_format": "png"
+      },
+      "response_headers": {
+        "Content-Type": "application/json",
+        "Date": "Sat, 07 Nov 2026 23:58:51 GMT",
+        "X-Vercel-Id": "fra1::fra1::xj6f6-1794095921638-31585ff383a3"
+      },
+      "http_status": 200,
+      "response": {
+        "created": 1794095931,
+        "data": [
+          {}
+        ],
+        "usage": {
+          "total_tokens": 1905,
+          "input_tokens": 552,
+          "output_tokens": 1353,
+          "input_tokens_details": {
+            "text_tokens": 552,
+            "image_tokens": 0
+          }
+        },
+        "providerMetadata": {
+          "openai": {
+            "images": [
+              {
+                "imageTokens": 0,
+                "textTokens": 552,
+                "created": 1794095931,
+                "size": "1536x1024",
+                "quality": "high",
+                "background": "opaque",
+                "outputFormat": "png"
+              }
+            ]
+          },
+          "gateway": {
+            "routing": {
+              "originalModelId": "openai/gpt-image-2.6-flare",
+              "resolvedProvider": "openai",
+              "fallbacksAvailable": [],
+              "canonicalSlug": "openai/gpt-image-2.6-flare",
+              "finalProvider": "openai",
+              "modelAttemptCount": 1,
+              "modelAttempts": [
+                {
+                  "canonicalSlug": "openai/gpt-image-2.6-flare",
+                  "success": true,
+                  "providerAttemptCount": 1,
+                  "providerAttempts": [
+                    {
+                      "provider": "openai",
+                      "credentialType": "system",
+                      "success": true,
+                      "startTime": 1794095921708,
+                      "endTime": 1794095931900,
+                      "statusCode": 200
+                    }
+                  ]
+                }
+              ],
+              "totalProviderAttemptCount": 1
+            },
+            "cost": "0.04335",
+            "marketCost": "0.04335",
+            "surchargeCost": "0",
+            "gatewayCost": "0.04335",
+            "inferenceCost": "0.04335",
+            "inputInferenceCost": "0",
+            "outputInferenceCost": "0.04335",
+            "generationId": "gen_01M6W76EGAZ5BX2HJ7CN6VYN40"
+          }
+        }
+      },
+      "sha256": "c57a4a096776925aecd283cb60fcfb389a9f201c665b8d11b5bbe704993b987e",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "status": "generated",
+      "visual_review": {
+        "ready_for_exact_grid_crop": true,
+        "findings": [
+          "All 16 ordered icons present, contained, four by four, clean white background after correction.",
+          "Gouache texture becomes fine detail at tiny toolbar scale; packing must assess legibility."
+        ]
+      }
+    }
+  ],
+  "discarded_attempts": [
+    {
+      "file": "rooms.png",
+      "grid": {
+        "columns": 2,
+        "rows": 8,
+        "cell_width": 768,
+        "cell_height": 128
+      },
+      "items": [
+        "office with desks and monitors",
+        "condo with sofa, kitchenette and plant",
+        "hotel bedroom with bed and bedside lamps",
+        "shop with shelves and checkout",
+        "fast-food counter with stools",
+        "restaurant with tables and kitchen",
+        "medical clinic with examination bed",
+        "security office with monitor desk",
+        "housekeeping with linen shelves and cart",
+        "party hall with festive tables",
+        "cinema with screen and seats",
+        "metro platform with train doors",
+        "lobby with reception and seating",
+        "parking garage with parked car",
+        "recycling room with bins",
+        "elevator machinery room with motor and pulley"
+      ],
+      "request": {
+        "model": "openai/gpt-image-2.6-flare",
+        "prompt": "Original warm illustrated dollhouse game art. Gentle hand-painted gouache surface, honey wood, terracotta, sage green, creamy walls, soft cozy lamplight; simple clean readable silhouettes, restrained detail, inviting handcrafted character. Fixed perfectly straight-on orthographic SIDE camera; no isometric rotation or perspective convergence. No text, labels, numbers, logos, lettering or watermarks. Create ONE production sprite sheet, exact size 1536x1024. EXACT regular invisible grid of 2 COLUMNS by 8 ROWS; 16 cells of 768x128 pixels. Vertical boundaries at [0, 768, 1536]; horizontal boundaries at [0, 128, 256, 384, 512, 640, 768, 896, 1024]. NO gutters, grid lines, borders, outer margins or labels. Never alter the grid to fit subjects. Each cell is a complete independent very wide low room vignette, room walls and furniture fully contained inside its 768x128 cell. Every cell has its own ceiling at top and floor at bottom, rooms never span cells. All rooms same camera, scale and lighting. No people. Do not make a tower scene. Each room is a broad panoramic game tile. Fill each cell edge to edge with its room, no outer margin. Cells in exact ROW-MAJOR order (left to right, then next row): row 1 column 1: office with desks and monitors; row 1 column 2: condo with sofa, kitchenette and plant; row 2 column 1: hotel bedroom with bed and bedside lamps; row 2 column 2: shop with shelves and checkout; row 3 column 1: fast-food counter with stools; row 3 column 2: restaurant with tables and kitchen; row 4 column 1: medical clinic with examination bed; row 4 column 2: security office with monitor desk; row 5 column 1: housekeeping with linen shelves and cart; row 5 column 2: party hall with festive tables; row 6 column 1: cinema with screen and seats; row 6 column 2: metro platform with train doors; row 7 column 1: lobby with reception and seating; row 7 column 2: parking garage with parked car; row 8 column 1: recycling room with bins; row 8 column 2: elevator machinery room with motor and pulley.",
+        "size": "1536x1024",
+        "quality": "high",
+        "n": 1,
+        "output_format": "png"
+      },
+      "response_headers": {
+        "Content-Type": "application/json",
+        "Date": "Sat, 07 Nov 2026 23:51:48 GMT",
+        "X-Vercel-Id": "fra1::fra1::fwhtt-1794095496336-58e8915d8a1f"
+      },
+      "http_status": 200,
+      "response": {
+        "created": 1794095508,
+        "data": [
+          {}
+        ],
+        "usage": {
+          "total_tokens": 1857,
+          "input_tokens": 504,
+          "output_tokens": 1353,
+          "input_tokens_details": {
+            "text_tokens": 504,
+            "image_tokens": 0
+          }
+        },
+        "providerMetadata": {
+          "openai": {
+            "images": [
+              {
+                "imageTokens": 0,
+                "textTokens": 504,
+                "created": 1794095507,
+                "size": "1536x1024",
+                "quality": "high",
+                "background": "opaque",
+                "outputFormat": "png"
+              }
+            ]
+          },
+          "gateway": {
+            "routing": {
+              "originalModelId": "openai/gpt-image-2.6-flare",
+              "resolvedProvider": "openai",
+              "fallbacksAvailable": [],
+              "canonicalSlug": "openai/gpt-image-2.6-flare",
+              "finalProvider": "openai",
+              "modelAttemptCount": 1,
+              "modelAttempts": [
+                {
+                  "canonicalSlug": "openai/gpt-image-2.6-flare",
+                  "success": true,
+                  "providerAttemptCount": 1,
+                  "providerAttempts": [
+                    {
+                      "provider": "openai",
+                      "credentialType": "system",
+                      "success": true,
+                      "startTime": 1794095496408,
+                      "endTime": 1794095508568,
+                      "statusCode": 200
+                    }
+                  ]
+                }
+              ],
+              "totalProviderAttemptCount": 1
+            },
+            "cost": "0.04311",
+            "marketCost": "0.04311",
+            "surchargeCost": "0",
+            "gatewayCost": "0.04311",
+            "inferenceCost": "0.04311",
+            "inputInferenceCost": "0",
+            "outputInferenceCost": "0.04311",
+            "generationId": "gen_01M6W6SF6ANNCYXAHVETBY7V1E"
+          }
+        }
+      },
+      "sha256": "84c742dc7a8eab589bcebf0a789bbbfb63e728c48a8e266467d280a3f2e689fe",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "status": "superseded",
+      "correction_reason": "CRITICAL GRID GEOMETRY: render exactly eight IDENTICAL HEIGHT horizontal rows, each exactly 128px high. Put horizontal floor edges at y=128,256,384,512,640,768,896,1024, never approximate. No ceiling decorations or furnishings may cross these boundaries. x=768 is the sole column split. All 16 independent rooms must occupy exactly 768x128 pixels, fully rectangular, orthographic elevation, simplified large furniture, much less decoration. No signs or written marks. "
+    },
+    {
+      "file": "exterior-effects.png",
+      "grid": {
+        "columns": 4,
+        "rows": 4,
+        "cell_width": 384,
+        "cell_height": 256
+      },
+      "items": [
+        "clear pale blue sky patch",
+        "warm dusk sky patch",
+        "deep indigo night sky patch",
+        "soft clouds",
+        "distant warm town skyline",
+        "horizontal floor and ceiling strip",
+        "horizontal ground and roof trim",
+        "small warm orange flame pose 1",
+        "same flame pose 2",
+        "same flame pose 3",
+        "cathedral exterior in daylight",
+        "cathedral ceremony with couple",
+        "wedding flower arch decoration",
+        "medical emblem cross",
+        "warning triangle symbol",
+        "star badge"
+      ],
+      "request": {
+        "model": "openai/gpt-image-2.6-flare",
+        "prompt": "Original warm illustrated dollhouse game art. Gentle hand-painted gouache surface, honey wood, terracotta, sage green, creamy walls, soft cozy lamplight; simple clean readable silhouettes, restrained detail, inviting handcrafted character. Fixed perfectly straight-on orthographic SIDE camera; no isometric rotation or perspective convergence. No text, labels, numbers, logos, lettering or watermarks. Create ONE production sprite sheet, exact size 1536x1024. EXACT regular invisible grid of 4 COLUMNS by 4 ROWS; 16 cells of 384x256 pixels. Vertical boundaries at [0, 384, 768, 1152, 1536]; horizontal boundaries at [0, 256, 512, 768, 1024]. NO gutters, grid lines, borders, outer margins or labels. Never alter the grid to fit subjects. Each 384x256 cell contains exactly its listed complete asset. First three sky cells fill their own cell edge to edge; every other cell has pure flat white #ffffff background and no ground shadows. Isolate the remaining objects with generous breathing room. Flame poses share same position, scale and palette for animation. Cathedral exterior and ceremony remain tiny complete side-view compositions contained inside their own cells. Cells in exact ROW-MAJOR order (left to right, then next row): row 1 column 1: clear pale blue sky patch; row 1 column 2: warm dusk sky patch; row 1 column 3: deep indigo night sky patch; row 1 column 4: soft clouds; row 2 column 1: distant warm town skyline; row 2 column 2: horizontal floor and ceiling strip; row 2 column 3: horizontal ground and roof trim; row 2 column 4: small warm orange flame pose 1; row 3 column 1: same flame pose 2; row 3 column 2: same flame pose 3; row 3 column 3: cathedral exterior in daylight; row 3 column 4: cathedral ceremony with couple; row 4 column 1: wedding flower arch decoration; row 4 column 2: medical emblem cross; row 4 column 3: warning triangle symbol; row 4 column 4: star badge.",
+        "size": "1536x1024",
+        "quality": "high",
+        "n": 1,
+        "output_format": "png"
+      },
+      "response_headers": {
+        "Content-Type": "application/json",
+        "Date": "Sat, 07 Nov 2026 23:51:45 GMT",
+        "X-Vercel-Id": "fra1::fra1::2w28h-1794095496336-09338d28523a"
+      },
+      "http_status": 200,
+      "response": {
+        "created": 1794095505,
+        "data": [
+          {}
+        ],
+        "usage": {
+          "total_tokens": 1825,
+          "input_tokens": 472,
+          "output_tokens": 1353,
+          "input_tokens_details": {
+            "text_tokens": 472,
+            "image_tokens": 0
+          }
+        },
+        "providerMetadata": {
+          "openai": {
+            "images": [
+              {
+                "imageTokens": 0,
+                "textTokens": 472,
+                "created": 1794095504,
+                "size": "1536x1024",
+                "quality": "high",
+                "background": "transparent",
+                "outputFormat": "png"
+              }
+            ]
+          },
+          "gateway": {
+            "routing": {
+              "originalModelId": "openai/gpt-image-2.6-flare",
+              "resolvedProvider": "openai",
+              "fallbacksAvailable": [],
+              "canonicalSlug": "openai/gpt-image-2.6-flare",
+              "finalProvider": "openai",
+              "modelAttemptCount": 1,
+              "modelAttempts": [
+                {
+                  "canonicalSlug": "openai/gpt-image-2.6-flare",
+                  "success": true,
+                  "providerAttemptCount": 1,
+                  "providerAttempts": [
+                    {
+                      "provider": "openai",
+                      "credentialType": "system",
+                      "success": true,
+                      "startTime": 1794095496346,
+                      "endTime": 1794095505754,
+                      "statusCode": 200
+                    }
+                  ]
+                }
+              ],
+              "totalProviderAttemptCount": 1
+            },
+            "cost": "0.04295",
+            "marketCost": "0.04295",
+            "surchargeCost": "0",
+            "gatewayCost": "0.04295",
+            "inferenceCost": "0.04295",
+            "inputInferenceCost": "0",
+            "outputInferenceCost": "0.04295",
+            "generationId": "gen_01M6W6SF4A4PRB0NSHTK5MAD8R"
+          }
+        }
+      },
+      "sha256": "04115759668d06c42b3e9b099f74765ecf94c5fb27bf04b5d3a688c2a49ad86e",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "status": "superseded",
+      "correction_reason": "CRITICAL BACKGROUND OVERRIDE: only cells row1 col1,col2,col3 contain full sky colors. EVERY OTHER CELL, including clouds, must have solid pure white RGB(255,255,255) background and white corners. No beige, gray, brown, gradients, vignette, scenery behind cutout objects, paper texture or glow on the background. Texture/warm light only INSIDE subject silhouettes. No grid divider lines. White space between subjects is background within cells, never a gutter. Floor/ceiling and ground/roof assets are thin isolated horizontal strips on white, not full room scenes. "
+    },
+    {
+      "file": "ui.png",
+      "grid": {
+        "columns": 4,
+        "rows": 4,
+        "cell_width": 384,
+        "cell_height": 256
+      },
+      "items": [
+        "office desk and monitor",
+        "home house and sofa",
+        "hotel bed",
+        "shop bag and storefront",
+        "dining plate and fork",
+        "medical cross and case",
+        "security shield",
+        "housekeeping brush and bucket",
+        "party hall bunting",
+        "cinema clapper and reel",
+        "metro train front",
+        "lobby reception bell",
+        "parking car",
+        "recycling arrows and bin",
+        "elevator doors",
+        "stairs"
+      ],
+      "request": {
+        "model": "openai/gpt-image-2.6-flare",
+        "prompt": "Original warm illustrated dollhouse game art. Gentle hand-painted gouache surface, honey wood, terracotta, sage green, creamy walls, soft cozy lamplight; simple clean readable silhouettes, restrained detail, inviting handcrafted character. Fixed perfectly straight-on orthographic SIDE camera; no isometric rotation or perspective convergence. No text, labels, numbers, logos, lettering or watermarks. Create ONE production sprite sheet, exact size 1536x1024. EXACT regular invisible grid of 4 COLUMNS by 4 ROWS; 16 cells of 384x256 pixels. Vertical boundaries at [0, 384, 768, 1152, 1536]; horizontal boundaries at [0, 256, 512, 768, 1024]. NO gutters, grid lines, borders, outer margins or labels. Never alter the grid to fit subjects. Exactly 16 coherent UI icons/ornaments, one centered icon per 384x256 cell. Flat pure white #ffffff background, no cast shadows. Identical visual weight, centered, strong silhouettes recognizable at tiny game toolbar sizes. No written symbols, letters or numerals. Warm painted honey-wood rounded frames and sage/terracotta highlights. Every icon entirely contained within its own cell. Cells in exact ROW-MAJOR order (left to right, then next row): row 1 column 1: office desk and monitor; row 1 column 2: home house and sofa; row 1 column 3: hotel bed; row 1 column 4: shop bag and storefront; row 2 column 1: dining plate and fork; row 2 column 2: medical cross and case; row 2 column 3: security shield; row 2 column 4: housekeeping brush and bucket; row 3 column 1: party hall bunting; row 3 column 2: cinema clapper and reel; row 3 column 3: metro train front; row 3 column 4: lobby reception bell; row 4 column 1: parking car; row 4 column 2: recycling arrows and bin; row 4 column 3: elevator doors; row 4 column 4: stairs.",
+        "size": "1536x1024",
+        "quality": "high",
+        "n": 1,
+        "output_format": "png"
+      },
+      "response_headers": {
+        "Content-Type": "application/json",
+        "Date": "Sat, 07 Nov 2026 23:51:45 GMT",
+        "X-Vercel-Id": "fra1::fra1::6mslv-1794095496333-08954b7a877f"
+      },
+      "http_status": 200,
+      "response": {
+        "created": 1794095505,
+        "data": [
+          {}
+        ],
+        "usage": {
+          "total_tokens": 1810,
+          "input_tokens": 457,
+          "output_tokens": 1353,
+          "input_tokens_details": {
+            "text_tokens": 457,
+            "image_tokens": 0
+          }
+        },
+        "providerMetadata": {
+          "openai": {
+            "images": [
+              {
+                "imageTokens": 0,
+                "textTokens": 457,
+                "created": 1794095504,
+                "size": "1536x1024",
+                "quality": "high",
+                "background": "transparent",
+                "outputFormat": "png"
+              }
+            ]
+          },
+          "gateway": {
+            "routing": {
+              "originalModelId": "openai/gpt-image-2.6-flare",
+              "resolvedProvider": "openai",
+              "fallbacksAvailable": [],
+              "canonicalSlug": "openai/gpt-image-2.6-flare",
+              "finalProvider": "openai",
+              "modelAttemptCount": 1,
+              "modelAttempts": [
+                {
+                  "canonicalSlug": "openai/gpt-image-2.6-flare",
+                  "success": true,
+                  "providerAttemptCount": 1,
+                  "providerAttempts": [
+                    {
+                      "provider": "openai",
+                      "credentialType": "system",
+                      "success": true,
+                      "startTime": 1794095496387,
+                      "endTime": 1794095505603,
+                      "statusCode": 200
+                    }
+                  ]
+                }
+              ],
+              "totalProviderAttemptCount": 1
+            },
+            "cost": "0.042875",
+            "marketCost": "0.042875",
+            "surchargeCost": "0",
+            "gatewayCost": "0.042875",
+            "inferenceCost": "0.042875",
+            "inputInferenceCost": "0",
+            "outputInferenceCost": "0.042875",
+            "generationId": "gen_01M6W6SF5J62SAZB3MTQJ07Z5Y"
+          }
+        }
+      },
+      "sha256": "0dda8e658c18e9595287fd988aa75cf99210c68f961d0fc95bc9e34194181dce",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "status": "superseded",
+      "correction_reason": "CRITICAL BACKGROUND OVERRIDE: the ENTIRE canvas background must be solid pure white RGB(255,255,255). No colored gradients, vignette, brown backdrop, room, paper texture, cast shadows or warm light on background. Gouache texture and warm colors apply ONLY inside the icon silhouettes. Every cell must have pure WHITE background corners, easy to remove for a game cutout. Keep each icon at least 24 pixels from cell boundaries, complete and isolated. "
+    }
+  ],
+  "production_ready": false,
+  "correction_rounds": 1,
+  "inspection": "Original rooms/exterior and new recycling inspected with view_image. Final separated room contact inspected: all sixteen present. Exterior checkerboard contact inspected and alpha corrected. Source-only pixel/dimension checks; no engine/build/browser/packing.",
+  "total_generation_requests": 9,
+  "total_gateway_cost_usd": 0.386225,
+  "source_contract_ready": true,
+  "production_ready_note": "Source grids and missing category corrected. Final packed sprite scale, animation registration and gameplay remain pack owner verification.",
+  "historical_generation_policy": "All recorded Gateway image calls completed before subsequent prohibition. No requests running at prohibition, none stopped mid-flight, none issued afterward. Future Gateway use forbidden except Jev.",
+  "supplemental_generations": [
+    {
+      "file": "recycling-room.generated.png",
+      "endpoint": "https://ai-gateway.vercel.sh/v1/images/generations",
+      "request": {
+        "model": "openai/gpt-image-2.6-flare",
+        "prompt": "Use case: stylized-concept. Original warm illustrated dollhouse game art. ONE single complete recycling utility room interior, straight-on orthographic side elevation, no perspective convergence. Honey wood shelving, terracotta floor, sage green recycling bins, small cardboard baler and sorting workbench with sorted paper and glass. Gentle hand-painted gouache texture, creamy walls, cozy warm lamplight, readable simple furniture, no people. A single broad panoramic room spanning the entire image width, ceiling at top and floor at bottom. No other rooms, no grid, no panels, no collage. No text, lettering, labels, numbers, logos, watermarks, or recycling symbols. The whole room and every furnishing fully inside the image. This room will be resized into a wide low game room tile.",
+        "size": "1536x1024",
+        "quality": "high",
+        "n": 1,
+        "output_format": "png"
+      },
+      "response_headers": {
+        "Content-Type": "application/json",
+        "Date": "Sun, 08 Nov 2026 00:40:57 GMT",
+        "X-Vercel-Id": "fra1::fra1::fxxm2-1794098449469-a3435d9ae88e"
+      },
+      "http_status": 200,
+      "response": {
+        "created": 1794098457,
+        "data": [
+          {}
+        ],
+        "usage": {
+          "total_tokens": 1518,
+          "input_tokens": 165,
+          "output_tokens": 1353,
+          "input_tokens_details": {
+            "text_tokens": 165,
+            "image_tokens": 0
+          }
+        },
+        "providerMetadata": {
+          "openai": {
+            "images": [
+              {
+                "imageTokens": 0,
+                "textTokens": 165,
+                "created": 1794098456,
+                "size": "1536x1024",
+                "quality": "high",
+                "background": "opaque",
+                "outputFormat": "png"
+              }
+            ]
+          },
+          "gateway": {
+            "routing": {
+              "originalModelId": "openai/gpt-image-2.6-flare",
+              "resolvedProvider": "openai",
+              "fallbacksAvailable": [],
+              "canonicalSlug": "openai/gpt-image-2.6-flare",
+              "finalProvider": "openai",
+              "modelAttemptCount": 1,
+              "modelAttempts": [
+                {
+                  "canonicalSlug": "openai/gpt-image-2.6-flare",
+                  "success": true,
+                  "providerAttemptCount": 1,
+                  "providerAttempts": [
+                    {
+                      "provider": "openai",
+                      "credentialType": "system",
+                      "success": true,
+                      "startTime": 1794098449775,
+                      "endTime": 1794098457621,
+                      "statusCode": 200
+                    }
+                  ]
+                }
+              ],
+              "totalProviderAttemptCount": 1
+            },
+            "cost": "0.041415",
+            "marketCost": "0.041415",
+            "surchargeCost": "0",
+            "gatewayCost": "0.041415",
+            "inferenceCost": "0.041415",
+            "inputInferenceCost": "0",
+            "outputInferenceCost": "0.041415",
+            "generationId": "gen_01M6W9KK45WD98B278YBFM1EJC"
+          }
+        }
+      },
+      "sha256": "9b60471b6608a19308c5249e0da25b85ccd60419033defeb175a32fd5aa3a557",
+      "model_verification": "GET https://ai-gateway.vercel.sh/v1/models returned exact openai/gpt-image-2.6-flare entry before request."
+    }
+  ],
+  "normalization": {
+    "manifest": "normalization.json",
+    "reproduction": "normalize.py",
+    "sha256": "8a81750ca91b18728dbfcbf916b8aab585cdd9ea22f41616c7a554dd04a0af7a",
+    "files": {
+      "rooms.generated.png": {
+        "sha256": "990008c569dd44ddf0edc3c2050ac3119fa301e3fa9f01e01330896904b32445",
+        "dimensions": [
+          1536,
+          1024
+        ]
+      },
+      "rooms.png": {
+        "sha256": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+        "dimensions": [
+          1536,
+          1024
+        ]
+      },
+      "recycling-room.generated.png": {
+        "sha256": "9b60471b6608a19308c5249e0da25b85ccd60419033defeb175a32fd5aa3a557",
+        "dimensions": [
+          1536,
+          1024
+        ]
+      },
+      "exterior-effects.generated.png": {
+        "sha256": "aac97bf4f73794ac8acb8172a41fab8b61bd5772d861ca1d200f12f8ac5cb063",
+        "dimensions": [
+          1536,
+          1024
+        ]
+      },
+      "exterior-effects.png": {
+        "sha256": "200943773a0ff4a091784a8a2dce4d049ef4d47ee47eb2716fbedab7c630303f",
+        "dimensions": [
+          1536,
+          1024
+        ]
+      },
+      "rooms.contact.png": {
+        "sha256": "ad559c30c211a94ab6cd7e46eb57c22c0f483e34fc3b8a23bc7faf944966276b",
+        "dimensions": [
+          1552,
+          1232
+        ]
+      },
+      "exterior-effects.contact.png": {
+        "sha256": "16f33b80f3c3a8df6c78a437e396aa81f2c8dae1eae5d9a052019eeba1719d2b",
+        "dimensions": [
+          1568,
+          1128
+        ]
+      }
+    },
+    "review_evidence": [
+      "rooms.contact.png",
+      "exterior-effects.contact.png"
+    ],
+    "rooms": "Fifteen observed crops plus separately generated recycling at index14, exact 2x8. Original seven bands explicitly retained, not represented as a valid eight-row generation.",
+    "exterior_effects": "Exact 4x4; full sky cells unchanged. Per-cell alpha only, original RGB retained throughout. Segmentation/polygon/pigment details and every bound in normalization.json."
+  }
+}

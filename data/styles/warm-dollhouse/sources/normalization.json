@@ -1,0 +1,862 @@
+{
+  "rooms": {
+    "original_bands": [
+      0,
+      154,
+      302,
+      446,
+      591,
+      732,
+      876,
+      1024
+    ],
+    "original_observation": "Seven bands, fifteen actual rooms, parking and machinery share final right half. Recycling absent. Original was NOT a valid eight-row sheet.",
+    "crops": [
+      {
+        "index": 0,
+        "source": "rooms.generated.png",
+        "box": [
+          0,
+          0,
+          768,
+          154
+        ],
+        "destination_box": [
+          0,
+          0,
+          768,
+          128
+        ],
+        "method": "Pillow crop, exclusive right/bottom; anisotropic LANCZOS resize to 768x128; no generative editing"
+      },
+      {
+        "index": 1,
+        "source": "rooms.generated.png",
+        "box": [
+          768,
+          0,
+          1536,
+          154
+        ],
+        "destination_box": [
+          768,
+          0,
+          1536,
+          128
+        ],
+        "method": "Pillow crop, exclusive right/bottom; anisotropic LANCZOS resize to 768x128; no generative editing"
+      },
+      {
+        "index": 2,
+        "source": "rooms.generated.png",
+        "box": [
+          0,
+          154,
+          768,
+          302
+        ],
+        "destination_box": [
+          0,
+          128,
+          768,
+          256
+        ],
+        "method": "Pillow crop, exclusive right/bottom; anisotropic LANCZOS resize to 768x128; no generative editing"
+      },
+      {
+        "index": 3,
+        "source": "rooms.generated.png",
+        "box": [
+          768,
+          154,
+          1536,
+          302
+        ],
+        "destination_box": [
+          768,
+          128,
+          1536,
+          256
+        ],
+        "method": "Pillow crop, exclusive right/bottom; anisotropic LANCZOS resize to 768x128; no generative editing"
+      },
+      {
+        "index": 4,
+        "source": "rooms.generated.png",
+        "box": [
+          0,
+          302,
+          768,
+          446
+        ],
+        "destination_box": [
+          0,
+          256,
+          768,
+          384
+        ],
+        "method": "Pillow crop, exclusive right/bottom; anisotropic LANCZOS resize to 768x128; no generative editing"
+      },
+      {
+        "index": 5,
+        "source": "rooms.generated.png",
+        "box": [
+          768,
+          302,
+          1536,
+          446
+        ],
+        "destination_box": [
+          768,
+          256,
+          1536,
+          384
+        ],
+        "method": "Pillow crop, exclusive right/bottom; anisotropic LANCZOS resize to 768x128; no generative editing"
+      },
+      {
+        "index": 6,
+        "source": "rooms.generated.png",
+        "box": [
+          0,
+          446,
+          768,
+          591
+        ],
+        "destination_box": [
+          0,
+          384,
+          768,
+          512
+        ],
+        "method": "Pillow crop, exclusive right/bottom; anisotropic LANCZOS resize to 768x128; no generative editing"
+      },
+      {
+        "index": 7,
+        "source": "rooms.generated.png",
+        "box": [
+          768,
+          446,
+          1536,
+          591
+        ],
+        "destination_box": [
+          768,
+          384,
+          1536,
+          512
+        ],
+        "method": "Pillow crop, exclusive right/bottom; anisotropic LANCZOS resize to 768x128; no generative editing"
+      },
+      {
+        "index": 8,
+        "source": "rooms.generated.png",
+        "box": [
+          0,
+          591,
+          768,
+          732
+        ],
+        "destination_box": [
+          0,
+          512,
+          768,
+          640
+        ],
+        "method": "Pillow crop, exclusive right/bottom; anisotropic LANCZOS resize to 768x128; no generative editing"
+      },
+      {
+        "index": 9,
+        "source": "rooms.generated.png",
+        "box": [
+          768,
+          591,
+          1536,
+          732
+        ],
+        "destination_box": [
+          768,
+          512,
+          1536,
+          640
+        ],
+        "method": "Pillow crop, exclusive right/bottom; anisotropic LANCZOS resize to 768x128; no generative editing"
+      },
+      {
+        "index": 10,
+        "source": "rooms.generated.png",
+        "box": [
+          0,
+          732,
+          768,
+          876
+        ],
+        "destination_box": [
+          0,
+          640,
+          768,
+          768
+        ],
+        "method": "Pillow crop, exclusive right/bottom; anisotropic LANCZOS resize to 768x128; no generative editing"
+      },
+      {
+        "index": 11,
+        "source": "rooms.generated.png",
+        "box": [
+          768,
+          732,
+          1536,
+          876
+        ],
+        "destination_box": [
+          768,
+          640,
+          1536,
+          768
+        ],
+        "method": "Pillow crop, exclusive right/bottom; anisotropic LANCZOS resize to 768x128; no generative editing"
+      },
+      {
+        "index": 12,
+        "source": "rooms.generated.png",
+        "box": [
+          0,
+          876,
+          768,
+          1024
+        ],
+        "destination_box": [
+          0,
+          768,
+          768,
+          896
+        ],
+        "method": "Pillow crop, exclusive right/bottom; anisotropic LANCZOS resize to 768x128; no generative editing"
+      },
+      {
+        "index": 13,
+        "source": "rooms.generated.png",
+        "box": [
+          768,
+          876,
+          1150,
+          1024
+        ],
+        "destination_box": [
+          768,
+          768,
+          1536,
+          896
+        ],
+        "method": "Pillow crop, exclusive right/bottom; anisotropic LANCZOS resize to 768x128; no generative editing"
+      },
+      {
+        "index": 14,
+        "source": "recycling-room.generated.png",
+        "box": [
+          0,
+          0,
+          1536,
+          824
+        ],
+        "destination_box": [
+          0,
+          896,
+          768,
+          1024
+        ],
+        "method": "Pillow crop, exclusive right/bottom; anisotropic LANCZOS resize to 768x128; no generative editing"
+      },
+      {
+        "index": 15,
+        "source": "rooms.generated.png",
+        "box": [
+          1150,
+          876,
+          1536,
+          1024
+        ],
+        "destination_box": [
+          768,
+          896,
+          1536,
+          1024
+        ],
+        "method": "Pillow crop, exclusive right/bottom; anisotropic LANCZOS resize to 768x128; no generative editing"
+      }
+    ]
+  },
+  "exterior_effects": {
+    "grid": [
+      4,
+      4
+    ],
+    "unchanged_full_sky_cells": [
+      0,
+      1,
+      2
+    ],
+    "cutouts": [
+      {
+        "bounds": [
+          0,
+          32,
+          384,
+          241
+        ],
+        "foreground_anchor_circles": [
+          [
+            70,
+            100
+          ],
+          [
+            170,
+            190
+          ],
+          [
+            290,
+            140
+          ]
+        ],
+        "anchor_radius": 6,
+        "method": "OpenCV GrabCut, fixed RNG seed 0, eight iterations; outside observed bounds definite background; inside probable foreground; anchors definite foreground; retain components >=12px; fill enclosed holes to preserve original subject interiors; binary alpha, RGB unchanged",
+        "index": 3,
+        "transparent_pixels": 39605,
+        "opaque_pixels": 58699
+      },
+      {
+        "polygon": [
+          [
+            3,
+            181
+          ],
+          [
+            9,
+            164
+          ],
+          [
+            24,
+            160
+          ],
+          [
+            29,
+            143
+          ],
+          [
+            33,
+            128
+          ],
+          [
+            38,
+            159
+          ],
+          [
+            47,
+            150
+          ],
+          [
+            53,
+            128
+          ],
+          [
+            60,
+            125
+          ],
+          [
+            61,
+            112
+          ],
+          [
+            70,
+            106
+          ],
+          [
+            80,
+            110
+          ],
+          [
+            91,
+            104
+          ],
+          [
+            105,
+            108
+          ],
+          [
+            105,
+            123
+          ],
+          [
+            130,
+            121
+          ],
+          [
+            130,
+            110
+          ],
+          [
+            150,
+            108
+          ],
+          [
+            150,
+            98
+          ],
+          [
+            167,
+            95
+          ],
+          [
+            181,
+            101
+          ],
+          [
+            181,
+            116
+          ],
+          [
+            216,
+            116
+          ],
+          [
+            223,
+            86
+          ],
+          [
+            229,
+            75
+          ],
+          [
+            233,
+            61
+          ],
+          [
+            240,
+            79
+          ],
+          [
+            244,
+            109
+          ],
+          [
+            249,
+            112
+          ],
+          [
+            249,
+            126
+          ],
+          [
+            267,
+            114
+          ],
+          [
+            288,
+            111
+          ],
+          [
+            309,
+            119
+          ],
+          [
+            309,
+            141
+          ],
+          [
+            332,
+            147
+          ],
+          [
+            342,
+            164
+          ],
+          [
+            349,
+            155
+          ],
+          [
+            355,
+            136
+          ],
+          [
+            363,
+            160
+          ],
+          [
+            372,
+            175
+          ],
+          [
+            379,
+            181
+          ]
+        ],
+        "method": "Observed complete wall/trim bounds; polygon alpha; full interior RGB retained",
+        "index": 4,
+        "transparent_pixels": 76161,
+        "opaque_pixels": 22143
+      },
+      {
+        "polygon": [
+          [
+            5,
+            47
+          ],
+          [
+            377,
+            47
+          ],
+          [
+            377,
+            197
+          ],
+          [
+            8,
+            197
+          ]
+        ],
+        "method": "Observed complete wall/trim bounds; polygon alpha; full interior RGB retained",
+        "index": 5,
+        "transparent_pixels": 42209,
+        "opaque_pixels": 56095
+      },
+      {
+        "polygon": [
+          [
+            8,
+            68
+          ],
+          [
+            375,
+            68
+          ],
+          [
+            375,
+            186
+          ],
+          [
+            8,
+            186
+          ]
+        ],
+        "method": "Observed complete wall/trim bounds; polygon alpha; full interior RGB retained",
+        "index": 6,
+        "transparent_pixels": 54512,
+        "opaque_pixels": 43792
+      },
+      {
+        "bounds": [
+          122,
+          29,
+          257,
+          210
+        ],
+        "method": "Bright warm flame pigment R>244 and ((R-G>15 and G-B>35) or G>230) within observed bounds; fill enclosed holes; RGB unchanged",
+        "index": 7,
+        "transparent_pixels": 87979,
+        "opaque_pixels": 10325
+      },
+      {
+        "bounds": [
+          128,
+          8,
+          263,
+          205
+        ],
+        "foreground_anchor_circles": [
+          [
+            192,
+            145
+          ]
+        ],
+        "anchor_radius": 6,
+        "method": "OpenCV GrabCut, fixed RNG seed 0, eight iterations; outside observed bounds definite background; inside probable foreground; anchors definite foreground; retain components >=12px; fill enclosed holes to preserve original subject interiors; binary alpha, RGB unchanged",
+        "index": 8,
+        "transparent_pixels": 83793,
+        "opaque_pixels": 14511
+      },
+      {
+        "bounds": [
+          126,
+          8,
+          261,
+          205
+        ],
+        "foreground_anchor_circles": [
+          [
+            194,
+            142
+          ]
+        ],
+        "anchor_radius": 6,
+        "method": "OpenCV GrabCut, fixed RNG seed 0, eight iterations; outside observed bounds definite background; inside probable foreground; anchors definite foreground; retain components >=12px; fill enclosed holes to preserve original subject interiors; binary alpha, RGB unchanged",
+        "index": 9,
+        "transparent_pixels": 85468,
+        "opaque_pixels": 12836
+      },
+      {
+        "bounds": [
+          4,
+          3,
+          378,
+          232
+        ],
+        "foreground_anchor_circles": [
+          [
+            194,
+            148
+          ]
+        ],
+        "anchor_radius": 6,
+        "method": "OpenCV GrabCut, fixed RNG seed 0, eight iterations; outside observed bounds definite background; inside probable foreground; anchors definite foreground; retain components >=12px; fill enclosed holes to preserve original subject interiors; binary alpha, RGB unchanged",
+        "index": 10,
+        "transparent_pixels": 58887,
+        "opaque_pixels": 39417
+      },
+      {
+        "polygon": [
+          [
+            40,
+            232
+          ],
+          [
+            44,
+            187
+          ],
+          [
+            61,
+            175
+          ],
+          [
+            66,
+            141
+          ],
+          [
+            88,
+            141
+          ],
+          [
+            96,
+            105
+          ],
+          [
+            119,
+            105
+          ],
+          [
+            127,
+            76
+          ],
+          [
+            138,
+            45
+          ],
+          [
+            147,
+            75
+          ],
+          [
+            158,
+            80
+          ],
+          [
+            158,
+            65
+          ],
+          [
+            180,
+            49
+          ],
+          [
+            194,
+            45
+          ],
+          [
+            205,
+            8
+          ],
+          [
+            214,
+            45
+          ],
+          [
+            225,
+            49
+          ],
+          [
+            242,
+            65
+          ],
+          [
+            247,
+            81
+          ],
+          [
+            256,
+            75
+          ],
+          [
+            266,
+            47
+          ],
+          [
+            275,
+            80
+          ],
+          [
+            282,
+            108
+          ],
+          [
+            303,
+            117
+          ],
+          [
+            306,
+            152
+          ],
+          [
+            325,
+            177
+          ],
+          [
+            331,
+            232
+          ]
+        ],
+        "method": "Observed complete wall/trim bounds; polygon alpha; full interior RGB retained",
+        "index": 11,
+        "transparent_pixels": 58283,
+        "opaque_pixels": 40021
+      },
+      {
+        "bounds": [
+          70,
+          9,
+          310,
+          222
+        ],
+        "foreground_anchor_circles": [
+          [
+            195,
+            100
+          ]
+        ],
+        "anchor_radius": 6,
+        "method": "OpenCV GrabCut, fixed RNG seed 0, eight iterations; outside observed bounds definite background; inside probable foreground; anchors definite foreground; retain components >=12px; fill enclosed holes to preserve original subject interiors; binary alpha, RGB unchanged",
+        "index": 12,
+        "transparent_pixels": 61535,
+        "opaque_pixels": 36769
+      },
+      {
+        "bounds": [
+          76,
+          10,
+          310,
+          222
+        ],
+        "foreground_anchor_circles": [
+          [
+            175,
+            110
+          ]
+        ],
+        "anchor_radius": 6,
+        "method": "OpenCV GrabCut, fixed RNG seed 0, eight iterations; outside observed bounds definite background; inside probable foreground; anchors definite foreground; retain components >=12px; fill enclosed holes to preserve original subject interiors; binary alpha, RGB unchanged",
+        "index": 13,
+        "transparent_pixels": 69281,
+        "opaque_pixels": 29023
+      },
+      {
+        "bounds": [
+          78,
+          7,
+          308,
+          207
+        ],
+        "foreground_anchor_circles": [
+          [
+            192,
+            135
+          ]
+        ],
+        "anchor_radius": 6,
+        "method": "OpenCV GrabCut, fixed RNG seed 0, eight iterations; outside observed bounds definite background; inside probable foreground; anchors definite foreground; retain components >=12px; fill enclosed holes to preserve original subject interiors; binary alpha, RGB unchanged",
+        "index": 14,
+        "transparent_pixels": 73063,
+        "opaque_pixels": 25241
+      },
+      {
+        "bounds": [
+          78,
+          6,
+          309,
+          222
+        ],
+        "foreground_anchor_circles": [
+          [
+            190,
+            128
+          ]
+        ],
+        "anchor_radius": 6,
+        "method": "OpenCV GrabCut, fixed RNG seed 0, eight iterations; outside observed bounds definite background; inside probable foreground; anchors definite foreground; retain components >=12px; fill enclosed holes to preserve original subject interiors; binary alpha, RGB unchanged",
+        "index": 15,
+        "transparent_pixels": 74474,
+        "opaque_pixels": 23830
+      }
+    ],
+    "rgb_policy": "Original RGB unchanged in every cell, only alpha modified; no global white/color key."
+  },
+  "files": {
+    "rooms.generated.png": {
+      "sha256": "990008c569dd44ddf0edc3c2050ac3119fa301e3fa9f01e01330896904b32445",
+      "dimensions": [
+        1536,
+        1024
+      ]
+    },
+    "rooms.png": {
+      "sha256": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+      "dimensions": [
+        1536,
+        1024
+      ]
+    },
+    "recycling-room.generated.png": {
+      "sha256": "9b60471b6608a19308c5249e0da25b85ccd60419033defeb175a32fd5aa3a557",
+      "dimensions": [
+        1536,
+        1024
+      ]
+    },
+    "exterior-effects.generated.png": {
+      "sha256": "aac97bf4f73794ac8acb8172a41fab8b61bd5772d861ca1d200f12f8ac5cb063",
+      "dimensions": [
+        1536,
+        1024
+      ]
+    },
+    "exterior-effects.png": {
+      "sha256": "200943773a0ff4a091784a8a2dce4d049ef4d47ee47eb2716fbedab7c630303f",
+      "dimensions": [
+        1536,
+        1024
+      ]
+    },
+    "rooms.contact.png": {
+      "sha256": "ad559c30c211a94ab6cd7e46eb57c22c0f483e34fc3b8a23bc7faf944966276b",
+      "dimensions": [
+        1552,
+        1232
+      ]
+    },
+    "exterior-effects.contact.png": {
+      "sha256": "16f33b80f3c3a8df6c78a437e396aa81f2c8dae1eae5d9a052019eeba1719d2b",
+      "dimensions": [
+        1568,
+        1128
+      ]
+    }
+  }
+}

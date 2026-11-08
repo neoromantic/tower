@@ -1,0 +1,32 @@
+{
+  "scale": 4,
+  "sources": {
+    "rooms.png": "14a6352f7eaffb6074b7ff1b2dfe16bf7a2a23039256503cafb09e72fc4c48e6",
+    "people.png": "a55608bbbe5888f00068290aadd0e945a3506e36ad8fb8d33280401bda76fb01",
+    "transport.png": "8c7e2acb78552fb173d293438529171f8e222847527db8c1c8a8c462390433d3",
+    "exterior-effects.png": "cdd23de5e94222d5accd6f689a71828403645793a2dc51da5bbe82af6afc2ee1",
+    "ui.png": "264aa4ee52ef72a111abb1a01442f452c3cdec1085200329b484ad5901deaf25"
+  },
+  "operation": "LANCZOS cover for room footprints; contain for objects; bottom-center registered people; deduplicated 64x36 logical tiles; metadata composites",
+  "tiles": 404,
+  "pages": [
+    [
+      2048,
+      2044
+    ],
+    [
+      2048,
+      2044
+    ],
+    [
+      2048,
+      2048
+    ],
+    [
+      2048,
+      422
+    ]
+  ],
+  "gpu_bytes": 53723136,
+  "sha256": "e64194f2ea1800ce2dbfd2c2840588a2e59bec6c7ebf381f877317ba99eb4e32"
+}

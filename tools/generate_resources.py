@@ -1,16 +1,29 @@
 #!/usr/bin/env python3
 """Build original resources: uv run --with pillow==12.0.0 python tools/generate_resources.py."""
+import argparse
+import hashlib
 import json
 import math
 from pathlib import Path
 import re
 import struct
 
-from PIL import Image, ImageDraw, ImageEnhance, ImageFont
+from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 from sound_resources import SOUNDS, TEXTS
 
 ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / 'data/art'
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--style', choices=['schematic', 'modern-pixel', 'warm-dollhouse', 'miniature-3d'])
+args = parser.parse_args()
+destination = ROOT / 'data'
+room_source = ART / 'interiors.png'
+coverage = {}
+source_crops = {}
+key_masks = {}
+if args.style:
+    destination = ROOT / 'data/styles' / args.style
+    room_source = destination / 'sources/rooms.png'
 main = (ROOT / 'src/main.c').read_text()
 tower = (ROOT / 'src/tower.h').read_text()
 frame_widths = {name: int(width) for name, width in re.findall(
@@ -30,11 +43,17 @@ colors[197:204] = [(248, 197, 81), (178, 77, 49), (44, 110, 110),
                    (174, 209, 199), (217, 159, 55), (244, 232, 203), (85, 155, 151)]
 palette = Image.new('P', (1, 1))
 palette.putpalette([c for rgb in colors for c in rgb])
-source = Image.open(ART / 'interiors.png').convert('RGB')
+source = Image.open(room_source).convert('RGB')
 tiles = []
+source_crops['rooms'] = []
 for i in range(16):
     x, y = i % 2 * source.width // 2, i // 2 * source.height // 8
-    tiles.append(source.crop((x, y, x + source.width // 2, y + source.height // 8)))
+    bottom = y + source.height // 8
+    if args.style == 'miniature-3d':
+        bands = [0, 144, 284, 416, 545, 678, 796, 906, 1024]
+        y, bottom = bands[i // 2:i // 2 + 2]
+    source_crops['rooms'].append([x, y, x + source.width // 2, bottom])
+    tiles.append(source.crop(source_crops['rooms'][-1]))
 images = {}
 raw_ids = set()
 # id, item geometry, atlas tile, frames, horizontal pieces, vertical resource rows.
@@ -63,6 +82,8 @@ for spec in json.loads((ART / 'sheets.json').read_text()):
     for row, ids in enumerate(rows):
         for col, rid in enumerate(ids):
             images[rid] = sheet.crop((xcuts[col], row * h // len(rows), xcuts[col + 1], (row + 1) * h // len(rows)))
+            coverage[rid] = dict(source='rooms', cells=[tile], frames=frames, dark=spec['dark'],
+                                 sheet_crop=[xcuts[col], row * h // len(rows), xcuts[col + 1], (row + 1) * h // len(rows)])
 
 # CGPK is eight-pixel columns of 36 top-down rows, NOT a linear raster.
 for base, chunks in [(0x89E8, 3), (0x8A28, 2), (0x8A68, 1)]:
@@ -73,6 +94,7 @@ for base, chunks in [(0x89E8, 3), (0x8A28, 2), (0x8A68, 1)]:
             image.paste(tiles[12].resize((328, cell_h), Image.Resampling.NEAREST), (chunk * 328, 0))
         images[rid] = image
         raw_ids.add(rid)
+        coverage[rid] = dict(source='rooms', cells=[12], chunks=chunks, variant=v)
 
 # Animated figures, queue silhouettes, popup portraits, emergency and wedding sheets.
 people = [(0x8468, 40, 16, 36, 0), (0x8469, 10, 16, 36, 0),
@@ -283,11 +305,264 @@ for spec in ui:
         draw.text((w // 2 - 3, h // 2), '!', fill=colors[1])
     images[rid] = image
 
+# The legacy authoring above defines the resource geometry; style packs replace every
+# non-room pixel below. No baseline drawing enters a themed output.
+if args.style:
+    cells = {'rooms': tiles}
+    for category, columns, rows in [('people', 6, 4), ('transport', 4, 4),
+                                    ('exterior-effects', 4, 4), ('ui', 4, 4)]:
+        plate = Image.open(destination / 'sources' / (category + '.png')).convert('RGBA')
+        cells[category] = []
+        source_crops[category] = []
+        for n in range(columns * rows):
+            x, y = n % columns * plate.width // columns, n // columns * plate.height // rows
+            source_crops[category].append([x, y, x + plate.width // columns, y + plate.height // rows])
+            crop = plate.crop(source_crops[category][-1])
+            if category != 'exterior-effects' or n >= 3:
+                # Edge-connected white only: preserve enclosed white clothing/details.
+                for corner in [(0, 0), (crop.width - 1, 0), (0, crop.height - 1),
+                               (crop.width - 1, crop.height - 1)]:
+                    if min(crop.getpixel(corner)[:3]) > 220:
+                        ImageDraw.floodfill(crop, corner, (255, 255, 255, 0), thresh=50)
+            cells[category].append(crop)
+
+    # Expand source sequential poses into each native strip, including portrait keys.
+    for rid, count, stride, h, bg in people:
+        row = 0
+        if rid in [0x82BE, 0x85E9, 0x85EB, 0x85ED]:
+            row = 1
+        if rid in [0x85EC, 0x85EE]:
+            row = 2
+        if rid in [0x82BF, 0x8469, 0x8828]:
+            row = 3
+        image = Image.new('RGBA', images[rid].size)
+        for f in range(count):
+            pose = cells['people'][row * 6 + f % 6]
+            pose = ImageOps.contain(pose.crop(pose.getbbox()), (stride, h), Image.Resampling.NEAREST)
+            image.alpha_composite(pose, (f * stride + (stride - pose.width) // 2, h - pose.height))
+        images[rid] = image
+        coverage[rid] = dict(source='people', cells=list(range(row * 6, row * 6 + 6)),
+                             frames=count, stride=stride, sequence='frame modulo six', key=bg)
+
+    for rid, fw, count, engine in [(0x8428, 32, 1, 1), (0x8429, 32, 6, 4),
+                                   (0x842A, 32, 5, 5), (0x842B, 48, 7, 5)]:
+        image = Image.new('RGBA', images[rid].size)
+        states = []
+        for f in range(count):
+            cell = min(f, 2)
+            if rid == 0x842B:
+                cell = 3
+            if f >= engine:
+                cell = 4
+            states.append(cell)
+            car = cells['transport'][cell]
+            car = ImageOps.contain(car.crop(car.getbbox()), (fw, cell_h), Image.Resampling.NEAREST)
+            image.alpha_composite(car, (f * fw + (fw - car.width) // 2, cell_h - car.height))
+            # Five native fullness states: generated passengers on generated car art.
+            if f < engine:
+                for person in range(f):
+                    pose = cells['people'][person % 6]
+                    pose = ImageOps.contain(pose.crop(pose.getbbox()), (5, 15), Image.Resampling.NEAREST)
+                    image.alpha_composite(pose, (f * fw + 3 + person * (fw - 8) // 5, 16))
+        images[rid] = image
+        coverage[rid] = dict(source='transport', cells=states, frames=count, stride=fw,
+                             people='people row 0 sequential poses', key=2)
+
+    for ids, frames in [([0x8968, 0x89A8, 0x8969, 0x89A9], 11),
+                         ([0x8AA8, 0x8AE8], 12), ([0x8FE9], 69), ([0x8FEA], 92)]:
+        cell = 6
+        if frames == 12:
+            cell = 8
+        full = Image.new('RGBA', (frames * 64, 72))
+        stair = cells['transport'][cell]
+        stair = stair.crop(stair.getbbox()).resize((64, 72), Image.Resampling.NEAREST)
+        for f in range(frames):
+            full.alpha_composite(stair, (f * 64, 0))
+            if f:
+                pose = cells['people'][f % 6]
+                pose = ImageOps.contain(pose.crop(pose.getbbox()), (8, 20), Image.Resampling.NEAREST)
+                step = f * 5 % 48
+                full.alpha_composite(pose, (f * 64 + step, 48 - step))
+        for i, rid in enumerate(ids):
+            start, end = 0, frames * 64
+            if len(ids) == 4:
+                start, end = (i // 2) * 384, min((i // 2 + 1) * 384, frames * 64)
+            top = i % 2 * 36
+            images[rid] = full.crop((start, top, end, top + 36))
+            coverage[rid] = dict(source='transport', cells=[cell], frames=frames,
+                                 sheet_crop=[start, top, end, top + 36],
+                                 people='people row 0 sequential poses on diagonal', key=0)
+
+    # Categorical one-cell scenery, infrastructure, effects and UI surfaces.
+    mapping = {0x842C: ('transport', 5), 0x87E8: ('transport', 5),
+               0x8389: ('exterior-effects', 4), 0x83E8: ('exterior-effects', 5),
+               0x8F28: ('exterior-effects', 6), 0x8388: ('transport', 14),
+               0x8F6D: ('transport', 14), 0xA711: ('transport', 14),
+               0xA712: ('transport', 13), 0x83E9: ('exterior-effects', 12),
+               0x83EA: ('transport', 15), 0x842D: ('transport', 7),
+               0x8E28: ('transport', 15), 0x8E29: ('transport', 15),
+               0x8FA8: ('exterior-effects', 6), 0x892E: ('transport', 11),
+               0x8EE8: ('transport', 12), 0x8EE9: ('transport', 12), 0x8EEA: ('transport', 12)}
+    for i in range(4):
+        mapping[0x8384 + i] = ('exterior-effects', 3)
+        mapping[0x8F68 + i] = ('exterior-effects', 7 + i % 3)
+    for i in range(11):
+        mapping[0x8351 + i] = ('exterior-effects', min(i * 3 // 11, 2))
+    for rid in [0x8C68, 0x8CA8, 0x8C69, 0x8CA9]:
+        mapping[rid] = ('rooms', 10)
+    for rid, (category, cell) in mapping.items():
+        art = cells[category][cell]
+        if category not in ['rooms'] and not (category == 'exterior-effects' and cell < 3):
+            art = art.crop(art.getbbox())
+        images[rid] = art.resize(images[rid].size, Image.Resampling.NEAREST).convert('RGBA')
+        coverage[rid] = dict(source=category, cells=[cell], operation='crop alpha bounds and resize', key=0)
+        if rid == 0x8389:
+            coverage[rid]['key'] = 16
+        if rid in [0x842C, 0x87E8]:
+            coverage[rid]['key'] = 2
+
+    for spec in json.loads((ART / 'sheets.json').read_text()):
+        if spec['item'] != 'METRO':
+            continue
+        fw, h = frame_widths['METRO'], heights['METRO'] * cell_h
+        sheet = Image.new('RGBA', (fw * spec['frames'], h))
+        for f in range(spec['frames']):
+            sheet.paste(tiles[11].resize((fw, h), Image.Resampling.NEAREST), (f * fw, 0))
+            train = cells['transport'][10]
+            train = ImageOps.contain(train.crop(train.getbbox()), (fw, h // 2), Image.Resampling.NEAREST)
+            sheet.alpha_composite(train, (f * fw + f * 8, h - train.height))
+        for row, ids in enumerate(spec['rows']):
+            for col, rid in enumerate(ids):
+                box = (int(col * fw * 1.5), row * h // 3, int((col + 1) * fw * 1.5), (row + 1) * h // 3)
+                images[rid] = sheet.crop(box)
+                coverage[rid] = dict(source='rooms', cells=[11], transport_cell=10,
+                                     sheet_crop=box, frames=spec['frames'], key=0)
+
+    # Reconstruct both cathedral composites from complete generated scenes.
+    for ceremony in [False, True]:
+        cell = 10 + int(ceremony)
+        h = 180 + 36 * ceremony
+        scene = cells['exterior-effects'][cell]
+        scene = scene.crop(scene.getbbox()).resize((224, h), Image.Resampling.NEAREST)
+        for row in range(h // 36):
+            rid = 0x8CE8 + row * 0x40 + int(ceremony)
+            if row == 5:
+                rid = 0x8DEA
+            strip = scene.crop((0, row * 36, 224, (row + 1) * 36))
+            if not ceremony:
+                daynight = Image.new('RGBA', (448, 36))
+                daynight.paste(strip, (0, 0))
+                night = ImageEnhance.Brightness(strip).enhance(0.55)
+                night.putalpha(strip.getchannel('A'))
+                daynight.paste(night, (224, 0))
+                strip = daynight
+            images[rid] = strip
+            coverage[rid] = dict(source='exterior-effects', cells=[cell],
+                                 scene_crop=[0, row * 36, 224, (row + 1) * 36], daynight=not ceremony, key=18)
+
+    # Retain native UI labels and icon slots; draw on thematic room wall surfaces.
+    for spec in ui:
+        rid, w, h = spec['id'], spec['width'], spec['height']
+        surface = tiles[12].resize((1, 1), Image.Resampling.BOX).resize((w, h), Image.Resampling.NEAREST)
+        if rid in [0x8142, 0x8143, 0xA716, 0xA710, 0xA714]:
+            cell = 15
+            if rid in [0xA710, 0xA714]:
+                cell = 14
+            surface = cells['exterior-effects'][cell].resize((w, h), Image.Resampling.NEAREST)
+            coverage[rid] = dict(source='exterior-effects', cells=[cell], key=0)
+        else:
+            coverage[rid] = dict(source='rooms', cells=[12], operation='average generated lobby colors into UI surface',
+                                 labels=spec['labels'], ui_icons=rid in [0x812C, 0x812D, 0x812E])
+        image = surface.convert('RGBA')
+        draw = ImageDraw.Draw(image)
+        draw.rectangle((0, 0, w - 1, h - 1), outline=colors[2])
+        # Geometry aligns with the renderer's interactive subrectangles.
+        if rid in [0x8190, 0x8191]:
+            for box in [(28, 2, 99, 19), (101, 2, 170, 19), (76, 93, 120, 114),
+                        (76, 148, 120, 169), (16, 399, 86, 423), (135, 399, 180, 423)]:
+                draw.rectangle(box, outline=colors[2])
+            for x in range(18, 137, 13):
+                draw.line((x, 195, x, 390), fill=colors[3])
+            for y in range(195, 391, 13):
+                draw.line((18, y, 135, y), fill=colors[3])
+            for n in range(6):
+                draw.rectangle((14 + n * 28, 43, 40 + n * 28, 66), outline=colors[2])
+        if rid in [0x81F4, 0x81F5]:
+            for y in [60, 230, 300, 327]:
+                draw.line((7, y, w - 8, y), fill=colors[3])
+            draw.line((194, 60, 194, 230), fill=colors[3])
+            draw.rectangle((156, 329, 193, 350), outline=colors[2])
+        if rid in [0x819A, 0x819B]:
+            draw.rectangle((14, 399, 84, 423), outline=colors[2])
+        if rid == 0x8141:
+            draw.ellipse((0, 0, w - 1, h - 1), outline=colors[2])
+        for x, y, label in spec['labels']:
+            draw.text((x, y), label, fill=colors[1])
+        if 0x812C <= rid <= 0x812E:
+            icon_cells = [11, 11, 15, 15, 14, 14, 14, 0, 2, 2, 2, 4, 4, 3, 9, 8, 12, 12, 13, 10, 8, 11, 5, 7, 1, 6]
+            for n, cell in enumerate(icon_cells):
+                x, y = n % 8 * 32, n // 8 * 32
+                icon = cells['ui'][cell]
+                if n == 1:
+                    icon = cells['exterior-effects'][5]
+                if n == 20:
+                    icon = cells['exterior-effects'][10]
+                icon = ImageOps.contain(icon.crop(icon.getbbox()), (28, 28), Image.Resampling.NEAREST)
+                image.alpha_composite(icon, (x + (32 - icon.width) // 2, y + (32 - icon.height) // 2))
+                draw.rectangle((x, y, x + 31, y + 31), outline=colors[2])
+            coverage[rid]['icon_source'] = 'ui'
+            coverage[rid]['icon_cells'] = icon_cells
+            coverage[rid]['icon_overrides'] = {'1': ['exterior-effects', 5], '20': ['exterior-effects', 10]}
+        if rid in [0x812D, 0x8137, 0x8191, 0x8196, 0x81F5, 0x8259, 0x825B]:
+            image = ImageEnhance.Brightness(image).enhance(0.75)
+        images[rid] = image
+    for rid, count in [(0x87E9, 10), (0x87EA, 12), (0x87EC, 10)]:
+        images[rid] = Image.new('RGBA', images[rid].size, colors[15])
+        draw = ImageDraw.Draw(images[rid])
+        for n in range(count):
+            label = str(n)
+            if rid == 0x87EA:
+                label = ['B1', 'B2', 'B', '1', '2', '3', '4', '5', '6', '7', '8', '9'][n]
+            ink = colors[7]
+            if rid == 0x87EC:
+                ink = colors[12]
+            plaque = cells['transport'][5].resize((12, 19), Image.Resampling.NEAREST)
+            images[rid].alpha_composite(plaque, (n * 16, 15))
+            draw.text((n * 16 + 1, 16), label, fill=ink, font=ImageFont.load_default(size=14))
+        coverage[rid] = dict(source='transport', cells=[5], frames=count, key=15,
+                             operation='generated shaft plaques with deterministic floor labels')
+
+    assert set(coverage) == set(images)
+    for rid, image in images.items():
+        if image.mode == 'RGBA':
+            key = coverage[rid].get('key', 0)
+            mask = image.getchannel('A').point(lambda a: 255 * (a < 128))
+            if rid in [0x87E9, 0x87EA, 0x87EC]:
+                mask = image.convert('L').point(lambda v: 255 * (v == 25))
+            key_masks[rid] = (key, mask)
+            image = image.convert('RGB')
+            image.paste(colors[key], mask=mask)
+            images[rid] = image
+    # Keep semantic colors/keys and cycling slots, adding theme-specific shades.
+    swatch = Image.new('RGB', (1536, 1024 * 5))
+    for i, category in enumerate(['rooms', 'people', 'transport', 'exterior-effects', 'ui']):
+        swatch.paste(Image.open(destination / 'sources' / (category + '.png')).convert('RGB'), (0, i * 1024))
+    theme = swatch.quantize(colors=171, dither=Image.Dither.NONE).getpalette()
+    colors[19:190] = [tuple(theme[i:i + 3]) for i in range(0, 171 * 3, 3)]
+    palette.putpalette([c for rgb in colors for c in rgb])
+
 resources = {}
 resources[(0xFF03, 0x83E8)] = b''.join(struct.pack('>HHHH', i, r * 257, g * 257, b * 257) for i, (r, g, b) in enumerate(colors))
 contact = Image.new('RGB', (800, ((len(images) + 3) // 4) * 90), colors[14])
 for i, (rid, image) in enumerate(sorted(images.items())):
     indexed = image.quantize(palette=palette, dither=Image.Dither.NONE)
+    if rid in key_masks:
+        key, mask = key_masks[rid]
+        replacement = min((n for n in range(19, 190) if colors[n] != colors[key]), key=lambda n: sum((colors[n][c] - colors[key][c]) ** 2 for c in range(3)))
+        remap = list(range(256))
+        remap[key] = replacement
+        indexed = indexed.point(remap)
+        indexed.paste(key, mask=mask)
     if rid in [0x8429, 0x842B, 0x8768, 0x8868]:
         # Palette-cycled status lamps (indices must survive quantization).
         for x in range(7):
@@ -333,6 +608,24 @@ for kind in groups:
         pos += 12
         output.extend(blob + bytes(padded - len(blob)))
         offset += padded
-(ROOT / 'data/tower.dat').write_bytes(output)
-contact.save(ART / 'contact-sheet.png')
+(destination / 'tower.dat').write_bytes(output)
+if args.style:
+    contact.save(destination / 'contact-sheet.png')
+    records = []
+    for rid, image in sorted(images.items()):
+        records.append(dict(id=f'{rid:04X}', width=image.width, height=image.height,
+                            raw=rid in raw_ids, **coverage[rid]))
+    sources = {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+               for p in sorted((destination / 'sources').glob('*.png'))}
+    if args.style == 'miniature-3d':
+        for record in records:
+            if record['source'] == 'rooms':
+                record['room_row_bounds'] = bands
+    (destination / 'coverage.json').write_text(json.dumps(dict(style=args.style, sources=sources,
+        pack_sha256=hashlib.sha256(output).hexdigest(),
+        grids={'rooms': [2, 8], 'people': [6, 4], 'transport': [4, 4],
+               'exterior-effects': [4, 4], 'ui': [4, 4]},
+        source_crops=source_crops, sprites=records), indent=2) + '\n')
+else:
+    contact.save(ART / 'contact-sheet.png')
 print(f'{len(images)} sprites, {len(SOUNDS)} sounds, {len(TEXTS)} text resources, {len(output)} bytes')

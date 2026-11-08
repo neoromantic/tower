@@ -551,6 +551,9 @@ int tower_stair_rise(const Tower *tower, ItemType type, int *floor);
 /* Place an item. Returns tenant_id on success, 0 on failure. */
 uint16_t tower_place(Tower *tower, ItemType type, int floor, int x);
 
+/* Trial placement: same rules/charges on a Tower copy, no random draw. */
+uint16_t tower_preview_place(Tower *trial, ItemType type, int floor, int x);
+
 /* Remove a tenant. Returns 1 on success. */
 int tower_remove(Tower *tower, uint16_t tenant_id);
 

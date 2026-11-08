@@ -1,0 +1,113 @@
+{
+  "date": "2026-11-07T23:54:44.532110+00:00",
+  "endpoint": "https://ai-gateway.vercel.sh/v1/images/generations",
+  "request": {
+    "model": "openai/gpt-image-2.6-flare",
+    "prompt": "Create a beautiful original illustration for the title screen of a contemporary tower management game. Landscape 1536x1024. A single magnificent slender tower in the center, seen straight on as an inviting architectural dollhouse cutaway: warmly lit apartments, offices, restaurant, trees on terraces and tiny residents, an elegant central elevator shaft. Refined painterly gouache with crisp architectural silhouettes, warm honey lights, terracotta and sage, deep midnight teal sky, quiet dusk city silhouettes. Tower occupies central 45 percent so its silhouette remains readable when cropped to a square app icon. Bottom quarter quiet dark teal for interface overlay. No text, letters, titles, signs, logos, watermarks. This is original game key art, no existing game references.",
+    "size": "1536x1024",
+    "quality": "medium",
+    "n": 1,
+    "output_format": "png"
+  },
+  "response": {
+    "created": 1794095513,
+    "data": [
+      {}
+    ],
+    "usage": {
+      "total_tokens": 1288,
+      "input_tokens": 156,
+      "output_tokens": 1132,
+      "input_tokens_details": {
+        "text_tokens": 156,
+        "image_tokens": 0
+      }
+    },
+    "providerMetadata": {
+      "openai": {
+        "images": [
+          {
+            "imageTokens": 0,
+            "textTokens": 156,
+            "created": 1794095512,
+            "size": "1536x1024",
+            "quality": "medium",
+            "background": "opaque",
+            "outputFormat": "png"
+          }
+        ]
+      },
+      "gateway": {
+        "routing": {
+          "originalModelId": "openai/gpt-image-2.6-flare",
+          "resolvedProvider": "openai",
+          "fallbacksAvailable": [],
+          "canonicalSlug": "openai/gpt-image-2.6-flare",
+          "finalProvider": "openai",
+          "modelAttemptCount": 1,
+          "modelAttempts": [
+            {
+              "canonicalSlug": "openai/gpt-image-2.6-flare",
+              "success": true,
+              "providerAttemptCount": 1,
+              "providerAttempts": [
+                {
+                  "provider": "openai",
+                  "credentialType": "system",
+                  "success": true,
+                  "startTime": 1794095503847,
+                  "endTime": 1794095513292,
+                  "statusCode": 200
+                }
+              ]
+            }
+          ],
+          "totalProviderAttemptCount": 1
+        },
+        "cost": "0.03474",
+        "marketCost": "0.03474",
+        "surchargeCost": "0",
+        "gatewayCost": "0.03474",
+        "inferenceCost": "0.03474",
+        "inputInferenceCost": "0",
+        "outputInferenceCost": "0.03474",
+        "generationId": "gen_01M6W6SPE5FAHT7A0YR6CE25B7"
+      }
+    }
+  },
+  "response_headers": {
+    "Content-Type": "application/json",
+    "Date": "Sat, 07 Nov 2026 23:51:53 GMT",
+    "X-Vercel-Id": "fra1::fra1::5g4gl-1794095503817-09a3b3167443"
+  },
+  "file": "hero.png",
+  "dimensions": [
+    1536,
+    1024
+  ],
+  "sha256": "17360eafe175d7115a1969d8bcb4a7288c4317b9419251e6d86b47742fce1107",
+  "derivatives": [
+    {
+      "file": "art/icon-192.png",
+      "size": [
+        192,
+        192
+      ],
+      "method": "Centered square crop of hero.png, Pillow LANCZOS resize, RGB PNG",
+      "sha256": "efb0df0a1275177b4ae0c4496d3840c494f4516b557442c0dea0c93ac03c9456"
+    },
+    {
+      "file": "art/icon-512.png",
+      "size": [
+        512,
+        512
+      ],
+      "method": "Centered square crop of hero.png, Pillow LANCZOS resize, RGB PNG",
+      "sha256": "b2a1cd1017213e53d7b782ccc5c0d3f29e00f8237c349b8146e27f8a1e3bc270"
+    }
+  ],
+  "visual_review": {
+    "performed": true,
+    "observation": "New original warm architectural cutaway tower centered in a dusk scene; no visible titles, signs, logos or watermarks. Center crop keeps tower silhouette for icons."
+  }
+}

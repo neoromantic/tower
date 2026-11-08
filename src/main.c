@@ -355,7 +355,9 @@ typedef struct {
                                   * (the 14px bold overflows the DTMP
                                   * label rects; Jonah 2026-08-23) */
     int             running;
-    int             screen_w, screen_h;
+    int             screen_w, screen_h; /* UI logical units */
+    int             css_w, css_h, world_pass, style, pan_tool;
+    double          dpr, ui_scale, ui_size;
     int             show_debug;   /* Toggle diagnostic labels */
     int             show_stats;   /* Analytics window (F3) */
     int             show_tuning;  /* Tuning/modding window (F4) */
@@ -384,6 +386,16 @@ typedef struct {
     
     /* Build mode */
     ItemType        build_type;
+    double render_ms, render_total_ms, render_max_ms, frame_ms;
+    unsigned rendered_frames;
+    int preview_count, preview_valid, preview_add_car;
+    ItemType preview_type;
+    int preview_cells[TOWER_WIDTH + TOWER_FLOOR_COUNT][2];
+    uint16_t selected_tid;
+    ItemType selected_type;
+    int selected_floor, selected_cell, selected_hit_floor;
+    uint16_t selected_pid, selected_home;
+    int selected_member;
     int             demolish_mode;   /* Bulldozer active: clicks remove facilities */
     int             finger_mode;     /* Finger/pointer tool: clicks interact (open
                                       * elevator dialog, etc.) instead of building */
@@ -791,6 +803,9 @@ static void get_top_menu_rect(int idx, int *x, int *y, int *w, int *h)
         int tw = top_menu_width(i);
         if (i == idx) {
             *x = cx; *y = HUD_HEIGHT; *w = tw; *h = MENU_BAR_H;
+#ifdef __EMSCRIPTEN__
+            if (game.css_w < 900) *x = 4;
+#endif
             return;
         }
         cx += tw;
@@ -826,8 +841,15 @@ static const CloudPos CLOUD_POSITIONS[] = {
 
 static void screen_to_grid(int sx, int sy, int *floor, int *cell)
 {
-    int world_x = sx + (int)game.cam_fx - game.screen_w / 2;
-    int world_y = sy + (int)game.cam_fy - game.screen_h / 2;
+    double scale = 1;
+    int cx = game.screen_w / 2, cy = game.screen_h / 2;
+    if (!game.world_pass) {
+        scale = game.ui_scale / game.zoom;
+        cx = (int)ceil(game.css_w / game.zoom) / 2;
+        cy = (int)ceil(game.css_h / game.zoom) / 2;
+    }
+    int world_x = (int)floorf(sx * scale - cx) + (int)game.cam_fx;
+    int world_y = (int)floorf(sy * scale - cy) + (int)game.cam_fy;
 
     /* True floor-division by CELL_H. Plain integer division truncates toward
      * zero, which picks the wrong floor (off by one) above ground where
@@ -962,7 +984,7 @@ static void ambient_tick(void)
  * the deepest basement, or absurdly far above the build ceiling. */
 static void clamp_camera(void)
 {
-    float half = game.screen_h / 2.0f;
+    float half = game.screen_h * game.ui_scale / game.zoom / 2.0f;
     /* Bottom: one row PAST B10's lower edge — pit machinery draws a row
      * below a shaft's last segment, and a legacy B10-reaching shaft
      * (possible before the B9 extend gate, 2026-08-12) needs its pit
@@ -975,7 +997,7 @@ static void clamp_camera(void)
     if (game.cam_fy < top)    game.cam_fy = top;
 
     /* Horizontal: keep at least part of the tower's width on screen. */
-    float halfw = game.screen_w / 2.0f;
+    float halfw = game.screen_w * game.ui_scale / game.zoom / 2.0f;
     float right = (float)(TOWER_WIDTH * CELL_W) - halfw;
     float left  = halfw;
     if (left > right) left = right;
@@ -1011,27 +1033,46 @@ static void format_money(long amount, char *buf, int bufsize)
 }
 
 /* Render text to a texture, returns texture and sets w/h */
-static SDL_Texture *render_text(const char *text, SDL_Color color, int *w, int *h)
+static unsigned text_uploads;
+static SDL_Texture *render_text(TTF_Font *font, const char *text, SDL_Color color, int *w, int *h)
 {
-    if (!game.font || !text || !text[0]) return NULL;
-    SDL_Surface *surf = TTF_RenderUTF8_Blended(game.font, text, color);
+    static struct {
+        char text[512];
+        TTF_Font *font;
+        SDL_Color color;
+        SDL_Texture *texture;
+        int w, h;
+    } cache[128];
+    static unsigned next;
+    for (int i = 0; i < 128; i++) {
+        if (cache[i].texture && cache[i].font == font &&
+            memcmp(&cache[i].color, &color, sizeof color) == 0 &&
+            strcmp(cache[i].text, text) == 0) {
+            *w = cache[i].w; *h = cache[i].h;
+            return cache[i].texture;
+        }
+    }
+    unsigned slot = next++ % 128;
+    SDL_DestroyTexture(cache[slot].texture);
+    SDL_Surface *surf = TTF_RenderUTF8_Blended(font, text, color);
     if (!surf) return NULL;
-    SDL_Texture *tex = SDL_CreateTextureFromSurface(game.renderer, surf);
-    *w = surf->w;
-    *h = surf->h;
+    cache[slot].texture = SDL_CreateTextureFromSurface(game.renderer, surf);
+    snprintf(cache[slot].text, sizeof cache[slot].text, "%s", text);
+    cache[slot].font = font; cache[slot].color = color;
+    *w = cache[slot].w = surf->w; *h = cache[slot].h = surf->h;
     SDL_FreeSurface(surf);
-    return tex;
+    text_uploads++;
+    return cache[slot].texture;
 }
 
 /* Draw text at position, returns width drawn */
 static int draw_text(const char *text, int x, int y, SDL_Color color)
 {
     int w, h;
-    SDL_Texture *tex = render_text(text, color, &w, &h);
+    SDL_Texture *tex = render_text(game.font, text, color, &w, &h);
     if (!tex) return 0;
     SDL_Rect dst = { x, y, w, h };
     SDL_RenderCopy(game.renderer, tex, NULL, &dst);
-    SDL_DestroyTexture(tex);
     return w;
 }
 
@@ -1084,7 +1125,7 @@ static void render_sky(void)
      * but our sprite loader doesn't do palette patching yet. So we use
      * a clean gradient that matches the original's daytime sky color. */
     {
-        int sky_h = lobby_sy;
+        int sky_h = lobby_sy + CELL_H;
         if (sky_h > game.screen_h) sky_h = game.screen_h;
         /* Overcast while it rains — the original's rainy sky bitmaps are
          * grey cloud cover, not blue-with-streaks. Same window as the
@@ -1116,7 +1157,7 @@ static void render_sky(void)
         if (ta > 0) {
             SDL_SetRenderDrawBlendMode(game.renderer, SDL_BLENDMODE_BLEND);
             SDL_SetRenderDrawColor(game.renderer, tr, tg, tb, ta);
-            int sky_bottom = lobby_sy;
+            int sky_bottom = lobby_sy + CELL_H;
             if (sky_bottom > game.screen_h) sky_bottom = game.screen_h;
             SDL_Rect tint_rect = { 0, 0, game.screen_w, sky_bottom };
             SDL_RenderFillRect(game.renderer, &tint_rect);
@@ -1157,7 +1198,7 @@ static void render_sky(void)
                 if (cy + row_h < 0 || cy > game.screen_h) continue;
                 
                 SDL_Rect dst = { tx, cy, cs->w, row_h };
-                SDL_RenderCopy(game.renderer, cs->texture, &src, &dst);
+                sprites_copy(game.renderer, &game.sprites, cs, &src, &dst);
             }
             SDL_SetTextureAlphaMod(cs->texture, 255);
         }
@@ -1185,7 +1226,7 @@ static void render_sky(void)
             lobby_sy + CELL_H - 0x84c + game.sim.santa.y,
             game.santa->w, game.santa->h
         };
-        SDL_RenderCopy(game.renderer, game.santa->texture, NULL, &dst);
+        sprites_copy(game.renderer, &game.sprites, game.santa, NULL, &dst);
     }
     
     /* City skyline — tiled at ground level (from Sky.cpp).
@@ -1220,7 +1261,7 @@ static void render_sky(void)
         int shift = (int)game.cam_fx % tile_w;   /* world scroll, may be < 0 */
         for (int sx = -tile_w - shift; sx < game.screen_w + tile_w; sx += tile_w) {
             SDL_Rect dst = { sx, skyline_y, tile_w, game.skyline->h };
-            SDL_RenderCopy(game.renderer, game.skyline->texture, NULL, &dst);
+            sprites_copy(game.renderer, &game.sprites, game.skyline, NULL, &dst);
         }
         /* Reset color mod */
         SDL_SetTextureColorMod(game.skyline->texture, 255, 255, 255);
@@ -1363,7 +1404,7 @@ static void draw_shaft_digits(int tx, int ty, int w, int wf, int hot)
         if (wf >= -2) {
             SDL_Rect src = { 16 * (-wf - 1), 0, 16, 36 };
             SDL_Rect dst = { tx + (w - 16) / 2, ty, 16, 36 };
-            SDL_RenderCopy(game.renderer, b->texture, &src, &dst);
+            sprites_copy(game.renderer, &game.sprites, b, &src, &dst);
         } else {
             /* Deeper floors: the B and digit tiles are full 16x36 shaft
              * SECTIONS with the glyph baked over the shaft art — stamp
@@ -1374,8 +1415,8 @@ static void draw_shaft_digits(int tx, int ty, int w, int wf, int hot)
             int x = tx + (w - 32) / 2;
             SDL_Rect db = { x, ty, 16, 36 };
             SDL_Rect dd = { x + 16, ty, 16, 36 };
-            SDL_RenderCopy(game.renderer, b->texture, &sb, &db);
-            SDL_RenderCopy(game.renderer, b->texture, &sd, &dd);
+            sprites_copy(game.renderer, &game.sprites, b, &sb, &db);
+            sprites_copy(game.renderer, &game.sprites, b, &sd, &dd);
         }
         return;
     }
@@ -1390,7 +1431,7 @@ static void draw_shaft_digits(int tx, int ty, int w, int wf, int hot)
     for (int i = 0; i < n; i++) {
         SDL_Rect src = { 1 + 16 * (buf[i] - '0'), 16, 11, 17 };
         SDL_Rect dst = { x, ty + 10, 11, 17 };
-        SDL_RenderCopy(game.renderer, d->texture, &src, &dst);
+        sprites_copy(game.renderer, &game.sprites, d, &src, &dst);
         x += 12;
     }
 }
@@ -1495,7 +1536,7 @@ static void render_tower(void)
             if (floor_strip) {
                 SDL_Rect src = { 16, 0, 2, 36 };
                 SDL_Rect dst = { wall_x, sy_base, wall_w, CELL_H };
-                SDL_RenderCopy(game.renderer, floor_strip->texture, &src, &dst);
+                sprites_copy(game.renderer, &game.sprites, floor_strip, &src, &dst);
             } else {
                 /* fallback: joist band + dark interior */
                 SDL_SetRenderDrawColor(game.renderer, 64, 64, 64, 255);
@@ -1535,7 +1576,7 @@ static void render_tower(void)
             grid_to_screen(metro->floor, 0, &sx, &sy);
             for (int x = 0; x < TOWER_WIDTH; x += 4) {
                 SDL_Rect dst = { sx + x * CELL_W, sy, 4 * CELL_W, CELL_H };
-                SDL_RenderCopy(game.renderer, tracks->texture, NULL, &dst);
+                sprites_copy(game.renderer, &game.sprites, tracks, NULL, &dst);
             }
         }
     }
@@ -1633,7 +1674,7 @@ static void render_tower(void)
                     if (bsx + bw < 0 || bsx > game.screen_w) continue;
                     SDL_Rect src_body = { base, 0, bw, sheet->h };
                     SDL_Rect dst_body = { bsx, ty, bw, CELL_H };
-                    SDL_RenderCopy(game.renderer, sheet->texture, &src_body, &dst_body);
+                    sprites_copy(game.renderer, &game.sprites, sheet, &src_body, &dst_body);
                 }
                 /* Facade overlay — once, at the left edge, on top of the body. */
                 {
@@ -1642,7 +1683,7 @@ static void render_tower(void)
                     if (fw > 0 && !(tx + fw < 0 || tx > game.screen_w)) {
                         SDL_Rect src_cap = { base + 272, 0, fw, sheet->h };
                         SDL_Rect dst_cap = { tx, ty, fw, CELL_H };
-                        SDL_RenderCopy(game.renderer, sheet->texture, &src_cap, &dst_cap);
+                        sprites_copy(game.renderer, &game.sprites, sheet, &src_cap, &dst_cap);
                     }
                 }
                 continue;
@@ -1922,20 +1963,20 @@ static void render_tower(void)
                             if (cgrid->h < CELL_H && scaf) {
                                 SDL_Rect cs = { 0, 0, gw, CEIL_H };
                                 SDL_Rect cd = { gx, fy, gw, CEIL_H };
-                                SDL_RenderCopy(game.renderer, scaf->texture,
+                                sprites_copy(game.renderer, &game.sprites, scaf,
                                                &cs, &cd);
                             }
                             SDL_Rect gs = { 0, 0, gw, cgrid->h };
                             SDL_Rect gd = { gx, fy + CELL_H - cgrid->h,
                                             gw, cgrid->h };
-                            SDL_RenderCopy(game.renderer, cgrid->texture, &gs, &gd);
+                            sprites_copy(game.renderer, &game.sprites, cgrid, &gs, &gd);
                         }
                     }
                 } else {
                     if (tenant->state == TENANT_CONSTRUCTION) frame_idx = 0;
                     SDL_Rect src = { frame_idx * frame_w_hint, 0, frame_w_hint, spr->h };
                     SDL_Rect dst = { tx, draw_y, tw, draw_h };
-                    SDL_RenderCopy(game.renderer, spr->texture, &src, &dst);
+                    sprites_copy(game.renderer, &game.sprites, spr, &src, &dst);
                 }
 
                 /* The garbage truck (fill state 6, 7:00-7:24 AM): 0x892E
@@ -1951,14 +1992,14 @@ static void render_tower(void)
                         /* sheet split: 24px upper + 36px lower of 60 */
                         SDL_Rect td = { tx, draw_y + draw_h * 24 / 60,
                                         tw, draw_h * 36 / 60 };
-                        SDL_RenderCopy(game.renderer, truck->texture,
+                        sprites_copy(game.renderer, &game.sprites, truck,
                                        NULL, &td);
                     }
                 }
             } else if (spr) {
                 /* Full sprite, no frame extraction — scale to fit */
                 SDL_Rect dst = { tx, draw_y, tw, draw_h };
-                SDL_RenderCopy(game.renderer, spr->texture, NULL, &dst);
+                sprites_copy(game.renderer, &game.sprites, spr, NULL, &dst);
             } else {
                 /* Fallback: colored rectangle with label */
                 uint8_t r, g, b;
@@ -1987,7 +2028,7 @@ static void render_tower(void)
                     if (seg > remaining) seg = remaining;
                     SDL_Rect src = { sx, 0, seg, rub->h };
                     SDL_Rect dst = { dx, tenant_y, seg, rub->h };
-                    SDL_RenderCopy(game.renderer, rub->texture, &src, &dst);
+                    sprites_copy(game.renderer, &game.sprites, rub, &src, &dst);
                     dx += seg; remaining -= seg; sx = 0;
                 }
             }
@@ -2051,11 +2092,11 @@ static void render_tower(void)
             grid_to_screen(0, ovl_left[gi], &tx, &ty);
             SDL_Rect src_l = { 0, 0, half_w, game.entrances->h };
             SDL_Rect awning_l = { tx - half_w, ty, half_w, CELL_H };
-            SDL_RenderCopy(game.renderer, game.entrances->texture, &src_l, &awning_l);
+            sprites_copy(game.renderer, &game.sprites, game.entrances, &src_l, &awning_l);
             grid_to_screen(0, ovl_right[gi], &tx, &ty);
             SDL_Rect src_r = { half_w, 0, half_w, game.entrances->h };
             SDL_Rect awning_r = { tx, ty, half_w, CELL_H };
-            SDL_RenderCopy(game.renderer, game.entrances->texture, &src_r, &awning_r);
+            sprites_copy(game.renderer, &game.sprites, game.entrances, &src_r, &awning_r);
         }
     }
 
@@ -2072,10 +2113,10 @@ static void render_tower(void)
             grid_to_screen(floor, ovl_right[fidx], &rx, &ry);
             SDL_Rect src_left = { 0, 0, half_w, game.fireladder->h };
             SDL_Rect fe_left = { lx - half_w, ly, half_w, CELL_H };
-            SDL_RenderCopy(game.renderer, game.fireladder->texture, &src_left, &fe_left);
+            sprites_copy(game.renderer, &game.sprites, game.fireladder, &src_left, &fe_left);
             SDL_Rect src_right = { half_w, 0, half_w, game.fireladder->h };
             SDL_Rect fe_right = { rx, ry, half_w, CELL_H };
-            SDL_RenderCopy(game.renderer, game.fireladder->texture, &src_right, &fe_right);
+            sprites_copy(game.renderer, &game.sprites, game.fireladder, &src_right, &fe_right);
         }
     }
 
@@ -2115,18 +2156,18 @@ static void render_tower(void)
         if (tw == 48) {
             Sprite *ext = sprites_find(&game.sprites, SPR_ELEV_EXT);
             SDL_Rect mid = { tx + 8, ty, 32, CELL_H };
-            SDL_RenderCopy(game.renderer, spr->texture, &src, &mid);
+            sprites_copy(game.renderer, &game.sprites, spr, &src, &mid);
             if (ext) {
                 SDL_Rect sl = { 0, 0, 8, ext->h };
                 SDL_Rect dl = { tx, ty, 8, CELL_H };
                 SDL_Rect sr = { 8, 0, 8, ext->h };
                 SDL_Rect dr = { tx + 40, ty, 8, CELL_H };
-                SDL_RenderCopy(game.renderer, ext->texture, &sl, &dl);
-                SDL_RenderCopy(game.renderer, ext->texture, &sr, &dr);
+                sprites_copy(game.renderer, &game.sprites, ext, &sl, &dl);
+                sprites_copy(game.renderer, &game.sprites, ext, &sr, &dr);
             }
         } else {
             SDL_Rect dst = { tx, ty, tw, CELL_H };
-            SDL_RenderCopy(game.renderer, spr->texture, &src, &dst);
+            sprites_copy(game.renderer, &game.sprites, spr, &src, &dst);
         }
         /* floor number, on serviced stops only (as the original) */
         int fi = floor_to_index(t->floor);
@@ -2203,7 +2244,7 @@ static void render_tower(void)
                     int ly;
                     grid_to_screen(t->floor + rise - L, t->x, &tx, &ly);
                     SDL_Rect dst = { tx, ly, tw, CELL_H };
-                    SDL_RenderCopy(game.renderer, sheet->texture, &src, &dst);
+                    sprites_copy(game.renderer, &game.sprites, sheet, &src, &dst);
                 }
                 continue;
             }
@@ -2234,7 +2275,7 @@ static void render_tower(void)
             int draw_h = spr->h;
             int draw_y = ty + CELL_H - draw_h;
             SDL_Rect dst = { tx, draw_y, tw, draw_h };
-            SDL_RenderCopy(game.renderer, spr->texture, &src, &dst);
+            sprites_copy(game.renderer, &game.sprites, spr, &src, &dst);
         } else {
             /* Fallback: semi-transparent overlay */
             SDL_SetRenderDrawBlendMode(game.renderer, SDL_BLENDMODE_BLEND);
@@ -2273,13 +2314,11 @@ static void render_tower(void)
                 else if (f == 0) snprintf(flabel, sizeof(flabel), "L");
                 else snprintf(flabel, sizeof(flabel), "%d", f);
                 
-                SDL_Surface *ts = TTF_RenderText_Blended(game.font_small, flabel, white);
-                if (ts) {
-                    SDL_Texture *tt = SDL_CreateTextureFromSurface(game.renderer, ts);
-                    SDL_Rect dst = { 2, fsy + CELL_H/2 - ts->h/2, ts->w, ts->h };
+                int text_w, text_h;
+                SDL_Texture *tt = render_text(game.font_small, flabel, white, &text_w, &text_h);
+                if (tt) {
+                    SDL_Rect dst = { 2, fsy + CELL_H/2 - text_h/2, text_w, text_h };
                     SDL_RenderCopy(game.renderer, tt, NULL, &dst);
-                    SDL_DestroyTexture(tt);
-                    SDL_FreeSurface(ts);
                 }
             }
         } else {
@@ -2319,14 +2358,12 @@ static void render_tower(void)
                          t->demand_category);
             }
             
-            SDL_Surface *ts = TTF_RenderText_Blended(game.font_small, info, yellow);
-            if (ts) {
-                SDL_Texture *tt = SDL_CreateTextureFromSurface(game.renderer, ts);
-                int label_y = ty + CELL_H / 2 - ts->h / 2;
-                SDL_Rect dst = { tx + 4, label_y, ts->w, ts->h };
+            int text_w, text_h;
+                SDL_Texture *tt = render_text(game.font_small, info, yellow, &text_w, &text_h);
+                if (tt) {
+                int label_y = ty + CELL_H / 2 - text_h / 2;
+                SDL_Rect dst = { tx + 4, label_y, text_w, text_h };
                 SDL_RenderCopy(game.renderer, tt, NULL, &dst);
-                SDL_DestroyTexture(tt);
-                SDL_FreeSurface(ts);
             }
         }
     }
@@ -2356,11 +2393,11 @@ static void stats_plot(int gx, int gy, int gw, int gh,
 static void stats_label(int x, int y, const char *text, SDL_Color col)
 {
     int tw, th;
-    SDL_Texture *t = render_text(text, col, &tw, &th);
+    SDL_Texture *t = render_text(game.font, text, col, &tw, &th);
     if (!t) return;
     SDL_Rect dst = { x, y, tw, th };
     SDL_RenderCopy(game.renderer, t, NULL, &dst);
-    SDL_DestroyTexture(t);
+
 }
 
 #define STATS_W 470
@@ -2908,7 +2945,7 @@ static void elv_mode_glyph(int cx, int cy, int mode)
     if (icon) {
         SDL_Rect dst = { cx - icon->w / 2, cy - icon->h / 2,
                          icon->w, icon->h };
-        SDL_RenderCopy(game.renderer, icon->texture, NULL, &dst);
+        sprites_copy(game.renderer, &game.sprites, icon, NULL, &dst);
         return;
     }
     /* fallback pictograph if the bitmap is missing */
@@ -2988,7 +3025,7 @@ static void render_elv_dialog_faithful(void)
     Sprite *bg = sprites_find(&game.sprites, SPR_ELV_DIALOG);
     if (bg) {
         SDL_Rect dst = { bx, by, ELV_DLG_W, ELV_DLG_H };
-        SDL_RenderCopy(game.renderer, bg->texture, NULL, &dst);
+        sprites_copy(game.renderer, &game.sprites, bg, NULL, &dst);
     } else {
         elv_box(bx, by, 0, 0, ELV_DLG_W, ELV_DLG_H, 192, 192, 192, 1);
     }
@@ -3033,12 +3070,12 @@ static void render_elv_dialog_faithful(void)
         int py = ELV_PCELL_Y + ELV_PCELL_H + 2;
         if (mn && mn->texture) {
             SDL_Rect dst = { bx + px, by + py, mn->w, mn->h };
-            SDL_RenderCopy(game.renderer, mn->texture, NULL, &dst);
+            sprites_copy(game.renderer, &game.sprites, mn, NULL, &dst);
             int cur = s->sched_mode[game.elv_day][game.elv_period];
             if (mp && mp->texture && cur >= 0 && cur < 3) {
                 SDL_Rect src = { 0, cur * 22, 82, 22 };
                 SDL_Rect pd  = { bx + px, by + py + cur * 22, 82, 22 };
-                SDL_RenderCopy(game.renderer, mp->texture, &src, &pd);
+                sprites_copy(game.renderer, &game.sprites, mp, &src, &pd);
             }
         }
     }
@@ -3179,7 +3216,7 @@ static void render_elv_dialog_faithful(void)
         if (rs) {
             SDL_Rect btn = { 17, 404, 66, 19 };
             SDL_Rect dst = { bx + btn.x, by + btn.y, btn.w, btn.h };
-            SDL_RenderCopy(game.renderer, rs->texture, &btn, &dst);
+            sprites_copy(game.renderer, &game.sprites, rs, &btn, &dst);
         } else {
             int sxb = bx + 10, syb = by + 398;
             SDL_SetRenderDrawColor(game.renderer, 30, 60, 120, 255);
@@ -3246,11 +3283,10 @@ static void render_elv_dialog(void)
 static void draw_text_right(const char *text, int right_x, int y, SDL_Color c)
 {
     int w, h;
-    SDL_Texture *tex = render_text(text, c, &w, &h);
+    SDL_Texture *tex = render_text(game.font, text, c, &w, &h);
     if (!tex) return;
     SDL_Rect dst = { right_x - w, y, w, h };
     SDL_RenderCopy(game.renderer, tex, NULL, &dst);
-    SDL_DestroyTexture(tex);
 }
 
 /* Small variant for the 13px-pitch ledger grid — the 14px UI font overflowed
@@ -3299,7 +3335,7 @@ static void render_fin_dialog(void)
     Sprite *bg = sprites_find(&game.sprites, SPR_FIN_DIALOG);
     if (bg) {
         SDL_Rect dst = { bx, by, FIN_DLG_W, FIN_DLG_H };
-        SDL_RenderCopy(game.renderer, bg->texture, NULL, &dst);
+        sprites_copy(game.renderer, &game.sprites, bg, NULL, &dst);
     } else {
         SDL_SetRenderDrawColor(game.renderer, 192, 192, 192, 255);
         SDL_Rect r = { bx, by, FIN_DLG_W, FIN_DLG_H };
@@ -3643,7 +3679,7 @@ static void render_occupants(void)
             grid_to_screen(t->floor, t->x + o->x[k], &sx, &sy);
             SDL_Rect src = { fx, 0, 16, 24 };
             SDL_Rect dst = { sx, sy + CELL_H - 24, 16, 24 };
-            SDL_RenderCopy(game.renderer, spr->texture, &src, &dst);
+            sprites_copy(game.renderer, &game.sprites, spr, &src, &dst);
         }
     }
 }
@@ -3691,12 +3727,12 @@ static void render_shaft(ElevatorShaft *s)
                 grid_to_screen(index_to_floor(s->hi) + 1, s->x, &ex, &ey);
                 SDL_Rect src_top = { tail * tile_w, 0, tile_w, 36 };
                 SDL_Rect dst_top = { ex, ey, shaft_w, CELL_H };
-                SDL_RenderCopy(game.renderer, eng->texture, &src_top, &dst_top);
+                sprites_copy(game.renderer, &game.sprites, eng, &src_top, &dst_top);
 
                 grid_to_screen(index_to_floor(s->lo) - 1, s->x, &ex, &ey);
                 SDL_Rect src_bot = { (tail + 1) * tile_w, 0, tile_w, 36 };
                 SDL_Rect dst_bot = { ex, ey, shaft_w, CELL_H };
-                SDL_RenderCopy(game.renderer, eng->texture, &src_bot, &dst_bot);
+                sprites_copy(game.renderer, &game.sprites, eng, &src_bot, &dst_bot);
             }
         }
 
@@ -3768,17 +3804,18 @@ static void render_shaft(ElevatorShaft *s)
                         /* swap to the white clone — mod can only darken,
                          * so the black sheet itself can never redden */
                         if (w >= bar2)
-                            SDL_SetTextureColorMod(game.queue_hot,
+                            SDL_SetTextureColorMod(queue_spr->texture,
                                                    255, 25, 25);
                         else
-                            SDL_SetTextureColorMod(game.queue_hot,
+                            SDL_SetTextureColorMod(queue_spr->texture,
                                                    255, 127, 127);
-                        SDL_RenderCopy(game.renderer, game.queue_hot,
+                        sprites_copy(game.renderer, &game.sprites, queue_spr,
                                        &src, &dst);
+                        SDL_SetTextureColorMod(queue_spr->texture, 255, 255, 255);
                         continue;
                     }
                 }
-                SDL_RenderCopy(game.renderer, queue_spr->texture, &src, &dst);
+                sprites_copy(game.renderer, &game.sprites, queue_spr, &src, &dst);
             }
             SDL_SetTextureColorMod(queue_spr->texture, 255, 255, 255);
         }
@@ -3873,7 +3910,7 @@ static void render_shaft(ElevatorShaft *s)
             }
             SDL_Rect dst = { sx, sy, shaft_w, CELL_H };
             if (spr) {
-                SDL_RenderCopy(game.renderer, spr->texture, &src, &dst);
+                sprites_copy(game.renderer, &game.sprites, spr, &src, &dst);
             } else {
                 SDL_SetRenderDrawColor(game.renderer, 90, 90, 140, 255);
                 SDL_RenderFillRect(game.renderer, &dst);
@@ -3939,7 +3976,7 @@ static void render_people(void)
             int xoff = cells ? (int)((h >> 8) % (uint32_t)(cells + 1)) : 0;
             SDL_Rect src = { pose * 16, 0, 16, 24 };
             SDL_Rect dst = { sx + xoff * CELL_W, sy + CELL_H - 24, 16, 24 };
-            SDL_RenderCopy(game.renderer, maid->texture, &src, &dst);
+            sprites_copy(game.renderer, &game.sprites, maid, &src, &dst);
         }
     }
 
@@ -4009,16 +4046,16 @@ static void render_elv_edit_mode(void)
             SDL_Rect src = { 0, 0, 32, shaftspr->h };
             if (tw == 48) {
                 SDL_Rect mid = { tx + 8, ty, 32, CELL_H };
-                SDL_RenderCopy(game.renderer, shaftspr->texture, &src, &mid);
+                sprites_copy(game.renderer, &game.sprites, shaftspr, &src, &mid);
                 if (ext) {
                     SDL_Rect sl = { 0, 0, 8, ext->h }, dl = { tx, ty, 8, CELL_H };
                     SDL_Rect sr = { 8, 0, 8, ext->h }, dr = { tx + 40, ty, 8, CELL_H };
-                    SDL_RenderCopy(game.renderer, ext->texture, &sl, &dl);
-                    SDL_RenderCopy(game.renderer, ext->texture, &sr, &dr);
+                    sprites_copy(game.renderer, &game.sprites, ext, &sl, &dl);
+                    sprites_copy(game.renderer, &game.sprites, ext, &sr, &dr);
                 }
             } else {
                 SDL_Rect dst = { tx, ty, tw, CELL_H };
-                SDL_RenderCopy(game.renderer, shaftspr->texture, &src, &dst);
+                sprites_copy(game.renderer, &game.sprites, shaftspr, &src, &dst);
             }
         }
         if (elv_structural_stop(sel, f)) {
@@ -4127,6 +4164,24 @@ static int build_origin_floor(ItemType ty, int mouse_floor)
 
 static void render_build_ghost(void)
 {
+#ifdef __EMSCRIPTEN__
+    SDL_SetRenderDrawBlendMode(game.renderer, SDL_BLENDMODE_BLEND);
+    for (int i = 0; i < game.preview_count; i++) {
+        int x, y;
+        grid_to_screen(game.preview_cells[i][0], game.preview_cells[i][1], &x, &y);
+        int w = ITEM_WIDTH[game.preview_type] * CELL_W;
+        int h = ITEM_HEIGHT[game.preview_type] * CELL_H;
+        if (game.preview_type == ITEM_FLOOR) { w = CELL_W; h = CEIL_H; }
+        SDL_Rect rect = {x, y - h + CELL_H, w, h};
+        SDL_SetRenderDrawColor(game.renderer, 220, 60, 40, 100);
+        if (game.preview_valid) SDL_SetRenderDrawColor(game.renderer, 40, 210, 130, 100);
+        SDL_RenderFillRect(game.renderer, &rect);
+        SDL_SetRenderDrawColor(game.renderer, 255, 255, 255, 180);
+        SDL_RenderDrawRect(game.renderer, &rect);
+    }
+    SDL_SetRenderDrawBlendMode(game.renderer, SDL_BLENDMODE_NONE);
+    return;
+#endif
     if (game.demolish_mode || game.build_type == ITEM_NONE) return;
     /* A live cap drag lays real shaft as the cursor moves — the growing
      * shaft itself is the feedback; a ghost shadow on top is just noise. */
@@ -4389,7 +4444,7 @@ static void draw_analog_clock(int cx, int cy, int r, int hour, int minute)
     if (face && face->texture) {
         SDL_Rect dst = { cx - face->w / 2, cy - face->h / 2,
                          face->w, face->h };
-        SDL_RenderCopy(game.renderer, face->texture, NULL, &dst);
+        sprites_copy(game.renderer, &game.sprites, face, NULL, &dst);
     } else {
         /* Fallback: the old vector face */
         SDL_SetRenderDrawColor(game.renderer, 255, 255, 240, 255);
@@ -4551,7 +4606,7 @@ static void render_info_window(void)
         Sprite *tl = sprites_find(&game.sprites, 0x8147);
         if (tl && tl->texture) {
             SDL_Rect dst = { star_x, wy + 2, tl->w, tl->h };
-            SDL_RenderCopy(game.renderer, tl->texture, NULL, &dst);
+            sprites_copy(game.renderer, &game.sprites, tl, NULL, &dst);
         } else if (game.font_small) {
             SDL_Color gold = {220, 180, 0, 255};
             SDL_Surface *ts = TTF_RenderUTF8_Blended(game.font_small,
@@ -4930,7 +4985,7 @@ static void render_minimap(void)
             int lw = lg->w * map_w / 200;       /* legends drawn for a 200px map */
             int lh = lg->h;
             SDL_Rect dst = { map_x, map_y + map_h - lh, lw, lh };
-            SDL_RenderCopy(game.renderer, lg->texture, NULL, &dst);
+            sprites_copy(game.renderer, &game.sprites, lg, NULL, &dst);
         }
     }
 
@@ -4946,12 +5001,12 @@ static void render_minimap(void)
             /* 1:1 blit — map_w == art width, MAP_TAB_H == art height;
              * scaling this strip mangles the tab text. */
             SDL_Rect dst = { map_x, by0, map_w, MAP_TAB_H };
-            SDL_RenderCopy(game.renderer, tabs->texture, NULL, &dst);
+            sprites_copy(game.renderer, &game.sprites, tabs, NULL, &dst);
             if (tabsp && tabsp->texture && game.map_mode >= 0) {
                 SDL_Rect src = { game.map_mode * 50, 0, 50, MAP_TAB_H };
                 SDL_Rect pd  = { map_x + game.map_mode * map_w / 4, by0,
                                  map_w / 4, MAP_TAB_H };
-                SDL_RenderCopy(game.renderer, tabsp->texture, &src, &pd);
+                sprites_copy(game.renderer, &game.sprites, tabsp, &src, &pd);
             }
             /* Port nicety (Jonah 2026-08-12): the star-gated Hotel tab is
              * dead until 2 stars — the EXE blits it looking live anyway.
@@ -5429,6 +5484,9 @@ static int draw_menu_text(const char *text, int x, int y, int state)
 
 static void render_menu_bar(void)
 {
+#ifdef __EMSCRIPTEN__
+    return;
+#endif
     /* Win3.1 menu bar: gray with raised border */
     int bar_y = HUD_HEIGHT;
     draw_win31_rect(0, bar_y, game.screen_w, MENU_BAR_H, 1);
@@ -5474,6 +5532,9 @@ static void render_dropdown(void)
     int drop_y = my + MENU_BAR_H;
     int drop_w = 180;
     int item_h = 18;
+#ifdef __EMSCRIPTEN__
+    if (game.css_w < 900) item_h = 30;
+#endif
     int sep_h = 6;
     
     /* Calculate total dropdown height */
@@ -5623,7 +5684,7 @@ static void render_crane(void)
         int tx, ty;
         grid_to_screen(game.crane_floor + 1, game.crane_x, &tx, &ty);
         SDL_Rect crane_dst = { tx, ty, game.crane->w, game.crane->h };
-        SDL_RenderCopy(game.renderer, game.crane->texture, NULL, &crane_dst);
+        sprites_copy(game.renderer, &game.sprites, game.crane, NULL, &crane_dst);
     }
 
     /* The wedding couple — AnimateWeddingCouple's script verbatim
@@ -5650,15 +5711,15 @@ static void render_crane(void)
             if (c < 14) {
                 SDL_Rect s0 = { 0, 0, fw, sheet->h };
                 SDL_Rect d0 = { tx + c * CELL_W, by, fw, sheet->h };
-                SDL_RenderCopy(game.renderer, sheet->texture, &s0, &d0);
+                sprites_copy(game.renderer, &game.sprites, sheet, &s0, &d0);
                 SDL_Rect s1 = { fw, 0, fw, sheet->h };
                 SDL_Rect d1 = { tx + (27 - c) * CELL_W, by, fw, sheet->h };
-                SDL_RenderCopy(game.renderer, sheet->texture, &s1, &d1);
+                sprites_copy(game.renderer, &game.sprites, sheet, &s1, &d1);
             } else {
                 int f = c < 19 ? c - 12 : 7;   /* 2..6, then the held pose */
                 SDL_Rect s = { f * fw, 0, fw, sheet->h };
                 SDL_Rect d = { tx + 13 * CELL_W, by, fw, sheet->h };
-                SDL_RenderCopy(game.renderer, sheet->texture, &s, &d);
+                sprites_copy(game.renderer, &game.sprites, sheet, &s, &d);
             }
         }
     }
@@ -5692,7 +5753,7 @@ static void render_guard_fleet(int lobby_sx, int lobby_sy)
                 int frame = action ? 4 : ((g->x & 1) ? 2 : 0);
                 SDL_Rect src = { 80 + frame * 8, 0, 2 * CELL_W, CELL_H };
                 SDL_Rect dst = { gx, gy, 2 * CELL_W, CELL_H };
-                SDL_RenderCopy(game.renderer, ges->texture, &src, &dst);
+                sprites_copy(game.renderer, &game.sprites, ges, &src, &dst);
             } else {   /* fallback: the old placeholder figure */
                 SDL_SetRenderDrawColor(game.renderer, 20, 20, 120, 255);
                 SDL_Rect body = { gx + 2, gy + CELL_H - 12, 4, 10 };
@@ -5749,7 +5810,7 @@ static void render_events(void)
                 if (flame && flame->texture) {
                     SDL_Rect dst = { fx, fy + CELL_H - flame->h,
                                      flame->w, flame->h };
-                    SDL_RenderCopy(game.renderer, flame->texture, NULL, &dst);
+                    sprites_copy(game.renderer, &game.sprites, flame, NULL, &dst);
                 } else {
                     int flicker = (game.sim.frame % 6 < 3) ? 200 : 255;
                     SDL_SetRenderDrawColor(game.renderer, flicker, flicker/4, 0, 120);
@@ -5769,7 +5830,7 @@ static void render_events(void)
             int hy = floor_y - 2 * CELL_H + bob;
             if (heli && heli->texture) {
                 SDL_Rect hd = { hx, hy - heli->h, heli->w, heli->h };
-                SDL_RenderCopy(game.renderer, heli->texture, NULL, &hd);
+                sprites_copy(game.renderer, &game.sprites, heli, NULL, &hd);
                 /* water streaming down onto the floors below */
                 SDL_SetRenderDrawBlendMode(game.renderer, SDL_BLENDMODE_BLEND);
                 SDL_SetRenderDrawColor(game.renderer, 90, 160, 230, 200);
@@ -5847,11 +5908,10 @@ static void draw_modal_button(SDL_Rect r, const char *label)
     draw_win31_rect(r.x, r.y, r.w, r.h, hot ? 0 : 1);
     SDL_Color fg = { 0, 0, 0, 255 };
     int tw, th;
-    SDL_Texture *t = render_text(label, fg, &tw, &th);
+    SDL_Texture *t = render_text(game.font, label, fg, &tw, &th);
     if (t) {
         SDL_Rect d = { r.x + (r.w - tw) / 2, r.y + (r.h - th) / 2, tw, th };
         SDL_RenderCopy(game.renderer, t, NULL, &d);
-        SDL_DestroyTexture(t);
     }
 }
 
@@ -5878,7 +5938,7 @@ static void render_disaster_modal(void)
     int text_x = wx + 16;
     if (icon && icon->texture) {
         SDL_Rect d = { wx + 14, body_y + 14, icon->w, icon->h };
-        SDL_RenderCopy(game.renderer, icon->texture, NULL, &d);
+        sprites_copy(game.renderer, &game.sprites, icon, NULL, &d);
         text_x = wx + 14 + icon->w + 12;
     }
 
@@ -5904,7 +5964,7 @@ static void render_disaster_modal(void)
             int ox = wx + 14;
             if (heli_art && heli_art->texture) {
                 SDL_Rect hd = { wx + 14, ty + 2, heli_art->w, heli_art->h };
-                SDL_RenderCopy(game.renderer, heli_art->texture, NULL, &hd);
+                sprites_copy(game.renderer, &game.sprites, heli_art, NULL, &hd);
                 ox = wx + 14 + heli_art->w + 10;
             }
             format_money(FIRE_CHOPPER_COST, num, sizeof num);
@@ -6085,7 +6145,7 @@ static void render_notice_modal(void)
     int tx = wx + 18;
     if (art && art->texture) {
         SDL_Rect ad = { wx + 14, wy + 16, art->w, art->h };
-        SDL_RenderCopy(game.renderer, art->texture, NULL, &ad);
+        sprites_copy(game.renderer, &game.sprites, art, NULL, &ad);
         tx = wx + 14 + art->w + 12;
     }
     draw_text_wrapped(game.notice_text, tx, wy + 16,
@@ -6507,7 +6567,7 @@ static void render_event_alert(void)
     draw_win31_rect(px, py, panel_w, panel_h, 1);
     if (icon && icon->texture) {
         SDL_Rect d = { px + pad, py + (panel_h - ih) / 2, iw, ih };
-        SDL_RenderCopy(game.renderer, icon->texture, NULL, &d);
+        sprites_copy(game.renderer, &game.sprites, icon, NULL, &d);
     }
     if (ts) {
         SDL_Texture *tt = SDL_CreateTextureFromSurface(game.renderer, ts);
@@ -7014,11 +7074,10 @@ static uint16_t stair_hit_test(int floor, int cell)
 /* ---- small drawing helpers ---- */
 static void draw_centered(SDL_Rect r, const char *s, SDL_Color c)
 {
-    int w = 0, h = 0; SDL_Texture *tex = render_text(s, c, &w, &h);
+    int w = 0, h = 0; SDL_Texture *tex = render_text(game.font, s, c, &w, &h);
     if (!tex) return;
     SDL_Rect d = { r.x + (r.w - w) / 2, r.y + (r.h - h) / 2, w, h };
     SDL_RenderCopy(game.renderer, tex, NULL, &d);
-    SDL_DestroyTexture(tex);
 }
 static void draw_bevel(SDL_Rect r, int raised)
 {
@@ -7105,11 +7164,10 @@ static void draw_field31_text(SDL_Rect r, const char *s, SDL_Color c)
     draw_field31(r);
     if (!s || !s[0]) return;
     int tw, th;
-    SDL_Texture *t = render_text(s, c, &tw, &th);
+    SDL_Texture *t = render_text(game.font, s, c, &tw, &th);
     if (t) {
         SDL_Rect d = { r.x + 5, r.y + (r.h - th) / 2, tw, th };
         SDL_RenderCopy(game.renderer, t, NULL, &d);
-        SDL_DestroyTexture(t);
     }
 }
 
@@ -7226,6 +7284,7 @@ static void draw_tenant_picture(const Tenant *t, SDL_Rect box)
     }
     if (tgt) {
         SDL_SetRenderTarget(game.renderer, tgt);
+        game.world_pass = 1;
         float sx = game.cam_fx, sy = game.cam_fy;
         game.cam_fx = (float)(wx0 + game.screen_w / 2);
         game.cam_fy = (float)(wy0 + game.screen_h / 2);
@@ -7233,6 +7292,7 @@ static void draw_tenant_picture(const Tenant *t, SDL_Rect box)
         render_tower();
         render_people();
         game.cam_fx = sx; game.cam_fy = sy;
+        game.world_pass = 0;
         SDL_SetRenderTarget(game.renderer, NULL);
     }
 
@@ -7462,6 +7522,8 @@ static void person_where_line(const Person *p, char *buf, int bufn)
  * through the elevator dialog). Returns people[] slot + 1, or 0. */
 static uint16_t person_hit_test(int mx, int my)
 {
+    mx = mx * game.ui_scale / game.zoom - (int)ceil(game.css_w / game.zoom) / 2 + game.screen_w / 2;
+    my = my * game.ui_scale / game.zoom - (int)ceil(game.css_h / game.zoom) / 2 + game.screen_h / 2;
     if (!game.anim_people) return 0;   /* hidden crowd isn't clickable */
     PeopleSim *ps = &game.sim.people;
     for (int i = 0; i < ps->shaft_count; i++) {
@@ -7559,7 +7621,7 @@ static int draw_person_figure(uint16_t pid, int x, int y, int scale)
     /* wide frames shift left half a cell so they stay centered (372c) */
     SDL_Rect dst = { x - (frame >= 6 ? 4 * scale : 0), y,
                      fw * scale, 24 * scale };
-    SDL_RenderCopy(game.renderer, sheet->texture, &src, &dst);
+    sprites_copy(game.renderer, &game.sprites, sheet, &src, &dst);
     return 1;
 }
 
@@ -7575,7 +7637,7 @@ static void draw_person_strip(const uint16_t *pids, int n, int x, int y)
             int fig = (pids[k] * 7) % 40;   /* legacy silhouette fallback */
             SDL_Rect src = { fig * 16, 0, 16, PSTRIP_H };
             SDL_Rect dst = { x + k * PSTRIP_PITCH, y, 16, PSTRIP_H };
-            SDL_RenderCopy(game.renderer, qs->texture, &src, &dst);
+            sprites_copy(game.renderer, &game.sprites, qs, &src, &dst);
         } else {
             SDL_SetRenderDrawColor(game.renderer, 40, 40, 40, 255);
             SDL_Rect dst = { x + k * PSTRIP_PITCH, y + 8, 12, PSTRIP_H - 8 };
@@ -7645,7 +7707,7 @@ static void render_person_popup(void)
             int fig = (game.person_pid * 7) % 40;
             SDL_Rect src = { fig * 16, 0, 16, 36 };
             SDL_Rect dst = { tx, ty, 32, 72 };
-            SDL_RenderCopy(game.renderer, qs->texture, &src, &dst);
+            sprites_copy(game.renderer, &game.sprites, qs, &src, &dst);
         }
     }
 
@@ -7901,9 +7963,9 @@ static void render_name_editor(void)
     draw_field31(e);
     int tw = 0, th = 0;
     if (game.name_edit_len > 0) {
-        SDL_Texture *tex = render_text(game.name_edit_buf, ink, &tw, &th);
+        SDL_Texture *tex = render_text(game.font, game.name_edit_buf, ink, &tw, &th);
         if (tex) { SDL_Rect td = { e.x + 5, e.y + 4, tw, th };
-                   SDL_RenderCopy(game.renderer, tex, NULL, &td); SDL_DestroyTexture(tex); }
+                   SDL_RenderCopy(game.renderer, tex, NULL, &td);  }
     }
     SDL_SetRenderDrawColor(game.renderer, 0, 0, 0, 255);
     int cx = e.x + 5 + tw + 1;
@@ -8261,6 +8323,11 @@ static void render(void)
     SDL_SetRenderDrawColor(game.renderer, 0, 0, 0, 255);
     SDL_RenderClear(game.renderer);
 
+    int ui_w = game.screen_w, ui_h = game.screen_h;
+    game.screen_w = (int)ceil(game.css_w / game.zoom);
+    game.screen_h = (int)ceil(game.css_h / game.zoom);
+    game.world_pass = 1;
+    SDL_RenderSetScale(game.renderer, game.dpr * game.zoom, game.dpr * game.zoom);
     render_sky();
     if (game.elv_edit_mode) {
         render_elv_edit_mode();   /* silhouette tower + isolated shaft */
@@ -8279,7 +8346,7 @@ static void render(void)
             if (arw && arw->texture) {
                 SDL_Rect ad = { ax - arw->w / 2 + CELL_W / 2,
                                 ay - CELL_H - arw->h + bob, arw->w, arw->h };
-                SDL_RenderCopy(game.renderer, arw->texture, NULL, &ad);
+                sprites_copy(game.renderer, &game.sprites, arw, NULL, &ad);
             } else {
                 SDL_SetRenderDrawColor(game.renderer, 220, 0, 0, 255);
                 SDL_Rect tip = { ax + CELL_W / 2 - 2, ay - CELL_H + bob, 4, 12 };
@@ -8290,6 +8357,9 @@ static void render(void)
         render_crane();
         render_build_ghost();
     }
+    game.world_pass = 0;
+    game.screen_w = ui_w; game.screen_h = ui_h;
+    SDL_RenderSetScale(game.renderer, game.dpr * game.ui_scale, game.dpr * game.ui_scale);
     render_ui();
     render_stats_window();
     render_tuning_window();
@@ -8759,6 +8829,9 @@ static int minimap_click(int mx, int my)
 
 static int menu_bar_hit_test(int mx, int my)
 {
+#ifdef __EMSCRIPTEN__
+    return -1;
+#endif
     if (my < HUD_HEIGHT || my >= HUD_HEIGHT + MENU_BAR_H) return -1;
     int cx = 8;
     for (int i = 0; i < TOP_MENU_COUNT; i++) {
@@ -8780,6 +8853,9 @@ static int dropdown_hit_test(int mx, int my)
     int drop_y = dy + MENU_BAR_H;
     int drop_w = 180;
     int item_h = 18;
+#ifdef __EMSCRIPTEN__
+    if (game.css_w < 900) item_h = 30;
+#endif
     int sep_h = 6;
     
     if (mx < drop_x || mx >= drop_x + drop_w) return -1;
@@ -8794,7 +8870,7 @@ static int dropdown_hit_test(int mx, int my)
 }
 
 /* Save/load/export bodies shared by the F-keys and the Game menu. */
-static void do_save_game(void)
+static int do_save_game(void)
 {
     /* Never serialize the Simulate mode's transient state (isolated shaft
      * flags, settled car positions): resolve it first, exactly as if
@@ -8804,12 +8880,13 @@ static void do_save_game(void)
     if (game_save(&game.sim, &game.tower, save_path()) == 0) {
         add_event_message("Game saved.");
         game.autosave_blocked = 0;   /* a deliberate save re-arms autosave */
-        web_syncfs();
-    } else
-        add_event_message("Save FAILED!");
+        return 1;
+    }
+    add_event_message("Save FAILED!");
+    return 0;
 }
 
-static void do_load_game(void)
+static int do_load_game(void)
 {
     /* Roll the edit mode back against the CURRENT sim before the load
      * overwrites it — exiting afterwards would smear a stale snapshot
@@ -8822,9 +8899,10 @@ static void do_load_game(void)
                               game_is_weekend(&game.tower),
                               game.sim.hour >= 17 || game.sim.hour < 7);
         add_event_message("Game loaded.");
-    } else {
-        add_event_message("Load failed (no/old save).");
+        return 1;
     }
+    add_event_message("Load failed (no/old save).");
+    return 0;
 }
 
 static void do_export_tdt(void)
@@ -8896,6 +8974,7 @@ static void execute_menu_item(const MenuItem *item)
             game.menu_open = -1;
             return;
         }
+        game.pan_tool = 0;
         game.build_type = item->build_type;
         /* Toolbar-button click (#7002), suppressed during fire/emergency like
          * the EXE (event_flags & 9 == 0). referee_sound_events row 20. */
@@ -8948,7 +9027,7 @@ static void execute_menu_item(const MenuItem *item)
         add_event_message("New tower started.");
         break;
     case ACT_FINANCE: toggle_fin_dialog(); break;
-    case ACT_SAVE:       do_save_game();  break;
+    case ACT_SAVE:       if (do_save_game()) web_syncfs();  break;
     case ACT_LOAD:       do_load_game();  break;
     case ACT_EXPORT_TDT: do_export_tdt(); break;
     case ACT_EXPORT_SAV: do_export_sav(); break;
@@ -9101,6 +9180,16 @@ static void cap_drag_track(void)
 /* ---------- Input handling ---------- */
 static void handle_event(SDL_Event *ev)
 {
+    if (ev->type == SDL_MOUSEMOTION) {
+        ev->motion.x /= game.dpr * game.ui_scale;
+        ev->motion.y /= game.dpr * game.ui_scale;
+    }
+    if (ev->type == SDL_MOUSEBUTTONDOWN || ev->type == SDL_MOUSEBUTTONUP) {
+        ev->button.x /= game.dpr * game.ui_scale;
+        ev->button.y /= game.dpr * game.ui_scale;
+        game.mouse_x = ev->button.x; game.mouse_y = ev->button.y;
+        screen_to_grid(game.mouse_x, game.mouse_y, &game.mouse_floor, &game.mouse_cell);
+    }
     /* Quit save-prompt: fully modal, topmost. */
     if (game.quit_confirm) {
         switch (ev->type) {
@@ -9221,6 +9310,7 @@ static void handle_event(SDL_Event *ev)
         break;
         
     case SDL_KEYDOWN:
+        game.pan_tool = 0;
         switch (ev->key.keysym.sym) {
         case SDLK_ESCAPE:
             /* Esc closes the topmost thing — never the game. It used to
@@ -9289,11 +9379,11 @@ static void handle_event(SDL_Event *ev)
          * Ctrl/Cmd+S aliases F5 — in a browser F5 fights the reload key
          * (Phase D1). */
         case SDLK_F5:
-            do_save_game();
+            if (do_save_game()) web_syncfs();
             break;
         case SDLK_s:
             if (ev->key.keysym.mod & (KMOD_CTRL | KMOD_GUI))
-                do_save_game();
+                if (do_save_game()) web_syncfs();
             break;
         /* Export as an original-format save (SimTower 1.1 .TDT) */
         case SDLK_F6:
@@ -9409,8 +9499,8 @@ static void handle_event(SDL_Event *ev)
         if (game.cam_panning) {
             int dx = ev->motion.x - game.cam_pan_last_x;
             int dy = ev->motion.y - game.cam_pan_last_y;
-            game.cam_fx -= dx;
-            game.cam_fy -= dy;
+            game.cam_fx -= dx * game.ui_scale / game.zoom;
+            game.cam_fy -= dy * game.ui_scale / game.zoom;
             game.cam_anim = 0;
             game.cam_pan_last_x = ev->motion.x;
             game.cam_pan_last_y = ev->motion.y;
@@ -9613,6 +9703,8 @@ static void handle_event(SDL_Event *ev)
 
             /* Block clicks that land on any window body from reaching the game */
             if (point_in_any_window(ev->button.x, ev->button.y)) break;
+
+            if (game.pan_tool) break;
 
             /* Fire/bomb lockout (world-click dispatcher 1058:0000 gate,
              * [0xB406]&9): during an emergency the WORLD takes no clicks —
@@ -9852,11 +9944,11 @@ static void handle_event(SDL_Event *ev)
         
     case SDL_WINDOWEVENT:
 #ifndef __EMSCRIPTEN__
-        /* Web canvas is fixed 960x720 — browser-side CSS resize events
-         * must never shrink the game's render size. */
+        /* Native window dimensions are logical pixels. Web uses ct_resize. */
         if (ev->window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
             game.screen_w = ev->window.data1;
             game.screen_h = ev->window.data2;
+            game.css_w = game.screen_w; game.css_h = game.screen_h;
         }
 #endif
         break;
@@ -9977,96 +10069,10 @@ static void snd_tally_dump(void)
  * audio device, records the sim's sounds, and writes a WAV at exit. */
 static int g_sound_capture = 0;
 
-int main(int argc, char *argv[])
+static void load_style_sprites(void)
 {
-    const char *resource_path = "data/tower.dat";
-    int auto_screenshot = 0;
-    const char *screenshot_path = "/tmp/simtower_screenshot.bmp";
-
-    for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "--screenshot") == 0) {
-            auto_screenshot = 1;
-            if (i + 1 < argc && argv[i+1][0] != '-') {
-                screenshot_path = argv[++i];
-            }
-        } else if (strncmp(argv[i], "--save=", 7) == 0) {
-            save_path_override = argv[i] + 7;
-        }
-    }
-    
-#ifndef CT_BUILD_VERSION
-#define CT_BUILD_VERSION "dev"
-#endif
-    printf("ConciliaTower — SimTower for Linux (build %s)\n", CT_BUILD_VERSION);
-    printf("Loading resources from: %s\n", resource_path);
-
-    /* Load bundled NE resources */
-    if (ne_load(&game.exe, resource_path) != 0) {
-        fprintf(stderr, "Failed to load %s\n", resource_path);
-        return 1;
-    }
-
-    exe_strings_init(&game.exe);   /* 0x7f06 string tables + dialog texts */
-    
-    /* Initialize SDL */
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
-        fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
-        return 1;
-    }
-    
-    game.screen_w = WINDOW_W;
-    game.screen_h = WINDOW_H;
-    Uint32 wflags = SDL_WINDOW_SHOWN;
-#ifndef __EMSCRIPTEN__
-    /* Fixed canvas on the web: under Emscripten RESIZABLE binds the
-     * window to the canvas's CSS box, whose transition fired a
-     * SIZE_CHANGED that shrank the render target to a dot (Jonah's
-     * first web bug report, 2026-08-09). */
-    wflags |= SDL_WINDOW_RESIZABLE;
-#endif
-    game.window = SDL_CreateWindow("ConciliaTower",
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        WINDOW_W, WINDOW_H, wflags);
-    
-    /* Software renderer for VNC visibility */
-#ifdef __EMSCRIPTEN__
-    /* In a browser the software renderer means CPU-compositing every frame
-     * inside wasm — Jonah's beta tab ran at ~25fps, which stretched the
-     * tick-paced sounds and starved the audio callback (2026-08-10). WebGL
-     * does it on the GPU; TARGETTEXTURE is for texture_to_surface's
-     * readback path in sprite loading. */
-    game.renderer = SDL_CreateRenderer(game.window, -1,
-        SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
-    if (!game.renderer)
-#endif
-    /* Native stays software: the service runs under Xvfb/VNC with no GPU. */
-    game.renderer = SDL_CreateRenderer(game.window, -1, SDL_RENDERER_SOFTWARE);
-
-    /* Replace the bare X-server root cursor with a proper arrow; the bulldozer
-     * gets a crosshair. (SimTower swaps the cursor per active tool.) */
-    game.cursor_arrow    = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
-    game.cursor_demolish = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_CROSSHAIR);
-    SDL_ShowCursor(SDL_ENABLE);
-    if (game.cursor_arrow) SDL_SetCursor(game.cursor_arrow);
-
-    /* Initialize SDL_ttf fonts */
-    init_fonts();
-    
     /* Load sprites */
     sprites_init(&game.sprites, &game.exe, game.renderer);
-
-    /* Audio: decode the EXE's 55 WAV effects and wire the sim's sound hook.
-     * CT_SOUND_CAPTURE=<path> renders a WAV headless (no device) instead of
-     * playing live. Event->sound map: referee_sound_events_2026-07-13.md. */
-    g_sound_capture = getenv("CT_SOUND_CAPTURE") != NULL;
-    if (g_sound_capture ? (audio_init_capture() == 0) : (audio_init() == 0)) {
-        int nclips = audio_load_from_ne(&game.exe);
-        printf("Audio: %d sound effects loaded%s\n", nclips,
-               g_sound_capture ? " (capture mode)" : "");
-        g_sound_hook = sound_shim;
-        if (g_sound_capture) audio_capture_begin();
-        play_snd(SND_STARTUP);          /* intro jingle (referee row 23) */
-    }
 
     /* Queue silhouettes use white as transparent */
     sprites_apply_white_key(&game.sprites, game.renderer, SPR_ELEV_QUEUE);
@@ -10365,8 +10371,6 @@ int main(int argc, char *argv[])
     }
     
     /* Load decorative sprites with white transparency */
-    game.crane_floor = CRANE_NONE;  /* no crane until the tower has a top */
-    game.crane_x = 0;
     {
         struct { uint16_t id; Sprite **target; const char *name; } decos[] = {
             { SPR_ENTRANCES,    &game.entrances,      "Entrance awning" },
@@ -10632,6 +10636,499 @@ int main(int argc, char *argv[])
         }
     }
     
+}
+
+
+#ifdef __EMSCRIPTEN__
+EMSCRIPTEN_KEEPALIVE
+int ct_set_style(int style)
+{
+    static const char *paths[] = {
+        "data/styles/schematic/tower.dat", "data/styles/modern-pixel/tower.dat",
+        "data/styles/warm-dollhouse/tower.dat", "data/styles/miniature-3d/tower.dat"
+    };
+    if (style < 0 || style > 3) return 0;
+    if (style == game.style) return 1;
+    NEResourceTable next;
+    if (ne_load(&next, paths[style]) != 0) return 0;
+    sprites_free(&game.sprites);
+    SDL_DestroyTexture(game.queue_hot);
+    SDL_DestroyTexture(game.ui_items);
+    SDL_DestroyTexture(game.ui_timebar);
+    SDL_DestroyTexture(game.ui_star[0]);
+    SDL_DestroyTexture(game.ui_star[1]);
+    SDL_DestroyTexture(game.ui_speed);
+    SDL_DestroyTexture(game.ui_tools);
+    SDL_DestroyTexture(game.ui_map);
+    ne_free(&game.exe);
+    game.exe = next;
+    SDL_RenderSetScale(game.renderer, 1, 1);
+    load_style_sprites();
+    game.style = style;
+    static const char *hd[] = {"data/styles/schematic/hd/world.gz", "data/styles/modern-pixel/hd/world.gz", "data/styles/warm-dollhouse/hd/world.gz", "data/styles/miniature-3d/hd/world.gz"};
+    if (sprites_load_hd(&game.sprites, game.renderer, hd[style]) != 0) return 0;
+    return 1;
+}
+
+EMSCRIPTEN_KEEPALIVE
+void ct_resize(int width, int height, double dpr)
+{
+    game.css_w = width; game.css_h = height; game.dpr = dpr;
+    game.ui_scale = fmin(game.ui_size, fmin(width / 380.0, height / 560.0));
+    game.screen_w = width / game.ui_scale;
+    game.screen_h = height / game.ui_scale;
+    SDL_SetWindowSize(game.window, (int)round(width * dpr), (int)round(height * dpr));
+    game.win_toolbar = game.win_infobar = game.win_map = 0;
+    game.info_x = game.screen_w - INFO_BAR_W;
+    game.inspect_x = (game.screen_w - INSPECT_W) / 2;
+    game.inspect_y = 24;
+    game.elv_x = (game.screen_w - ELV_W) / 2;
+    game.elv_y = 24;
+    game.person_x = (game.screen_w - PINFO_W) / 2;
+    game.person_y = 24;
+    game.fin_x = (game.screen_w - FIN_DLG_W) / 2;
+    game.fin_y = 24;
+    clamp_camera();
+}
+
+EMSCRIPTEN_KEEPALIVE
+void ct_set_ui_scale(double scale)
+{
+    game.ui_size = scale;
+    ct_resize(game.css_w, game.css_h, game.dpr);
+}
+
+EMSCRIPTEN_KEEPALIVE
+void ct_set_zoom(double zoom)
+{
+    game.zoom = fmax(0.5, fmin(3, zoom));
+    clamp_camera();
+    screen_to_grid(game.mouse_x, game.mouse_y, &game.mouse_floor, &game.mouse_cell);
+}
+
+EMSCRIPTEN_KEEPALIVE
+void ct_pan(double dx, double dy)
+{
+    game.cam_fx -= dx / game.zoom;
+    game.cam_fy -= dy / game.zoom;
+    game.cam_anim = 0;
+    game.dragging = 0;
+    game.cap_drag = 0;
+    game.preview_count = game.preview_valid = game.preview_add_car = 0;
+    clamp_camera();
+}
+
+EMSCRIPTEN_KEEPALIVE
+void ct_tool(int tool)
+{
+    if (tool >= ITEM_TYPE_COUNT || tool < -3) return;
+    if (tool > 0 && !item_unlocked(tool)) return;
+    game.preview_count = game.preview_valid = game.preview_add_car = 0;
+    game.build_type = ITEM_NONE;
+    if (tool > 0) game.build_type = tool;
+    game.demolish_mode = tool == -1;
+    game.inspect_mode = tool == -2;
+    game.pan_tool = tool == -3;
+    game.finger_mode = tool == 0;
+    game.dragging = 0;
+    game.cap_drag = 0;
+    game.tool_popup = -1;
+}
+
+/* CSS coordinates stop at this boundary; pending placements store world cells. */
+EMSCRIPTEN_KEEPALIVE
+void ct_set_zoom_at(double zoom, double x, double y)
+{
+    double old = game.zoom;
+    game.zoom = fmax(0.5, fmin(3, zoom));
+    game.cam_fx += x / old - (int)ceil(game.css_w / old) / 2 - x / game.zoom + (int)ceil(game.css_w / game.zoom) / 2;
+    game.cam_fy += y / old - (int)ceil(game.css_h / old) / 2 - y / game.zoom + (int)ceil(game.css_h / game.zoom) / 2;
+    game.cam_anim = 0;
+    clamp_camera();
+}
+
+EMSCRIPTEN_KEEPALIVE
+void ct_cancel_preview(void)
+{
+    game.preview_count = game.preview_valid = game.preview_add_car = 0;
+    game.dragging = game.cap_drag = 0;
+}
+
+EMSCRIPTEN_KEEPALIVE
+int ct_preview(double x1, double y1, double x2, double y2)
+{
+    ct_cancel_preview();
+    ItemType type = game.build_type;
+    if (type <= ITEM_NONE || !item_unlocked(type)) return 0;
+    int f0, c0, f1, c1;
+    screen_to_grid(x1 / game.ui_scale, y1 / game.ui_scale, &f0, &c0);
+    screen_to_grid(x2 / game.ui_scale, y2 / game.ui_scale, &f1, &c1);
+    c0 = build_origin_cell(c0);
+    if (c0 < 0 || c0 >= TOWER_WIDTH || c1 < 0 || c1 >= TOWER_WIDTH) return 0;
+    if (x1 == x2 && y1 == y2) c1 = c0;
+    f0 = build_origin_floor(type, f0);
+    game.preview_type = type;
+    int dc = ITEM_WIDTH[type], df = 0;
+    if (c1 < c0) dc = -dc;
+    if (item_is_elevator(type)) {
+        c0 = elevator_snap_column_at(c0, f0);
+        c1 = c0;
+        dc = 0; df = 1;
+        if (f1 < f0) df = -1;
+    } else f1 = f0;
+    if (type == ITEM_FLOOR) {
+        dc = 1;
+        if (c1 < c0) dc = -1;
+    }
+    game.preview_valid = 1;
+    for (int f = f0, c = c0; ; f += df, c += dc) {
+        int n = game.preview_count++;
+        game.preview_cells[n][0] = f;
+        game.preview_cells[n][1] = c;
+        if (c == c1 && f == f1) break;
+        if (dc > 0 && c + dc > c1) break;
+        if (dc < 0 && c + dc < c1) break;
+    }
+    static Tower trial;
+    trial = game.tower;
+    if (trial.lobby_height == 0) tower_choose_lobby_height(&trial, 1);
+    if (type == ITEM_FLOOR) {
+        int lo = c0, hi = c1;
+        if (hi < lo) { lo = c1; hi = c0; }
+        game.preview_valid = tower_extend_deck(&trial, f0, lo, hi + 1);
+    } else {
+        int added = 0;
+        for (int i = 0; i < game.preview_count; i++) {
+            int fi = floor_to_index(game.preview_cells[i][0]);
+            if (item_is_elevator(type) && fi >= 0 && fi < TOWER_FLOOR_COUNT &&
+                trial.grid[fi][c0].type == type) continue;
+            added++;
+            if (!tower_preview_place(&trial, type, game.preview_cells[i][0], game.preview_cells[i][1])) {
+                game.preview_valid = 0;
+                break;
+            }
+        }
+        if (item_is_elevator(type) && !added) {
+            game.preview_add_car = 1;
+            game.preview_valid = elev_can_add_car_at(c0, f0) > 0;
+        }
+    }
+
+    return game.preview_valid;
+}
+
+EMSCRIPTEN_KEEPALIVE
+int ct_place(void)
+{
+    if (!game.preview_valid || game.preview_type != game.build_type ||
+        !item_unlocked(game.build_type)) return 0;
+    if (game.preview_add_car) {
+        int x = game.preview_cells[0][1], f = game.preview_cells[0][0];
+        if (elev_can_add_car_at(x, f) <= 0) return 0;
+        elev_add_car_at(x, f);
+        ct_cancel_preview();
+        return 1;
+    }
+    /* A rejected row is atomic: no partial building or money change. */
+    Tower *before = malloc(sizeof *before);
+    *before = game.tower;
+    if (game.tower.lobby_height == 0) tower_choose_lobby_height(&game.tower, 1);
+    int success = 1;
+    if (game.build_type == ITEM_FLOOR) {
+        int a = game.preview_cells[0][1];
+        int b = game.preview_cells[game.preview_count - 1][1];
+        if (b < a) { int t = a; a = b; b = t; }
+        success = tower_extend_deck(&game.tower, game.preview_cells[0][0], a, b + 1);
+    } else {
+        for (int i = 0; i < game.preview_count; i++) {
+            int fi = floor_to_index(game.preview_cells[i][0]);
+            int x = game.preview_cells[i][1];
+            if (item_is_elevator(game.build_type) && fi >= 0 && fi < TOWER_FLOOR_COUNT &&
+                game.tower.grid[fi][x].type == game.build_type) continue;
+            if (!tower_place(&game.tower, game.build_type,
+                             game.preview_cells[i][0], game.preview_cells[i][1])) {
+                success = 0;
+                break;
+            }
+        }
+    }
+    if (!success) game.tower = *before;
+    free(before);
+    if (success) {
+        play_snd(SND_BUILD_PLACE);
+        metro_seed_evening_aux();
+        game_notify_built(&game.sim, &game.tower);
+        ct_cancel_preview();
+    }
+    return success;
+}
+
+EMSCRIPTEN_KEEPALIVE
+const char *ct_inspect(double x, double y)
+{
+    static char result[512];
+    int f, c;
+    screen_to_grid(x / game.ui_scale, y / game.ui_scale, &f, &c);
+    game.selected_tid = game.selected_pid = 0;
+    int fi = floor_to_index(f);
+    if (fi >= 0 && fi < TOWER_FLOOR_COUNT && c >= 0 && c < TOWER_WIDTH) {
+        TowerCell *cell = &game.tower.grid[fi][c];
+        if (item_is_elevator(cell->type)) game.selected_tid = cell->tenant_id;
+        else {
+            game.selected_tid = stair_hit_test(f, c);
+            if (!game.selected_tid) {
+                game.selected_pid = person_hit_test(x / game.ui_scale, y / game.ui_scale);
+                if (game.selected_pid) {
+                    Person *p = &game.sim.people.people[game.selected_pid - 1];
+                    game.selected_home = p->home_tenant;
+                    game.selected_member = p->member;
+                    return "{\"name\":\"Person\",\"details\":\"Resident or visitor\",\"canDelete\":0,\"canUse\":1}";
+                }
+                game.selected_tid = cell->tenant_id;
+            }
+        }
+    }
+    Tenant *t = tower_tenant(&game.tower, game.selected_tid);
+    if (!t || t->type == ITEM_NONE) return "{\"name\":\"\",\"details\":\"\",\"canDelete\":0,\"canUse\":0}";
+    game.selected_type = t->type;
+    game.selected_floor = t->floor;
+    game.selected_cell = t->x;
+    game.selected_hit_floor = f;
+    int can_delete = !item_is_indestructible(t->type) && t->state != TENANT_CONSTRUCTION;
+    if (t->burned || t->state == TENANT_ABANDONED) can_delete = 1;
+    snprintf(result, sizeof result,
+             "{\"name\":\"%s\",\"details\":\"Floor %d · %d cells\",\"canDelete\":%d,\"canUse\":1}",
+             tower_item_name(t->type), t->floor, t->width, can_delete);
+    return result;
+}
+
+EMSCRIPTEN_KEEPALIVE
+int ct_delete_selected(void)
+{
+    Tenant *t = tower_tenant(&game.tower, game.selected_tid);
+    if (!t || t->type != game.selected_type || t->floor != game.selected_floor ||
+        t->x != game.selected_cell) return 0;
+    ItemType type = t->type;
+    uint16_t id = t->id;
+    if (item_is_elevator(type)) {
+        PeopleSim *people = &game.sim.people;
+        for (int i = 0; i < people->shaft_count; i++) {
+            ElevatorShaft *shaft = &people->shafts[i];
+            int fi = floor_to_index(game.selected_hit_floor);
+            if (!shaft->active || shaft->type != type || shaft->x != t->x || fi < shaft->lo || fi > shaft->hi) continue;
+            remove_shaft_now(i);
+            break;
+        }
+    } else request_remove_tenant(id, type);
+    t = tower_tenant(&game.tower, id);
+    if (t && t->type != ITEM_NONE) return 0;
+    game.selected_tid = 0;
+    return 1;
+}
+
+EMSCRIPTEN_KEEPALIVE
+void ct_use_selected(void)
+{
+    if (game.selected_pid) {
+        Person *p = &game.sim.people.people[game.selected_pid - 1];
+        if (p->home_tenant != game.selected_home || p->member != game.selected_member) return;
+        open_person_popup_at(game.selected_pid, 0, 0);
+        game.person_x = (game.screen_w - PINFO_W) / 2;
+        game.person_y = 24;
+        return;
+    }
+    Tenant *t = tower_tenant(&game.tower, game.selected_tid);
+    if (!t || t->type != game.selected_type || t->floor != game.selected_floor ||
+        t->x != game.selected_cell) return;
+    game.mouse_floor = game.selected_hit_floor;
+    game.mouse_cell = t->x;
+    if (item_is_elevator(t->type)) open_elv_dialog_at_mouse(game.screen_w / 2, 0);
+    else open_tenant_popup_at(t->id, game.screen_w / 2, 0);
+    game.elv_x = (game.screen_w - ELV_W) / 2;
+    game.elv_y = 24;
+    game.inspect_x = (game.screen_w - INSPECT_W) / 2;
+    game.inspect_y = 24;
+}
+
+/* CPU submission time, not GPU completion time or a physical-phone FPS claim. */
+EMSCRIPTEN_KEEPALIVE
+const char *ct_render_stats(void)
+{
+    static char result[256];
+    double mean = 0;
+    if (game.rendered_frames) mean = game.render_total_ms / game.rendered_frames;
+    snprintf(result, sizeof result,
+             "{\"renderMs\":%.3f,\"renderMeanMs\":%.3f,\"renderMaxMs\":%.3f,\"frameMs\":%.3f,\"frames\":%u,\"textUploads\":%u,\"hdBytes\":%u}",
+             game.render_ms, mean, game.render_max_ms, game.frame_ms,
+             game.rendered_frames, text_uploads, game.sprites.hd_bytes);
+    return result;
+}
+
+EMSCRIPTEN_KEEPALIVE
+int ct_save(void)
+{
+    return do_save_game();
+}
+
+EMSCRIPTEN_KEEPALIVE
+void ct_control(int action)
+{
+    if (game.quit_confirm || game.route_confirm || game.notice_modal ||
+        game.disaster_modal || game.find_open || game.elv_edit_mode) return;
+    switch (action) {
+    case 0:
+        if (game.sim.speed == SPEED_PAUSED) game.sim.speed = SPEED_NORMAL;
+        else game.sim.speed = SPEED_PAUSED;
+        break;
+    case 1: game.sim.speed = SPEED_NORMAL; break;
+    case 2: game.sim.speed = SPEED_FAST; break;
+    case 3: if (ct_save()) web_syncfs(); break;
+    }
+}
+
+/* Show the existing menu, including game decisions, inside the phone viewport. */
+EMSCRIPTEN_KEEPALIVE
+void ct_menu(int menu)
+{
+    game.selected_tid = game.selected_pid = 0;
+    ct_cancel_preview();
+    game.menu_open = menu;
+    game.menu_hover = -1;
+}
+
+EMSCRIPTEN_KEEPALIVE
+const char *ct_ui_state(void)
+{
+    static char state[1024];
+    int tool = game.build_type;
+    if (game.demolish_mode) tool = -1;
+    if (game.inspect_mode) tool = -2;
+    if (game.pan_tool) tool = -3;
+    int speed = game.sim.speed;
+    if (speed > 2) speed = 2;
+    snprintf(state, sizeof state,
+        "{\"money\":%ld,\"day\":%d,\"hour\":%d,\"minute\":%d,"
+        "\"stars\":%d,\"population\":%d,\"paused\":%d,\"currentTool\":%d,"
+        "\"style\":%d,\"zoom\":%.3f,\"saveBlocked\":%d,\"modal\":%d,\"speed\":%d,\"unlocked\":[",
+        game.tower.money, game.tower.day, game.sim.hour, game.sim.minute,
+        game.tower.star_rating, game.tower.population, game.sim.speed == SPEED_PAUSED,
+        tool, game.style, game.zoom, game.autosave_blocked,
+        game.quit_confirm || game.route_confirm || game.notice_modal ||
+        game.disaster_modal || game.find_open || game.name_edit_open ||
+        game.movie_dlg_open || game.elv_open || game.inspect_open || game.person_open ||
+        game.fin_open || game.menu_open >= 0, speed);
+    int used = strlen(state), first = 1;
+    for (int i = 1; i < ITEM_TYPE_COUNT; i++) {
+        if (!item_unlocked(i)) continue;
+        if (!first) state[used++] = ',';
+        used += snprintf(state + used, sizeof state - used, "%d", i);
+        first = 0;
+    }
+    snprintf(state + used, sizeof state - used, "]}");
+    return state;
+}
+#endif
+
+int main(int argc, char *argv[])
+{
+    const char *resource_path = "data/styles/schematic/tower.dat";
+    int auto_screenshot = 0;
+    const char *screenshot_path = "/tmp/simtower_screenshot.bmp";
+
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "--screenshot") == 0) {
+            auto_screenshot = 1;
+            if (i + 1 < argc && argv[i+1][0] != '-') {
+                screenshot_path = argv[++i];
+            }
+        } else if (strncmp(argv[i], "--save=", 7) == 0) {
+            save_path_override = argv[i] + 7;
+        }
+    }
+
+#ifndef CT_BUILD_VERSION
+#define CT_BUILD_VERSION "dev"
+#endif
+    printf("ConciliaTower — SimTower for Linux (build %s)\n", CT_BUILD_VERSION);
+    printf("Loading resources from: %s\n", resource_path);
+
+    /* Load bundled NE resources */
+    if (ne_load(&game.exe, resource_path) != 0) {
+        fprintf(stderr, "Failed to load %s\n", resource_path);
+        return 1;
+    }
+
+    exe_strings_init(&game.exe);   /* 0x7f06 string tables + dialog texts */
+
+    /* Initialize SDL */
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
+        fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
+        return 1;
+    }
+
+    game.dpr = game.ui_scale = game.ui_size = game.zoom = 1;
+    game.screen_w = WINDOW_W;
+    game.screen_h = WINDOW_H;
+    game.css_w = WINDOW_W; game.css_h = WINDOW_H;
+    Uint32 wflags = SDL_WINDOW_SHOWN;
+#ifndef __EMSCRIPTEN__
+    /* Web resizing is driven explicitly by ct_resize (CSS box + DPR). */
+    wflags |= SDL_WINDOW_RESIZABLE;
+#endif
+    game.window = SDL_CreateWindow("ConciliaTower",
+        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        WINDOW_W, WINDOW_H, wflags);
+
+    /* Software renderer for VNC visibility */
+#ifdef __EMSCRIPTEN__
+    /* In a browser the software renderer means CPU-compositing every frame
+     * inside wasm — Jonah's beta tab ran at ~25fps, which stretched the
+     * tick-paced sounds and starved the audio callback (2026-08-10). WebGL
+     * does it on the GPU; TARGETTEXTURE is for texture_to_surface's
+     * readback path in sprite loading. */
+    game.renderer = SDL_CreateRenderer(game.window, -1,
+        SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+    if (!game.renderer)
+#endif
+    /* Native stays software: the service runs under Xvfb/VNC with no GPU. */
+    game.renderer = SDL_CreateRenderer(game.window, -1, SDL_RENDERER_SOFTWARE);
+
+    /* Replace the bare X-server root cursor with a proper arrow; the bulldozer
+     * gets a crosshair. (SimTower swaps the cursor per active tool.) */
+    game.cursor_arrow    = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
+    game.cursor_demolish = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_CROSSHAIR);
+    SDL_ShowCursor(SDL_ENABLE);
+    if (game.cursor_arrow) SDL_SetCursor(game.cursor_arrow);
+
+    /* Initialize SDL_ttf fonts */
+    init_fonts();
+
+    load_style_sprites();
+    {
+        char hd_path[512];
+        snprintf(hd_path, sizeof hd_path, "%.*shd/world.gz", (int)(strrchr(resource_path, '/') - resource_path + 1), resource_path);
+        if (sprites_load_hd(&game.sprites, game.renderer, hd_path) != 0) {
+            fprintf(stderr, "HD world pack unavailable: %s\n", hd_path);
+            return 1;
+        }
+    }
+
+
+    /* Audio: decode the EXE's 55 WAV effects and wire the sim's sound hook.
+     * CT_SOUND_CAPTURE=<path> renders a WAV headless (no device) instead of
+     * playing live. Event->sound map: referee_sound_events_2026-07-13.md. */
+    g_sound_capture = getenv("CT_SOUND_CAPTURE") != NULL;
+    if (g_sound_capture ? (audio_init_capture() == 0) : (audio_init() == 0)) {
+        int nclips = audio_load_from_ne(&game.exe);
+        printf("Audio: %d sound effects loaded%s\n", nclips,
+               g_sound_capture ? " (capture mode)" : "");
+        g_sound_hook = sound_shim;
+        if (g_sound_capture) audio_capture_begin();
+        play_snd(SND_STARTUP);          /* intro jingle (referee row 23) */
+    }
+
+    game.crane_floor = CRANE_NONE;
+
     /* Print key sprite info for debugging */
     {
         struct { uint16_t id; const char *name; } checks[] = {
@@ -10785,8 +11282,7 @@ int main(int argc, char *argv[])
         FILE *sf = fopen(save_path(), "rb");
         if (sf) {
             fclose(sf);
-            do_load_game();
-            booted_from_save = game.tower.tenant_count > 0;
+            booted_from_save = do_load_game();
             printf("Boot autoload: %s (tenants=%d pop=%d money=%ld)\n",
                    save_path(), game.tower.tenant_count,
                    game.tower.population, (long)game.tower.money);
@@ -10983,9 +11479,13 @@ int main(int argc, char *argv[])
      * 10d0:08c6) sets current_tool [0x783C] = 3 = first build item = the
      * floor deck. (Was ITEM_OFFICE — a dev-era leftover.) */
     game.build_type = ITEM_FLOOR;
+#ifdef __EMSCRIPTEN__
+    ct_tool(-3);
+#endif
 
     int frame = 0;
     while (game.running) {
+        Uint64 frame_start = SDL_GetPerformanceCounter();
         SDL_Event ev;
         while (SDL_PollEvent(&ev)) {
             handle_event(&ev);
@@ -11540,7 +12040,12 @@ int main(int argc, char *argv[])
             }
         }
         clamp_camera();
+        Uint64 render_start = SDL_GetPerformanceCounter();
         render();
+        game.render_ms = (SDL_GetPerformanceCounter() - render_start) * 1000.0 / SDL_GetPerformanceFrequency();
+        game.render_total_ms += game.render_ms;
+        game.render_max_ms = fmax(game.render_max_ms, game.render_ms);
+        game.rendered_frames++;
         frame++;
 
         /* Capture mode: mix one frame's worth of audio (60fps -> real-time
@@ -11682,7 +12187,10 @@ int main(int argc, char *argv[])
         /* In headless --screenshot mode, fast-forward the warm-up frames with no
          * frame delay so a deep sim state (e.g. a settlement several game-days
          * out) is reachable quickly; pace normally otherwise. */
-        if (!auto_screenshot) SDL_Delay(16); /* ~60fps */
+        double work_ms = (SDL_GetPerformanceCounter() - frame_start) * 1000.0 / SDL_GetPerformanceFrequency();
+        if (!auto_screenshot && work_ms < 1000.0 / 60)
+            SDL_Delay((Uint32)ceil(1000.0 / 60 - work_ms));
+        game.frame_ms = (SDL_GetPerformanceCounter() - frame_start) * 1000.0 / SDL_GetPerformanceFrequency();
     }
     
     /* Cleanup */
