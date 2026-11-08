@@ -30,7 +30,7 @@ Controlled transition demonstration for the implementation owner, using the port
 2. In a targeted C fixture, use default tuning, `star_rating=1`, `rent_class=1`, `pool_stress_total=200`, `pool_stress_trips=1`, no noisy neighbor and no content same-type floor-mate to pair. The native metric is 200, above the 150 stress bar, so the judge returns category 0. Invoke `game_judge_daily` followed by the existing third-day `game_stressed_moveout` boundary. Assert state 7, capacity/population zero and demand disarmed. Do not implement a new eviction switch or use an original executable.
 3. Change the rate through existing `game_set_rent_class` / browser `ct_ui_action("rent", 3, "")` for the selected office. Class 3 forces the fixture metric to 0, yielding category 2. Demand re-arms while state remains 7. Advance normal mover travel on a reachable route, then `game_relet_arrivals`: state 3, capacity initialized, stress reset and the existing re-let payment retained. Separately retain the native content-neighbor pairing case; it can re-arm immediately at move-out.
 
-A focused source fixture covers construction/move-in, overnight closure, the controlled stressed move-out, rent-control rescue and real mover re-let. It has been syntax-checked; its runtime execution belongs to integration. No new revenue, automatic lease probability, tenancy timer or forced move-in action is authorized.
+A focused source fixture covers construction/move-in, overnight closure, the controlled stressed move-out, rent-control rescue and real mover re-let. The focused runtime fixture passed construction, closure, abandonment and native re-let. No new revenue, automatic lease probability, tenancy timer or forced move-in action is authorized.
 
 ## One forgiving construction plan
 

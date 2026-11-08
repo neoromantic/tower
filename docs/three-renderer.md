@@ -31,19 +31,40 @@ Production distribution combines this default game with the landing page in the 
 
 Actor root causes, source registration, queue semantics and visual cases are documented in [three-actors.md](three-actors.md).
 
-## Previous migration evidence
+## Validation evidence
 
-The integrated browser check passed 21 assertions covering campaign/sandbox tool
-availability, empty-tower save/reload, full-span preview, placement, rent, all four style changes, anchored
-zoom, Three PNG capture, financial panels, IndexedDB saving and a DPR-3 phone
-viewport. Manual browser passes also exercised elevator schedules/cars/Simulate,
-names/finding, tuning, fire and bomb decisions, star notice acknowledgement,
-Web Audio signal/loop start-stop/mute, original-format export/import and offline
-reload plus style switching. Offline assets are precached from a generated
-manifest. A mobile viewport emulation is evidence of layout, not a physical
-iPhone performance test.
+The browser smoke passed 21 assertions: sandbox tools, empty and nonempty saves,
+non-mutating preview, planned placement, inspection/rent, all four style swaps,
+anchored zoom, PNG capture, finance, IndexedDB sync, a 390×844 DPR-3 viewport,
+offline restore and full-resolution style switching.
 
-The native simulation suite has four existing failures in the 24-shaft fixture;
-the same four failures reproduce using the untouched base `8026387` tower source.
-It also needs `-include stddef.h` with Apple Clang because its existing test file
-uses `offsetof` without that include. No new failure was observed in that suite.
+`tests/test_three.c` passed the existing office construction/move-in/overnight/
+move-out/rent rescue/re-let lifecycle and 18 lift cases: standard and express,
+1/20/100 floors, empty/half/full. Samples stay within the route, accelerate and
+brake, reach the exact stop, then open doors and unboard. A separate regression
+asserts that a fresh call cannot change the physical position mid-segment.
+
+Independent browser verification used a seeded synthetic tower and real saved
+simulation states. Occupied-middle/edge drag, reversed endpoints, unchanged
+Cancel and exact-price Build were observed. A limited $85,000 budget selected only two $40,000 offices and retained $5,000; campaign locks matched native catalog availability. A stored $280,000 plan was rejected without construction or further charges after a separate legal $80,000 car purchase left $220,000. The same office ID demonstrated
+state 7 vacancy → state 3 re-let; state 5 overnight retained its lease with zero
+workers. Completed construction's `-1` sentinel is treated as complete. The
+mature scene includes real mixed queue wait bands, full cabins, parking bays,
+parked cars, stairs/escalators and the shaft/cabin minimap. Four live styles were
+captured at the same paused actor IDs and zoom.
+
+![Phone layout in the same synthetic tower](../screenshots/three-mobile.png)
+
+Screenshots show the working browser game at 1600×1000 and 390×844. They are
+synthetic gameplay, not generated illustrations. The source runtime is
+`e5cef55b5f29f2914d4c01cdeaa686144d30ad34`; subsequent documentation/image changes
+do not alter its runtime sources. Native saves retain their layout and the
+browser retains `/persist` IDBFS and `ct-slot`, `ct-style`, `ct-zoom`,
+`ct-uiscale`. Combined landing/game service-worker migration is verified by the
+site delivery owner before publication.
+
+A mobile viewport emulation establishes layout, not physical iPhone performance.
+The simulation has no authoritative non-elevator service-queue location/clock;
+no such queue is invented from room population or destination state. Original
+source paintings still limit fine pose anatomy. This scoped check does not
+claim a full simulation audit.
