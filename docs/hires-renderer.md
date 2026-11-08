@@ -70,3 +70,20 @@ phone FPS claim is made here. The controller owns the single integrated build,
 RAF/heap/render timing sample, same-tower four-style screenshots and focused
 mobile acceptance. Existing functional PWA evidence does not establish the new
 HD/touch visual result.
+
+## Integration evidence
+
+Focused desktop Chrome viewport emulation passed for phone portrait/landscape,
+four styles in the same tower, preview/cancel, placement, anchored picking,
+inspector/deletion cancellation and save/sync/reopen. Final floor material
+recheck used miniature at .75/1.5/2.5 zoom. This is not physical iPhone acceptance.
+
+A bounded 5-second phone-DPR3 sample measured CPU submission mean 5.166 ms,
+observed frame interval mean 18.326 ms, RAF median/p95 16.7 ms and zero new
+cached-text uploads. GPU completion and physical-device FPS were not measured.
+All four styles are locally cached; the initial asset package is about 78 MiB,
+and measured style loading pauses were about 236–246 ms.
+
+Empty-tower reopening now uses the actual load result rather than treating
+zero tenants as a failed load. Save format/layout and IndexedDB origin remain
+unchanged; incompatible-file overwrite protection remains in place.

@@ -6,7 +6,7 @@ the original C/SDL browser port.
 Build offices, homes, hotels and transport, manage tenants and finances, and
 advance through the star ratings. Sandbox mode unlocks every building.
 
-![Gameplay with bundled original resources](screenshots/original-gameplay.png)
+![Source-resolution gameplay and compact touch controls](screenshots/hires-phone.png)
 
 Play at [tower.sergeybaus.com](https://tower.sergeybaus.com).
 
