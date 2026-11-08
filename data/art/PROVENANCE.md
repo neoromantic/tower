@@ -45,3 +45,23 @@ palette. It does not reproduce the original game's appearance. Different room
 states share the original generated base, with lighting and occupancy marks;
 styles share their theme artwork. Palette animation, frame counts and source
 rectangles remain available to the existing renderer.
+
+## Four thematic gameplay packs
+
+The original baseline above remains reproducible. The selectable thematic packs
+use **only newly generated thematic plates** from
+`data/styles/{schematic,modern-pixel,warm-dollhouse,miniature-3d}/sources/`.
+These new source generations use the explicitly selected and verified
+`openai/gpt-image-2.6-flare` through the authorized AI Gateway Images API.
+Their own `provenance.json` files contain exact prompts, sanitized request and
+response/routing metadata, generation IDs and SHA256 hashes; no keys or image
+base64 payloads are stored. The baseline's unidentified-model interior image
+is not an input to themed packs.
+
+Use `tools/generate_resources.py --style STYLE` with the pinned Pillow command
+above. Outputs live in `data/styles/STYLE/`: resource-only `tower.dat`, full
+222-ID `coverage.json` and a contact sheet. Audio/text remain shared original
+syntheses. See [style-packs.md](../../docs/style-packs.md) for exact plate grids,
+composite/state derivation, palette/key handling and honest source limitations.
+Generated imagery supplies every category; geometry, text, labels, brightness,
+occupancy marks, palette-cycle lamps and composition are deterministic.

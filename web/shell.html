@@ -2,211 +2,25 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ConciliaTower - Play SimTower in the browser</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tower — Build a world above the city</title>
 <meta name="description" content="Build a tower in your browser with bundled original graphics and sound.">
-<meta property="og:title" content="ConciliaTower">
+<meta property="og:title" content="Tower">
 <meta property="og:description" content="Build a tower in your browser with bundled original graphics and sound.">
-<meta property="og:image" content="https://jonahss.github.io/concilia-tower/hero.png">
-<style>
-  :root { color-scheme: dark; }
-  body {
-    margin: 0; min-height: 100vh; display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    background: #161616; color: #d8d8d4;
-    font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue',
-                 Arial, sans-serif;
-  }
-  h1 { position: absolute; width: 1px; height: 1px; overflow: hidden;
-       clip: rect(0 0 0 0); white-space: nowrap; }
-
-  /* ---- Title screen: the hero is capped at the game's own size — the
-   * 960x720 canvas the engine opens at — centered on a plain dark page,
-   * with the menu floating over it like a game main menu. ---- */
-  #stage {
-    position: relative; width: 100%; min-height: 100vh;
-    display: flex; flex-direction: column; align-items: center;
-    justify-content: center; padding: 24px 0 72px;
-    box-sizing: border-box;
-  }
-  #herobox {
-    position: relative; width: min(960px, 100vw);
-    min-height: min(720px, 75vw);   /* hero.png is 4:3 — 720px tall at 960 */
-    display: flex; align-items: flex-start; justify-content: center;
-    padding: 0 0 28px; box-sizing: border-box;
-  }
-  /* The hero keeps its natural 4:3 size pinned to the top — a growing
-   * card (long tower list) extends past its bottom onto
-   * the plain page instead of re-zooming the image. */
-  #hero {
-    position: absolute; top: 0; left: 0; width: 100%;
-    height: min(720px, 75vw);
-    object-fit: cover; object-position: center top;
-    image-rendering: pixelated; z-index: 0;
-  }
-  #shade {
-    position: absolute; top: 0; left: 0; right: 0;
-    height: min(720px, 75vw); z-index: 1;
-    background: linear-gradient(rgba(8,9,10,.12) 0%, rgba(8,9,10,.28) 45%,
-                                rgba(8,9,10,.55) 100%);
-  }
-  /* The menu card complements the hero itself: translucent dusk slate
-   * (the concrete's #151819..#3d454a) with the lobby's warm amber glow
-   * (#b1947f / #5b4129) as the accent. Square-ish corners. */
-  #menu {
-    position: relative; z-index: 2; color: #e9e3d9;
-    background: rgba(20,23,24,.82);
-    -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
-    border: 1px solid rgba(196,183,168,.28); border-radius: 3px;
-    box-shadow: 0 12px 40px rgba(0,0,0,.5);
-    width: min(520px, calc(100vw - 24px));
-    padding: 12px 20px 16px; text-align: center; box-sizing: border-box;
-    /* Top-anchored below the CONCILIA TOWER sign (~y187 of 960x720):
-     * growing content (tower list) extends the card
-     * DOWN instead of re-centering it up over the sign. */
-    margin-top: min(250px, 26vw);
-  }
-  #menu p.tagline { font-size: 23px; letter-spacing: .5px; color: #f0eadf;
-                    margin: 4px 0 2px; text-align: center; }
-  #menu p { font-size: 15px; line-height: 1.55; color: #c2bab0;
-            text-align: left; }
-  #menu a { color: #d8b06a; }
-  input[type=file] { display: none; }
-  button.start {
-    display: inline-block; cursor: pointer; margin: 8px 6px 0;
-    background: #c08a44; color: #241708; border: 0; border-radius: 3px;
-    padding: 10px 22px; font-size: 16px; font-family: inherit;
-  }
-  button.start:hover { background: #d09a52; }
-  button.start[disabled] { background: rgba(120,115,108,.35);
-                           color: #8d867c; cursor: default; }
-  #status { font-size: 14px; color: #b5ada1; min-height: 18px;
-            margin-top: 10px; text-align: left; }
-  #canvaswrap { display: none; position: relative; }
-  canvas {
-    display: block; image-rendering: pixelated;
-    border: 1px solid #333; background: #000;
-  }
-  #mutebtn, #fsbtn {
-    position: absolute; top: 6px; z-index: 5;
-    background: rgba(20,20,20,.75); color: #d8d8d4;
-    border: 1px solid #3a3a36; border-radius: 5px;
-    padding: 4px 10px; font-size: 14px; cursor: pointer;
-  }
-  #mutebtn { right: 6px; }
-  #fsbtn { right: 52px; }
-  #mutebtn:hover, #fsbtn:hover { background: rgba(70,70,66,.85); }
-  a { color: #9eb8b8; }
-  /* Keep the tower on screen on small windows; fill (integer-ish) in
-   * fullscreen. Emscripten's SDL maps mouse coords through the CSS size. */
-  #canvaswrap canvas { max-width: 100vw; height: auto; }
-  #canvaswrap:fullscreen {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background: #000;
-  }
-  #canvaswrap:fullscreen canvas {
-    width: min(100vw, calc(100vh * 4 / 3)); height: auto; border: 0;
-  }
-  #towers { margin: 12px 0 4px; text-align: left; }
-  #towers h2 { font-size: 15px; letter-spacing: 1px; color: #d8d1c6;
-               margin: 0 0 8px; font-weight: normal;
-               border-bottom: 1px solid rgba(196,183,168,.25);
-               padding-bottom: 6px; }
-  #slotlist { max-height: min(300px, 38vh); overflow-y: auto; }
-  .slot { display: flex; align-items: center; gap: 10px;
-          padding: 7px 10px; cursor: pointer; }
-  .slot:hover { background: rgba(196,183,168,.12); }
-  .slot.sel { background: rgba(192,138,68,.16);
-              outline: 1px solid rgba(192,138,68,.55); }
-  .slot .who { flex: 1 1 auto; min-width: 0; }
-  .slot .nm { font-size: 15px; color: #ece6dc; overflow: hidden;
-              text-overflow: ellipsis; white-space: nowrap; }
-  .slot .meta { font-size: 12.5px; color: #9a938a; }
-  .slot .ops { flex: 0 0 auto; white-space: nowrap; }
-  .slot .ops button {
-    background: none; border: 1px solid rgba(196,183,168,.35);
-    border-radius: 2px;
-    color: #cfc7bb; font-size: 13px; padding: 3px 7px; margin-left: 4px;
-    cursor: pointer; font-family: inherit;
-  }
-  .slot .ops button:hover { border-color: #c08a44; color: #f0e9df; }
-  .slot .ops button.play { border-color: #c08a44; color: #e2b877; }
-  #startbtn { width: 100%; margin: 10px 0 2px; font-size: 17px;
-              padding: 11px 22px; }
-  #towerbtns { margin-top: 8px; display: flex; justify-content: center;
-               gap: 8px; flex-wrap: wrap; }
-  #towerbtns button, #towerbtns label {
-    background: none; border: 1px solid rgba(196,183,168,.35);
-    border-radius: 2px;
-    color: #cfc7bb; font-size: 13.5px; padding: 5px 12px;
-    cursor: pointer; font-family: inherit; display: inline-block;
-    margin: 0;
-  }
-  #towerbtns button:hover, #towerbtns label:hover {
-    border-color: #c08a44; color: #f0e9df; }
-  #pagefoot { position: absolute; bottom: 0; left: 0; right: 0; z-index: 2;
-              text-align: center; padding: 8px 12px 18px; }
-  #pagefoot .privacy { font-size: 13px; color: #a29b91; margin: 2px 0;
-                       text-shadow: 0 1px 3px rgba(0,0,0,.8); }
-  #crash, #modal {
-    display: none; position: fixed; inset: 0; z-index: 50;
-    background: rgba(8,9,10,.75); color: #e9e3d9;
-    align-items: center; justify-content: center; text-align: center;
-  }
-  #crash .card, #modal .card {
-    background: rgba(24,27,28,.94); border: 1px solid rgba(196,183,168,.3);
-    border-radius: 3px; padding: 22px 30px;
-    width: min(440px, calc(100vw - 40px)); box-sizing: border-box; }
-  #crash .card { border-color: #b25a50; max-width: 520px; width: auto; }
-  #crash code { display: block; margin: 10px 0; font-size: 13px;
-    color: #d8a95c; word-break: break-all; }
-  /* ---- In-page dialog (replaces prompt/confirm/alert) ---- */
-  #modal { background: rgba(8,9,10,.65); z-index: 60; }
-  #modal h3 { margin: 0 0 8px; font-size: 18px; color: #ece6dc;
-              font-weight: normal; letter-spacing: .5px; }
-  #modal .body { font-size: 14.5px; color: #c2bab0; line-height: 1.5;
-                 margin: 0 0 12px; text-align: left; }
-  #minput {
-    display: block; width: 100%; box-sizing: border-box;
-    background: rgba(0,0,0,.4); color: #f2ece2;
-    border: 1px solid rgba(196,183,168,.35);
-    border-radius: 3px; padding: 9px 11px; font-size: 16px;
-    font-family: inherit; outline: none;
-  }
-  #minput:focus { border-color: #c08a44; }
-  #minput.bad { border-color: #b25a50; }
-  #merror { font-size: 13px; color: #d88a80; min-height: 16px;
-            text-align: left; margin: 5px 2px 0; }
-  #modal .mrow { display: flex; justify-content: flex-end; gap: 8px;
-                 margin-top: 12px; }
-  #modal .mrow button {
-    border-radius: 3px; padding: 8px 18px; font-size: 15px;
-    font-family: inherit; cursor: pointer;
-  }
-  #mcancel { background: none; border: 1px solid rgba(196,183,168,.35);
-             color: #cfc7bb; }
-  #mcancel:hover { border-color: #c08a44; color: #f0e9df; }
-  #mok { background: #c08a44; border: 0; color: #241708; }
-  #mok:hover { background: #d09a52; }
-  #mok[disabled] { background: rgba(120,115,108,.35); color: #8d867c;
-                   cursor: default; }
-  #modal.danger #mok { background: #9e4a42; color: #f5eee8; }
-  #modal.danger #mok:hover { background: #b25a50; }
-  #experiments { width: min(1180px, 96vw); height: 90vh; padding: 0;
-    border: 1px solid #665b4a; background: #161c21; color: #eee; }
-  #experiments::backdrop { background: #000b; }
-  #experiments form { text-align: right; padding: 8px; }
-  #experiments iframe { width: 100%; height: calc(100% - 50px); border: 0; }
-  #experimentbtn { display: block; margin: 6px; }
-</style>
+<meta property="og:image" content="https://tower.sergeybaus.com/hero.png">
+<link rel="stylesheet" href="app.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="art/icon-192.png">
+<meta name="theme-color" content="#142b30">
+<meta name="apple-mobile-web-app-capable" content="yes">
 </head>
 <body>
   <div id="stage">
     <div id="herobox">
     <img id="hero" src="hero.png" width="640" height="480"
-         alt="A contemporary glass tower entrance at dusk bearing the sign CONCILIA TOWER, its warm lobby glowing through the glass, rendered in the dithered style of the 1994 SimTower splash screen">
+         alt="An original illustrated tower with warm rooms and tiny residents at dusk">
     <div id="shade"></div>
-    <h1>ConciliaTower</h1>
+    <h1>Tower</h1>
     <div id="menu">
       <p class="tagline">Build your tower</p>
       <div id="towersmode">
@@ -222,34 +36,33 @@
           <input type="file" id="importfile" accept=".sav,.tdt,.twr">
         </div>
       </div>
-      <button type="button" onclick="document.getElementById('experiments').showModal()">Эксперименты</button>
+
       <div id="status">Loading engine…</div>
     </div>
     </div>
-    <div id="pagefoot">
-      <p class="privacy"><a
-         href="https://www.wyldcard.io/blog/simtower-remake-playable-in-browser/"
-         target="_blank" rel="noopener">What is this?</a></p>
-      <p class="privacy">Open Source on
-         <a href="https://github.com/Jonahss/concilia-tower" target="_blank"
-            rel="noopener">github</a></p>
-      <p class="privacy">Say hi on
-         <a href="https://discord.gg/mPc99c8y79" target="_blank"
-            rel="noopener">discord</a></p>
-    </div>
+    <footer id="pagefoot"><a href="https://github.com/neoromantic/tower" target="_blank" rel="noopener">Tower · Open source</a><a href="https://github.com/Jonahss/concilia-tower" target="_blank" rel="noopener">Original port: Jonahss / ConciliaTower</a><span>Your towers stay in this browser. Export a backup to keep a copy.</span></footer>
   </div>
-  <div id="canvaswrap">
-    <button id="experimentbtn" type="button" onclick="document.getElementById('experiments').showModal()">Эксперименты</button>
-    <button id="fsbtn" title="Fullscreen">&#x26F6;</button>
-    <button id="mutebtn" title="Mute sound">&#128266;</button>
-    <canvas id="canvas" width="960" height="720"
-            oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
-  </div>
-  <dialog id="experiments" onkeydown="event.stopPropagation()" onkeyup="event.stopPropagation()" onclose="Module.canvas.focus()">
-      <form method="dialog"><button>Вернуться к игре</button></form>
-      <iframe src="experiments/index.html" title="Эксперименты Tower"></iframe>
+  <main id="canvaswrap" hidden>
+    <header id="hud"><strong>Tower</strong><output id="towerstats"></output><button id="menubtn">Game</button><button id="settingsbtn">Settings</button></header>
+    <div id="world"><canvas id="canvas" width="960" height="720" tabindex="-1" aria-label="Tower world. Tap to use tool; drag to pan; pinch to zoom."></canvas></div>
+    <nav id="toolbar" aria-label="Tower tools">
+      <div class="toolrow"><label>Build <select id="category"><option value="structure">Structure</option><option value="rooms">Rooms</option><option value="transport">Transport</option><option value="services">Services</option></select></label><select id="building" aria-label="Building type"></select><button id="buildbtn" aria-pressed="false">Build</button></div>
+      <div class="toolrow"><button data-tool="0" aria-pressed="false">Use</button><button data-tool="-2" aria-pressed="false">Inspect</button><button data-tool="-1" aria-pressed="false">Bulldoze</button><button data-tool="-3" aria-pressed="true">Pan</button><label>Speed <select id="speed"><option value="0">Paused</option><option value="1" selected>Normal</option><option value="2">Fast</option></select></label><button id="savebtn">Save</button><output id="savestate" role="status">Not saved yet</output></div>
+    </nav>
+  </main>
+  <dialog id="settings">
+    <form method="dialog" class="dialoghead"><h2>Settings</h2><button>Done</button></form>
+    <label>Gameplay style <select id="style"><option value="0">Architectural schematic</option><option value="1">Modern pixel art</option><option value="2">Warm dollhouse</option><option value="3">Miniature</option></select></label>
+    <label>Camera zoom <input id="zoom" type="range" min="0.5" max="3" step="0.05" value="1"><output id="zoomvalue">100%</output></label>
+    <label>Interface size <input id="uiscale" type="range" min="0.85" max="1.3" step="0.05" value="1"></label>
+    <div class="toolrow"><button id="fsbtn">Fullscreen</button><button id="mutebtn">Mute sound</button><button id="installbtn">Install app</button></div>
+    <p id="installhelp" hidden></p>
+    <div class="toolrow"><label>Game menu <select id="gamemenu"><option value="0">Game</option><option value="6">Options / Rescue</option><option value="7">People / Windows</option><option value="8">Reports / View</option><option value="9">Help</option></select></label><button id="openmenubtn">Open</button></div>
+    <div class="toolrow"><button id="exportbtn">Export .sav</button><button id="exporttdtbtn">Export .TDT</button><button id="loadbtn">Towers / Load</button></div>
+    <p>Based on <a href="https://github.com/Jonahss/concilia-tower" target="_blank" rel="noopener">ConciliaTower by Jonahss</a>.</p>
+    <p>Automatic saves every 30 seconds and when leaving the game. Export a backup before clearing browser data.</p>
   </dialog>
-  <div id="modal"><form class="card" id="modalform">
+  <div id="modal" role="dialog" aria-modal="true" aria-labelledby="mtitle"><form class="card" id="modalform">
     <h3 id="mtitle"></h3>
     <p class="body" id="mbody"></p>
     <input id="minput" autocomplete="off" spellcheck="false" maxlength="24">
@@ -261,11 +74,10 @@
   </form></div>
   <div id="crash"><div class="card">
     <h1 style="font-size:20px">The tower fell over</h1>
-    <p>The game hit an internal error. Your last save is safe in this
-       browser. Reloading the page picks it back up.</p>
+    <p>The game hit an internal error. Reload to return to your last completed save.</p>
     <code id="crashmsg"></code>
     <p style="font-size:13px; color:#5c5f5a">If this keeps happening,
-       send Jonah a screenshot of this box (build __CT_VERSION__).</p>
+       report this message (build __CT_VERSION__).</p>
     <button class="start" onclick="location.reload()">Reload</button>
   </div></div>
 
@@ -280,6 +92,7 @@
   var modalEl = document.getElementById('modal');
   var modalState = null;
   function ctModal(o) {
+    document.querySelectorAll('dialog[open]').forEach(dialog => dialog.close());
     return new Promise(function (res) {
       modalState = { resolve: res, validate: o.validate || null,
                      hasInput: 'input' in o };
@@ -315,6 +128,7 @@
     modalState = null;
     modalEl.style.display = 'none';
     if (st) st.resolve(value);
+    if (playing) Module.canvas.focus();
   }
   function modalValidate() {
     if (!modalState || !modalState.hasInput) return null;
@@ -426,7 +240,7 @@
   }
   function syncPersist(then) {
     FS.syncfs(false, function (err) {
-      if (err) console.warn('syncfs failed', err);
+      if (err) { ctAlert('Save failed', err.message); return; }
       if (then) then();
     });
   }
@@ -658,15 +472,22 @@
       FS.mount(IDBFS, {}, '/persist');
       Module.addRunDependency('idbfs');
       FS.syncfs(true, function (err) {
-        if (err) console.warn('idbfs load failed', err);
+        Module.persistError = err;
         Module.removeRunDependency('idbfs');
       });
     }],
     onRuntimeInitialized: function () {
+      if (Module.persistError) {
+        statusEl.textContent = 'Could not load saved towers. Reload to try again: ' + Module.persistError.message;
+        return;
+      }
       Module.engineReady = true;
       renderSlots();    /* IDBFS is loaded (run dependency) — list towers */
       startBtn.disabled = false;
       statusEl.textContent = '';
+      const pickTower = sessionStorage.getItem('ct-pick-tower');
+      sessionStorage.removeItem('ct-pick-tower');
+      if (!pickTower && slotExists(currentSlot)) startBtn.click();
     },
     print: function (t) { console.log(t); },
     printErr: function (t) { console.warn(t); }
@@ -683,8 +504,9 @@
     }
     try { localStorage.setItem('ct-slot', currentSlot); } catch (e) {}
     document.getElementById('stage').style.display = 'none';
-    document.getElementById('canvaswrap').style.display = 'block';
+    document.getElementById('canvaswrap').hidden = false;
     Module.callMain(['--save=' + slotPath(currentSlot)]);
+    ctStartShell();
     Module.canvas.focus();
   });
 
@@ -703,7 +525,8 @@
     if (!ctx) return;
     if (userMuted || document.hidden) ctx.suspend();
     else ctx.resume();
-    muteBtn.innerHTML = userMuted ? '&#128263;' : '&#128266;';
+    muteBtn.textContent = 'Mute sound';
+    if (userMuted) muteBtn.textContent = 'Unmute sound';
     muteBtn.title = userMuted ? 'Unmute sound' : 'Mute sound';
   }
   muteBtn.addEventListener('click', function () {
@@ -713,13 +536,6 @@
   });
   document.addEventListener('visibilitychange', applyAudioGate);
 
-  document.getElementById('fsbtn').addEventListener('click', function () {
-    var wrap = document.getElementById('canvaswrap');
-    if (document.fullscreenElement) document.exitFullscreen();
-    else if (wrap.requestFullscreen) wrap.requestFullscreen();
-    Module.canvas.focus();
-  });
-
   /* Wasm abort → a readable apology instead of a frozen canvas (E5).
    * Saves are on IDBFS and synced at save-time, so a reload recovers. */
   function showCrash(what) {
@@ -728,7 +544,7 @@
   }
   Module.onAbort = function (what) { showCrash(what || 'abort'); };
   window.addEventListener('error', function (ev) {
-    var up = document.getElementById('canvaswrap').style.display === 'block';
+    var up = !document.getElementById('canvaswrap').hidden;
     if (up && document.getElementById('crash').style.display !== 'flex')
       showCrash(ev.message);
   });
@@ -738,12 +554,13 @@
    * default is dead before anything else sees it; SDL still receives
    * the event. The landing page keeps normal browser keys. */
   document.addEventListener('keydown', function (ev) {
-    if (document.getElementById('canvaswrap').style.display !== 'block') return;
+    if (document.getElementById('canvaswrap').hidden) return;
     if (ev.key === 'F5' ||
         ((ev.ctrlKey || ev.metaKey) && (ev.key === 's' || ev.key === 'S')))
       ev.preventDefault();
   }, true);
 </script>
+<script src="app.js"></script>
 {{{ SCRIPT }}}
 </body>
 </html>

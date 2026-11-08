@@ -1,0 +1,4809 @@
+{
+  "style": "warm-dollhouse",
+  "sources": {
+    "exterior-effects.contact.png": "16f33b80f3c3a8df6c78a437e396aa81f2c8dae1eae5d9a052019eeba1719d2b",
+    "exterior-effects.generated.png": "aac97bf4f73794ac8acb8172a41fab8b61bd5772d861ca1d200f12f8ac5cb063",
+    "exterior-effects.png": "200943773a0ff4a091784a8a2dce4d049ef4d47ee47eb2716fbedab7c630303f",
+    "people.png": "4c80b525f341424cfcf7b1a9a87d9e8c5c495baddf46722b3762df2045925bfe",
+    "recycling-room.generated.png": "9b60471b6608a19308c5249e0da25b85ccd60419033defeb175a32fd5aa3a557",
+    "rooms.contact.png": "ad559c30c211a94ab6cd7e46eb57c22c0f483e34fc3b8a23bc7faf944966276b",
+    "rooms.generated.png": "990008c569dd44ddf0edc3c2050ac3119fa301e3fa9f01e01330896904b32445",
+    "rooms.png": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+    "transport.png": "4b8f22470b3ffa3b49984574182181ffca8a9e1ee607268169652411a17ad659",
+    "ui.png": "c57a4a096776925aecd283cb60fcfb389a9f201c665b8d11b5bbe704993b987e"
+  },
+  "pack_sha256": "4a80048fe2e0dfd96aad5ada631a2247ebb51dc3fb11c7ac2e0716e6cce878a8",
+  "grids": {
+    "rooms": [
+      2,
+      8
+    ],
+    "people": [
+      6,
+      4
+    ],
+    "transport": [
+      4,
+      4
+    ],
+    "exterior-effects": [
+      4,
+      4
+    ],
+    "ui": [
+      4,
+      4
+    ]
+  },
+  "source_crops": {
+    "rooms": [
+      [
+        0,
+        0,
+        768,
+        128
+      ],
+      [
+        768,
+        0,
+        1536,
+        128
+      ],
+      [
+        0,
+        128,
+        768,
+        256
+      ],
+      [
+        768,
+        128,
+        1536,
+        256
+      ],
+      [
+        0,
+        256,
+        768,
+        384
+      ],
+      [
+        768,
+        256,
+        1536,
+        384
+      ],
+      [
+        0,
+        384,
+        768,
+        512
+      ],
+      [
+        768,
+        384,
+        1536,
+        512
+      ],
+      [
+        0,
+        512,
+        768,
+        640
+      ],
+      [
+        768,
+        512,
+        1536,
+        640
+      ],
+      [
+        0,
+        640,
+        768,
+        768
+      ],
+      [
+        768,
+        640,
+        1536,
+        768
+      ],
+      [
+        0,
+        768,
+        768,
+        896
+      ],
+      [
+        768,
+        768,
+        1536,
+        896
+      ],
+      [
+        0,
+        896,
+        768,
+        1024
+      ],
+      [
+        768,
+        896,
+        1536,
+        1024
+      ]
+    ],
+    "people": [
+      [
+        0,
+        0,
+        256,
+        256
+      ],
+      [
+        256,
+        0,
+        512,
+        256
+      ],
+      [
+        512,
+        0,
+        768,
+        256
+      ],
+      [
+        768,
+        0,
+        1024,
+        256
+      ],
+      [
+        1024,
+        0,
+        1280,
+        256
+      ],
+      [
+        1280,
+        0,
+        1536,
+        256
+      ],
+      [
+        0,
+        256,
+        256,
+        512
+      ],
+      [
+        256,
+        256,
+        512,
+        512
+      ],
+      [
+        512,
+        256,
+        768,
+        512
+      ],
+      [
+        768,
+        256,
+        1024,
+        512
+      ],
+      [
+        1024,
+        256,
+        1280,
+        512
+      ],
+      [
+        1280,
+        256,
+        1536,
+        512
+      ],
+      [
+        0,
+        512,
+        256,
+        768
+      ],
+      [
+        256,
+        512,
+        512,
+        768
+      ],
+      [
+        512,
+        512,
+        768,
+        768
+      ],
+      [
+        768,
+        512,
+        1024,
+        768
+      ],
+      [
+        1024,
+        512,
+        1280,
+        768
+      ],
+      [
+        1280,
+        512,
+        1536,
+        768
+      ],
+      [
+        0,
+        768,
+        256,
+        1024
+      ],
+      [
+        256,
+        768,
+        512,
+        1024
+      ],
+      [
+        512,
+        768,
+        768,
+        1024
+      ],
+      [
+        768,
+        768,
+        1024,
+        1024
+      ],
+      [
+        1024,
+        768,
+        1280,
+        1024
+      ],
+      [
+        1280,
+        768,
+        1536,
+        1024
+      ]
+    ],
+    "transport": [
+      [
+        0,
+        0,
+        384,
+        256
+      ],
+      [
+        384,
+        0,
+        768,
+        256
+      ],
+      [
+        768,
+        0,
+        1152,
+        256
+      ],
+      [
+        1152,
+        0,
+        1536,
+        256
+      ],
+      [
+        0,
+        256,
+        384,
+        512
+      ],
+      [
+        384,
+        256,
+        768,
+        512
+      ],
+      [
+        768,
+        256,
+        1152,
+        512
+      ],
+      [
+        1152,
+        256,
+        1536,
+        512
+      ],
+      [
+        0,
+        512,
+        384,
+        768
+      ],
+      [
+        384,
+        512,
+        768,
+        768
+      ],
+      [
+        768,
+        512,
+        1152,
+        768
+      ],
+      [
+        1152,
+        512,
+        1536,
+        768
+      ],
+      [
+        0,
+        768,
+        384,
+        1024
+      ],
+      [
+        384,
+        768,
+        768,
+        1024
+      ],
+      [
+        768,
+        768,
+        1152,
+        1024
+      ],
+      [
+        1152,
+        768,
+        1536,
+        1024
+      ]
+    ],
+    "exterior-effects": [
+      [
+        0,
+        0,
+        384,
+        256
+      ],
+      [
+        384,
+        0,
+        768,
+        256
+      ],
+      [
+        768,
+        0,
+        1152,
+        256
+      ],
+      [
+        1152,
+        0,
+        1536,
+        256
+      ],
+      [
+        0,
+        256,
+        384,
+        512
+      ],
+      [
+        384,
+        256,
+        768,
+        512
+      ],
+      [
+        768,
+        256,
+        1152,
+        512
+      ],
+      [
+        1152,
+        256,
+        1536,
+        512
+      ],
+      [
+        0,
+        512,
+        384,
+        768
+      ],
+      [
+        384,
+        512,
+        768,
+        768
+      ],
+      [
+        768,
+        512,
+        1152,
+        768
+      ],
+      [
+        1152,
+        512,
+        1536,
+        768
+      ],
+      [
+        0,
+        768,
+        384,
+        1024
+      ],
+      [
+        384,
+        768,
+        768,
+        1024
+      ],
+      [
+        768,
+        768,
+        1152,
+        1024
+      ],
+      [
+        1152,
+        768,
+        1536,
+        1024
+      ]
+    ],
+    "ui": [
+      [
+        0,
+        0,
+        384,
+        256
+      ],
+      [
+        384,
+        0,
+        768,
+        256
+      ],
+      [
+        768,
+        0,
+        1152,
+        256
+      ],
+      [
+        1152,
+        0,
+        1536,
+        256
+      ],
+      [
+        0,
+        256,
+        384,
+        512
+      ],
+      [
+        384,
+        256,
+        768,
+        512
+      ],
+      [
+        768,
+        256,
+        1152,
+        512
+      ],
+      [
+        1152,
+        256,
+        1536,
+        512
+      ],
+      [
+        0,
+        512,
+        384,
+        768
+      ],
+      [
+        384,
+        512,
+        768,
+        768
+      ],
+      [
+        768,
+        512,
+        1152,
+        768
+      ],
+      [
+        1152,
+        512,
+        1536,
+        768
+      ],
+      [
+        0,
+        768,
+        384,
+        1024
+      ],
+      [
+        384,
+        768,
+        768,
+        1024
+      ],
+      [
+        768,
+        768,
+        1152,
+        1024
+      ],
+      [
+        1152,
+        768,
+        1536,
+        1024
+      ]
+    ]
+  },
+  "sprites": [
+    {
+      "id": "812C",
+      "width": 256,
+      "height": 128,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [],
+      "ui_icons": true,
+      "icon_source": "ui",
+      "icon_cells": [
+        11,
+        11,
+        15,
+        15,
+        14,
+        14,
+        14,
+        0,
+        2,
+        2,
+        2,
+        4,
+        4,
+        3,
+        9,
+        8,
+        12,
+        12,
+        13,
+        10,
+        8,
+        11,
+        5,
+        7,
+        1,
+        6
+      ],
+      "icon_overrides": {
+        "1": [
+          "exterior-effects",
+          5
+        ],
+        "20": [
+          "exterior-effects",
+          10
+        ]
+      }
+    },
+    {
+      "id": "812D",
+      "width": 256,
+      "height": 128,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [],
+      "ui_icons": true,
+      "icon_source": "ui",
+      "icon_cells": [
+        11,
+        11,
+        15,
+        15,
+        14,
+        14,
+        14,
+        0,
+        2,
+        2,
+        2,
+        4,
+        4,
+        3,
+        9,
+        8,
+        12,
+        12,
+        13,
+        10,
+        8,
+        11,
+        5,
+        7,
+        1,
+        6
+      ],
+      "icon_overrides": {
+        "1": [
+          "exterior-effects",
+          5
+        ],
+        "20": [
+          "exterior-effects",
+          10
+        ]
+      }
+    },
+    {
+      "id": "812E",
+      "width": 256,
+      "height": 128,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [],
+      "ui_icons": true,
+      "icon_source": "ui",
+      "icon_cells": [
+        11,
+        11,
+        15,
+        15,
+        14,
+        14,
+        14,
+        0,
+        2,
+        2,
+        2,
+        4,
+        4,
+        3,
+        9,
+        8,
+        12,
+        12,
+        13,
+        10,
+        8,
+        11,
+        5,
+        7,
+        1,
+        6
+      ],
+      "icon_overrides": {
+        "1": [
+          "exterior-effects",
+          5
+        ],
+        "20": [
+          "exterior-effects",
+          10
+        ]
+      }
+    },
+    {
+      "id": "8136",
+      "width": 200,
+      "height": 18,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          5,
+          3,
+          "Build"
+        ],
+        [
+          54,
+          3,
+          "Quality"
+        ],
+        [
+          103,
+          3,
+          "Prices"
+        ],
+        [
+          153,
+          3,
+          "Hotel"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "8137",
+      "width": 200,
+      "height": 18,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          5,
+          3,
+          "Build"
+        ],
+        [
+          54,
+          3,
+          "Quality"
+        ],
+        [
+          103,
+          3,
+          "Prices"
+        ],
+        [
+          153,
+          3,
+          "Hotel"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "8139",
+      "width": 200,
+      "height": 20,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          5,
+          4,
+          "Low  -  Quality  -  High"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "813A",
+      "width": 200,
+      "height": 20,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          5,
+          4,
+          "Low  -  Prices  -  High"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "813B",
+      "width": 200,
+      "height": 20,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          5,
+          4,
+          "Empty  -  Occupancy  -  Full"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "8140",
+      "width": 431,
+      "height": 41,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [],
+      "ui_icons": false
+    },
+    {
+      "id": "8141",
+      "width": 32,
+      "height": 31,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          12,
+          0,
+          "12"
+        ],
+        [
+          1,
+          10,
+          "9"
+        ],
+        [
+          24,
+          10,
+          "3"
+        ],
+        [
+          12,
+          21,
+          "6"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "8142",
+      "width": 21,
+      "height": 22,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        15
+      ],
+      "key": 0
+    },
+    {
+      "id": "8143",
+      "width": 21,
+      "height": 22,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        15
+      ],
+      "key": 0
+    },
+    {
+      "id": "8147",
+      "width": 108,
+      "height": 22,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          21,
+          5,
+          "T O W E R"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "8160",
+      "width": 200,
+      "height": 288,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [],
+      "ui_icons": false
+    },
+    {
+      "id": "8190",
+      "width": 200,
+      "height": 428,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          30,
+          4,
+          "Weekday"
+        ],
+        [
+          103,
+          4,
+          "Weekend"
+        ],
+        [
+          20,
+          23,
+          "Service timetable"
+        ],
+        [
+          12,
+          74,
+          "Waiting car response"
+        ],
+        [
+          12,
+          130,
+          "Departure threshold"
+        ],
+        [
+          12,
+          177,
+          "Stops / home floors"
+        ],
+        [
+          161,
+          196,
+          "Show"
+        ],
+        [
+          20,
+          403,
+          "Simulate"
+        ],
+        [
+          139,
+          403,
+          "OK"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "8191",
+      "width": 200,
+      "height": 428,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [],
+      "ui_icons": false
+    },
+    {
+      "id": "8192",
+      "width": 24,
+      "height": 21,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          4,
+          4,
+          "<>"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "8193",
+      "width": 24,
+      "height": 21,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          8,
+          4,
+          "^"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "8194",
+      "width": 24,
+      "height": 21,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          8,
+          4,
+          "v"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "8195",
+      "width": 82,
+      "height": 66,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          4,
+          5,
+          "Local"
+        ],
+        [
+          4,
+          27,
+          "Express up"
+        ],
+        [
+          4,
+          49,
+          "Express down"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "8196",
+      "width": 82,
+      "height": 66,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          4,
+          5,
+          "Local"
+        ],
+        [
+          4,
+          27,
+          "Express up"
+        ],
+        [
+          4,
+          49,
+          "Express down"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "819A",
+      "width": 200,
+      "height": 428,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          21,
+          405,
+          "Resume"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "819B",
+      "width": 200,
+      "height": 428,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          21,
+          405,
+          "Resume"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "81F4",
+      "width": 343,
+      "height": 364,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          12,
+          12,
+          "Year"
+        ],
+        [
+          195,
+          12,
+          "Q"
+        ],
+        [
+          12,
+          30,
+          "Income"
+        ],
+        [
+          205,
+          30,
+          "Expenses"
+        ],
+        [
+          12,
+          64,
+          "Category       People   Income"
+        ],
+        [
+          207,
+          64,
+          "Maintenance"
+        ],
+        [
+          12,
+          236,
+          "Net income"
+        ],
+        [
+          12,
+          253,
+          "Other income"
+        ],
+        [
+          12,
+          270,
+          "Construction"
+        ],
+        [
+          12,
+          287,
+          "Previous balance"
+        ],
+        [
+          12,
+          307,
+          "Balance"
+        ],
+        [
+          168,
+          331,
+          "OK"
+        ],
+        [
+          10,
+          81,
+          "Offices"
+        ],
+        [
+          10,
+          94,
+          "Condos"
+        ],
+        [
+          10,
+          107,
+          "Single"
+        ],
+        [
+          10,
+          120,
+          "Twin"
+        ],
+        [
+          10,
+          133,
+          "Suites"
+        ],
+        [
+          10,
+          146,
+          "Dining"
+        ],
+        [
+          10,
+          159,
+          "Shops"
+        ],
+        [
+          10,
+          172,
+          "Cinema"
+        ],
+        [
+          10,
+          185,
+          "Hall"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "81F5",
+      "width": 343,
+      "height": 364,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          168,
+          331,
+          "OK"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "8258",
+      "width": 64,
+      "height": 32,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          5,
+          9,
+          ">"
+        ],
+        [
+          36,
+          9,
+          ">>"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "8259",
+      "width": 64,
+      "height": 32,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          5,
+          9,
+          ">"
+        ],
+        [
+          36,
+          9,
+          ">>"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "825A",
+      "width": 64,
+      "height": 32,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          5,
+          9,
+          "||"
+        ],
+        [
+          36,
+          9,
+          ">>>"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "825B",
+      "width": 64,
+      "height": 32,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          5,
+          9,
+          "||"
+        ],
+        [
+          36,
+          9,
+          ">>>"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "825C",
+      "width": 64,
+      "height": 21,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          3,
+          5,
+          "X"
+        ],
+        [
+          24,
+          5,
+          "+"
+        ],
+        [
+          45,
+          5,
+          "?"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "825D",
+      "width": 64,
+      "height": 21,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          3,
+          5,
+          "X"
+        ],
+        [
+          24,
+          5,
+          "+"
+        ],
+        [
+          45,
+          5,
+          "?"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "825E",
+      "width": 64,
+      "height": 21,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          3,
+          5,
+          "X"
+        ],
+        [
+          24,
+          5,
+          "+"
+        ],
+        [
+          45,
+          5,
+          "?"
+        ]
+      ],
+      "ui_icons": false
+    },
+    {
+      "id": "82BC",
+      "width": 96,
+      "height": 24,
+      "raw": false,
+      "source": "people",
+      "cells": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "frames": 12,
+      "stride": 8,
+      "sequence": "frame modulo six",
+      "key": 14
+    },
+    {
+      "id": "82BE",
+      "width": 96,
+      "height": 24,
+      "raw": false,
+      "source": "people",
+      "cells": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "frames": 12,
+      "stride": 8,
+      "sequence": "frame modulo six",
+      "key": 14
+    },
+    {
+      "id": "82BF",
+      "width": 96,
+      "height": 24,
+      "raw": false,
+      "source": "people",
+      "cells": [
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "frames": 12,
+      "stride": 8,
+      "sequence": "frame modulo six",
+      "key": 14
+    },
+    {
+      "id": "8351",
+      "width": 32,
+      "height": 360,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        0
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8352",
+      "width": 32,
+      "height": 360,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        0
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8353",
+      "width": 32,
+      "height": 360,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        0
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8354",
+      "width": 32,
+      "height": 360,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        0
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8355",
+      "width": 32,
+      "height": 360,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        1
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8356",
+      "width": 32,
+      "height": 360,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        1
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8357",
+      "width": 32,
+      "height": 360,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        1
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8358",
+      "width": 32,
+      "height": 360,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        1
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8359",
+      "width": 32,
+      "height": 360,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        2
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "835A",
+      "width": 32,
+      "height": 360,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        2
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "835B",
+      "width": 32,
+      "height": 360,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        2
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8384",
+      "width": 96,
+      "height": 41,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        3
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8385",
+      "width": 192,
+      "height": 19,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        3
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8386",
+      "width": 292,
+      "height": 38,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        3
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8387",
+      "width": 216,
+      "height": 43,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        3
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8388",
+      "width": 140,
+      "height": 48,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        14
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8389",
+      "width": 96,
+      "height": 55,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        4
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 16
+    },
+    {
+      "id": "83E8",
+      "width": 96,
+      "height": 36,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        5
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "83E9",
+      "width": 112,
+      "height": 24,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        12
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "83EA",
+      "width": 128,
+      "height": 72,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        15
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8428",
+      "width": 32,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        0
+      ],
+      "frames": 1,
+      "stride": 32,
+      "people": "people row 0 sequential poses",
+      "key": 2
+    },
+    {
+      "id": "8429",
+      "width": 192,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        0,
+        1,
+        2,
+        2,
+        4,
+        4
+      ],
+      "frames": 6,
+      "stride": 32,
+      "people": "people row 0 sequential poses",
+      "key": 2
+    },
+    {
+      "id": "842A",
+      "width": 160,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        0,
+        1,
+        2,
+        2,
+        2
+      ],
+      "frames": 5,
+      "stride": 32,
+      "people": "people row 0 sequential poses",
+      "key": 2
+    },
+    {
+      "id": "842B",
+      "width": 336,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        4,
+        4
+      ],
+      "frames": 7,
+      "stride": 48,
+      "people": "people row 0 sequential poses",
+      "key": 2
+    },
+    {
+      "id": "842C",
+      "width": 16,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        5
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 2
+    },
+    {
+      "id": "842D",
+      "width": 32,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        7
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8468",
+      "width": 640,
+      "height": 36,
+      "raw": false,
+      "source": "people",
+      "cells": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "frames": 40,
+      "stride": 16,
+      "sequence": "frame modulo six",
+      "key": 0
+    },
+    {
+      "id": "8469",
+      "width": 160,
+      "height": 36,
+      "raw": false,
+      "source": "people",
+      "cells": [
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "frames": 10,
+      "stride": 16,
+      "sequence": "frame modulo six",
+      "key": 0
+    },
+    {
+      "id": "84A8",
+      "width": 32,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        2
+      ],
+      "frames": 9,
+      "dark": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        32,
+        24
+      ]
+    },
+    {
+      "id": "84A9",
+      "width": 256,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        2
+      ],
+      "frames": 9,
+      "dark": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "sheet_crop": [
+        32,
+        0,
+        288,
+        24
+      ]
+    },
+    {
+      "id": "84AA",
+      "width": 32,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        2
+      ],
+      "frames": 9,
+      "dark": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        32,
+        24
+      ]
+    },
+    {
+      "id": "84AB",
+      "width": 256,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        2
+      ],
+      "frames": 9,
+      "dark": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "sheet_crop": [
+        32,
+        0,
+        288,
+        24
+      ]
+    },
+    {
+      "id": "84E8",
+      "width": 48,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        2
+      ],
+      "frames": 9,
+      "dark": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        48,
+        24
+      ]
+    },
+    {
+      "id": "84E9",
+      "width": 384,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        2
+      ],
+      "frames": 9,
+      "dark": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "sheet_crop": [
+        48,
+        0,
+        432,
+        24
+      ]
+    },
+    {
+      "id": "84EA",
+      "width": 48,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        2
+      ],
+      "frames": 9,
+      "dark": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        48,
+        24
+      ]
+    },
+    {
+      "id": "84EB",
+      "width": 384,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        2
+      ],
+      "frames": 9,
+      "dark": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "sheet_crop": [
+        48,
+        0,
+        432,
+        24
+      ]
+    },
+    {
+      "id": "84EC",
+      "width": 48,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        2
+      ],
+      "frames": 9,
+      "dark": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        48,
+        24
+      ]
+    },
+    {
+      "id": "84ED",
+      "width": 384,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        2
+      ],
+      "frames": 9,
+      "dark": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "sheet_crop": [
+        48,
+        0,
+        432,
+        24
+      ]
+    },
+    {
+      "id": "84EE",
+      "width": 48,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        2
+      ],
+      "frames": 9,
+      "dark": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        48,
+        24
+      ]
+    },
+    {
+      "id": "84EF",
+      "width": 384,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        2
+      ],
+      "frames": 9,
+      "dark": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "sheet_crop": [
+        48,
+        0,
+        432,
+        24
+      ]
+    },
+    {
+      "id": "8528",
+      "width": 80,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        2
+      ],
+      "frames": 9,
+      "dark": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        80,
+        24
+      ]
+    },
+    {
+      "id": "8529",
+      "width": 640,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        2
+      ],
+      "frames": 9,
+      "dark": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "sheet_crop": [
+        80,
+        0,
+        720,
+        24
+      ]
+    },
+    {
+      "id": "852A",
+      "width": 80,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        2
+      ],
+      "frames": 9,
+      "dark": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        80,
+        24
+      ]
+    },
+    {
+      "id": "852B",
+      "width": 640,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        2
+      ],
+      "frames": 9,
+      "dark": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "sheet_crop": [
+        80,
+        0,
+        720,
+        24
+      ]
+    },
+    {
+      "id": "8568",
+      "width": 384,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        5
+      ],
+      "frames": 4,
+      "dark": [
+        3
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        384,
+        24
+      ]
+    },
+    {
+      "id": "8569",
+      "width": 384,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        5
+      ],
+      "frames": 4,
+      "dark": [
+        3
+      ],
+      "sheet_crop": [
+        384,
+        0,
+        768,
+        24
+      ]
+    },
+    {
+      "id": "856A",
+      "width": 384,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        5
+      ],
+      "frames": 4,
+      "dark": [
+        3
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        384,
+        24
+      ]
+    },
+    {
+      "id": "856B",
+      "width": 384,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        5
+      ],
+      "frames": 4,
+      "dark": [
+        3
+      ],
+      "sheet_crop": [
+        384,
+        0,
+        768,
+        24
+      ]
+    },
+    {
+      "id": "856C",
+      "width": 384,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        5
+      ],
+      "frames": 4,
+      "dark": [
+        3
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        384,
+        24
+      ]
+    },
+    {
+      "id": "856D",
+      "width": 384,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        5
+      ],
+      "frames": 4,
+      "dark": [
+        3
+      ],
+      "sheet_crop": [
+        384,
+        0,
+        768,
+        24
+      ]
+    },
+    {
+      "id": "856E",
+      "width": 384,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        5
+      ],
+      "frames": 4,
+      "dark": [
+        3
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        384,
+        24
+      ]
+    },
+    {
+      "id": "856F",
+      "width": 384,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        5
+      ],
+      "frames": 4,
+      "dark": [
+        3
+      ],
+      "sheet_crop": [
+        384,
+        0,
+        768,
+        24
+      ]
+    },
+    {
+      "id": "8570",
+      "width": 384,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        5
+      ],
+      "frames": 4,
+      "dark": [
+        3
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        384,
+        24
+      ]
+    },
+    {
+      "id": "8571",
+      "width": 384,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        5
+      ],
+      "frames": 4,
+      "dark": [
+        3
+      ],
+      "sheet_crop": [
+        384,
+        0,
+        768,
+        24
+      ]
+    },
+    {
+      "id": "85A8",
+      "width": 288,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        0
+      ],
+      "frames": 4,
+      "dark": [
+        1,
+        3
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        288,
+        24
+      ]
+    },
+    {
+      "id": "85A9",
+      "width": 288,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        0
+      ],
+      "frames": 4,
+      "dark": [
+        1,
+        3
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        288,
+        24
+      ]
+    },
+    {
+      "id": "85AA",
+      "width": 288,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        0
+      ],
+      "frames": 4,
+      "dark": [
+        1,
+        3
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        288,
+        24
+      ]
+    },
+    {
+      "id": "85AB",
+      "width": 144,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        0
+      ],
+      "frames": 2,
+      "dark": [
+        1
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        144,
+        24
+      ]
+    },
+    {
+      "id": "85E8",
+      "width": 480,
+      "height": 24,
+      "raw": false,
+      "source": "people",
+      "cells": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "frames": 30,
+      "stride": 16,
+      "sequence": "frame modulo six",
+      "key": 0
+    },
+    {
+      "id": "85E9",
+      "width": 432,
+      "height": 24,
+      "raw": false,
+      "source": "people",
+      "cells": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "frames": 27,
+      "stride": 16,
+      "sequence": "frame modulo six",
+      "key": 0
+    },
+    {
+      "id": "85EA",
+      "width": 96,
+      "height": 24,
+      "raw": false,
+      "source": "people",
+      "cells": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "frames": 6,
+      "stride": 16,
+      "sequence": "frame modulo six",
+      "key": 0
+    },
+    {
+      "id": "85EB",
+      "width": 160,
+      "height": 24,
+      "raw": false,
+      "source": "people",
+      "cells": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "frames": 10,
+      "stride": 16,
+      "sequence": "frame modulo six",
+      "key": 0
+    },
+    {
+      "id": "85EC",
+      "width": 112,
+      "height": 24,
+      "raw": false,
+      "source": "people",
+      "cells": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "frames": 7,
+      "stride": 16,
+      "sequence": "frame modulo six",
+      "key": 0
+    },
+    {
+      "id": "85ED",
+      "width": 256,
+      "height": 24,
+      "raw": false,
+      "source": "people",
+      "cells": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "frames": 16,
+      "stride": 16,
+      "sequence": "frame modulo six",
+      "key": 0
+    },
+    {
+      "id": "85EE",
+      "width": 48,
+      "height": 24,
+      "raw": false,
+      "source": "people",
+      "cells": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "frames": 3,
+      "stride": 16,
+      "sequence": "frame modulo six",
+      "key": 0
+    },
+    {
+      "id": "8628",
+      "width": 128,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        1
+      ],
+      "frames": 5,
+      "dark": [
+        2,
+        4
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        128,
+        24
+      ]
+    },
+    {
+      "id": "8629",
+      "width": 128,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        1
+      ],
+      "frames": 5,
+      "dark": [
+        2,
+        4
+      ],
+      "sheet_crop": [
+        128,
+        0,
+        256,
+        24
+      ]
+    },
+    {
+      "id": "862A",
+      "width": 128,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        1
+      ],
+      "frames": 5,
+      "dark": [
+        2,
+        4
+      ],
+      "sheet_crop": [
+        256,
+        0,
+        384,
+        24
+      ]
+    },
+    {
+      "id": "862B",
+      "width": 128,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        1
+      ],
+      "frames": 5,
+      "dark": [
+        2,
+        4
+      ],
+      "sheet_crop": [
+        384,
+        0,
+        512,
+        24
+      ]
+    },
+    {
+      "id": "862C",
+      "width": 128,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        1
+      ],
+      "frames": 5,
+      "dark": [
+        2,
+        4
+      ],
+      "sheet_crop": [
+        512,
+        0,
+        640,
+        24
+      ]
+    },
+    {
+      "id": "862D",
+      "width": 128,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        1
+      ],
+      "frames": 5,
+      "dark": [
+        2,
+        4
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        128,
+        24
+      ]
+    },
+    {
+      "id": "862E",
+      "width": 128,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        1
+      ],
+      "frames": 5,
+      "dark": [
+        2,
+        4
+      ],
+      "sheet_crop": [
+        128,
+        0,
+        256,
+        24
+      ]
+    },
+    {
+      "id": "862F",
+      "width": 128,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        1
+      ],
+      "frames": 5,
+      "dark": [
+        2,
+        4
+      ],
+      "sheet_crop": [
+        256,
+        0,
+        384,
+        24
+      ]
+    },
+    {
+      "id": "8630",
+      "width": 128,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        1
+      ],
+      "frames": 5,
+      "dark": [
+        2,
+        4
+      ],
+      "sheet_crop": [
+        384,
+        0,
+        512,
+        24
+      ]
+    },
+    {
+      "id": "8631",
+      "width": 128,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        1
+      ],
+      "frames": 5,
+      "dark": [
+        2,
+        4
+      ],
+      "sheet_crop": [
+        512,
+        0,
+        640,
+        24
+      ]
+    },
+    {
+      "id": "8632",
+      "width": 128,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        1
+      ],
+      "frames": 5,
+      "dark": [
+        2,
+        4
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        128,
+        24
+      ]
+    },
+    {
+      "id": "8633",
+      "width": 128,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        1
+      ],
+      "frames": 5,
+      "dark": [
+        2,
+        4
+      ],
+      "sheet_crop": [
+        128,
+        0,
+        256,
+        24
+      ]
+    },
+    {
+      "id": "8634",
+      "width": 128,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        1
+      ],
+      "frames": 5,
+      "dark": [
+        2,
+        4
+      ],
+      "sheet_crop": [
+        256,
+        0,
+        384,
+        24
+      ]
+    },
+    {
+      "id": "8635",
+      "width": 128,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        1
+      ],
+      "frames": 5,
+      "dark": [
+        2,
+        4
+      ],
+      "sheet_crop": [
+        384,
+        0,
+        512,
+        24
+      ]
+    },
+    {
+      "id": "8636",
+      "width": 128,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        1
+      ],
+      "frames": 5,
+      "dark": [
+        2,
+        4
+      ],
+      "sheet_crop": [
+        512,
+        0,
+        640,
+        24
+      ]
+    },
+    {
+      "id": "8668",
+      "width": 288,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        3
+      ],
+      "frames": 3,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        0,
+        288,
+        24
+      ]
+    },
+    {
+      "id": "8669",
+      "width": 288,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        3
+      ],
+      "frames": 3,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        0,
+        288,
+        24
+      ]
+    },
+    {
+      "id": "866A",
+      "width": 288,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        3
+      ],
+      "frames": 3,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        0,
+        288,
+        24
+      ]
+    },
+    {
+      "id": "866B",
+      "width": 288,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        3
+      ],
+      "frames": 3,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        0,
+        288,
+        24
+      ]
+    },
+    {
+      "id": "866C",
+      "width": 288,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        3
+      ],
+      "frames": 3,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        0,
+        288,
+        24
+      ]
+    },
+    {
+      "id": "866D",
+      "width": 288,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        3
+      ],
+      "frames": 3,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        0,
+        288,
+        24
+      ]
+    },
+    {
+      "id": "866E",
+      "width": 288,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        3
+      ],
+      "frames": 3,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        0,
+        288,
+        24
+      ]
+    },
+    {
+      "id": "866F",
+      "width": 288,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        3
+      ],
+      "frames": 3,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        0,
+        288,
+        24
+      ]
+    },
+    {
+      "id": "8670",
+      "width": 288,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        3
+      ],
+      "frames": 3,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        0,
+        288,
+        24
+      ]
+    },
+    {
+      "id": "8671",
+      "width": 288,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        3
+      ],
+      "frames": 3,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        0,
+        288,
+        24
+      ]
+    },
+    {
+      "id": "8672",
+      "width": 288,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        3
+      ],
+      "frames": 3,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        0,
+        288,
+        24
+      ]
+    },
+    {
+      "id": "8673",
+      "width": 96,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        3
+      ],
+      "frames": 1,
+      "dark": [
+        0
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        96,
+        24
+      ]
+    },
+    {
+      "id": "8674",
+      "width": 96,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        3
+      ],
+      "frames": 1,
+      "dark": [
+        0
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        96,
+        24
+      ]
+    },
+    {
+      "id": "86A8",
+      "width": 32,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        13
+      ],
+      "frames": 15,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        0,
+        32,
+        24
+      ]
+    },
+    {
+      "id": "86A9",
+      "width": 448,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        13
+      ],
+      "frames": 15,
+      "dark": [],
+      "sheet_crop": [
+        32,
+        0,
+        480,
+        24
+      ]
+    },
+    {
+      "id": "86E8",
+      "width": 256,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        4
+      ],
+      "frames": 4,
+      "dark": [
+        3
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        256,
+        24
+      ]
+    },
+    {
+      "id": "86E9",
+      "width": 256,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        4
+      ],
+      "frames": 4,
+      "dark": [
+        3
+      ],
+      "sheet_crop": [
+        256,
+        0,
+        512,
+        24
+      ]
+    },
+    {
+      "id": "86EA",
+      "width": 256,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        4
+      ],
+      "frames": 4,
+      "dark": [
+        3
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        256,
+        24
+      ]
+    },
+    {
+      "id": "86EB",
+      "width": 256,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        4
+      ],
+      "frames": 4,
+      "dark": [
+        3
+      ],
+      "sheet_crop": [
+        256,
+        0,
+        512,
+        24
+      ]
+    },
+    {
+      "id": "86EC",
+      "width": 256,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        4
+      ],
+      "frames": 4,
+      "dark": [
+        3
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        256,
+        24
+      ]
+    },
+    {
+      "id": "86ED",
+      "width": 256,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        4
+      ],
+      "frames": 4,
+      "dark": [
+        3
+      ],
+      "sheet_crop": [
+        256,
+        0,
+        512,
+        24
+      ]
+    },
+    {
+      "id": "86EE",
+      "width": 256,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        4
+      ],
+      "frames": 4,
+      "dark": [
+        3
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        256,
+        24
+      ]
+    },
+    {
+      "id": "86EF",
+      "width": 256,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        4
+      ],
+      "frames": 4,
+      "dark": [
+        3
+      ],
+      "sheet_crop": [
+        256,
+        0,
+        512,
+        24
+      ]
+    },
+    {
+      "id": "86F0",
+      "width": 256,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        4
+      ],
+      "frames": 4,
+      "dark": [
+        3
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        256,
+        24
+      ]
+    },
+    {
+      "id": "86F1",
+      "width": 256,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        4
+      ],
+      "frames": 4,
+      "dark": [
+        3
+      ],
+      "sheet_crop": [
+        256,
+        0,
+        512,
+        24
+      ]
+    },
+    {
+      "id": "8728",
+      "width": 208,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        6
+      ],
+      "frames": 3,
+      "dark": [
+        2
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        208,
+        24
+      ]
+    },
+    {
+      "id": "8729",
+      "width": 208,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        6
+      ],
+      "frames": 3,
+      "dark": [
+        2
+      ],
+      "sheet_crop": [
+        208,
+        0,
+        416,
+        24
+      ]
+    },
+    {
+      "id": "872A",
+      "width": 208,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        6
+      ],
+      "frames": 3,
+      "dark": [
+        2
+      ],
+      "sheet_crop": [
+        416,
+        0,
+        624,
+        24
+      ]
+    },
+    {
+      "id": "8768",
+      "width": 128,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        7
+      ],
+      "frames": 1,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        0,
+        128,
+        24
+      ]
+    },
+    {
+      "id": "87A8",
+      "width": 120,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        8
+      ],
+      "frames": 1,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        0,
+        120,
+        24
+      ]
+    },
+    {
+      "id": "87E8",
+      "width": 192,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        5
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 2
+    },
+    {
+      "id": "87E9",
+      "width": 160,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        5
+      ],
+      "frames": 10,
+      "key": 15,
+      "operation": "generated shaft plaques with deterministic floor labels"
+    },
+    {
+      "id": "87EA",
+      "width": 192,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        5
+      ],
+      "frames": 12,
+      "key": 15,
+      "operation": "generated shaft plaques with deterministic floor labels"
+    },
+    {
+      "id": "87EC",
+      "width": 160,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        5
+      ],
+      "frames": 10,
+      "key": 15,
+      "operation": "generated shaft plaques with deterministic floor labels"
+    },
+    {
+      "id": "8828",
+      "width": 128,
+      "height": 36,
+      "raw": false,
+      "source": "people",
+      "cells": [
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "frames": 8,
+      "stride": 16,
+      "sequence": "frame modulo six",
+      "key": 0
+    },
+    {
+      "id": "8868",
+      "width": 768,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        10
+      ],
+      "frames": 4,
+      "dark": [
+        0,
+        3
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        768,
+        36
+      ]
+    },
+    {
+      "id": "88A8",
+      "width": 768,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        10
+      ],
+      "frames": 4,
+      "dark": [
+        0,
+        3
+      ],
+      "sheet_crop": [
+        0,
+        36,
+        768,
+        72
+      ]
+    },
+    {
+      "id": "88E8",
+      "width": 200,
+      "height": 72,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        14
+      ],
+      "frames": 1,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        0,
+        200,
+        72
+      ]
+    },
+    {
+      "id": "88E9",
+      "width": 200,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        14
+      ],
+      "frames": 1,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        0,
+        200,
+        36
+      ]
+    },
+    {
+      "id": "88EA",
+      "width": 200,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        14
+      ],
+      "frames": 1,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        0,
+        200,
+        36
+      ]
+    },
+    {
+      "id": "88EB",
+      "width": 200,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        14
+      ],
+      "frames": 1,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        0,
+        200,
+        36
+      ]
+    },
+    {
+      "id": "88EC",
+      "width": 200,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        14
+      ],
+      "frames": 1,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        0,
+        200,
+        36
+      ]
+    },
+    {
+      "id": "88ED",
+      "width": 200,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        14
+      ],
+      "frames": 1,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        0,
+        200,
+        36
+      ]
+    },
+    {
+      "id": "8929",
+      "width": 200,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        14
+      ],
+      "frames": 1,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        36,
+        200,
+        72
+      ]
+    },
+    {
+      "id": "892A",
+      "width": 200,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        14
+      ],
+      "frames": 1,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        36,
+        200,
+        72
+      ]
+    },
+    {
+      "id": "892B",
+      "width": 200,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        14
+      ],
+      "frames": 1,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        36,
+        200,
+        72
+      ]
+    },
+    {
+      "id": "892C",
+      "width": 200,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        14
+      ],
+      "frames": 1,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        36,
+        200,
+        72
+      ]
+    },
+    {
+      "id": "892D",
+      "width": 200,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        14
+      ],
+      "frames": 1,
+      "dark": [],
+      "sheet_crop": [
+        0,
+        36,
+        200,
+        72
+      ]
+    },
+    {
+      "id": "892E",
+      "width": 96,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        11
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8968",
+      "width": 384,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        6
+      ],
+      "frames": 11,
+      "sheet_crop": [
+        0,
+        0,
+        384,
+        36
+      ],
+      "people": "people row 0 sequential poses on diagonal",
+      "key": 0
+    },
+    {
+      "id": "8969",
+      "width": 320,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        6
+      ],
+      "frames": 11,
+      "sheet_crop": [
+        384,
+        0,
+        704,
+        36
+      ],
+      "people": "people row 0 sequential poses on diagonal",
+      "key": 0
+    },
+    {
+      "id": "89A8",
+      "width": 384,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        6
+      ],
+      "frames": 11,
+      "sheet_crop": [
+        0,
+        36,
+        384,
+        72
+      ],
+      "people": "people row 0 sequential poses on diagonal",
+      "key": 0
+    },
+    {
+      "id": "89A9",
+      "width": 320,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        6
+      ],
+      "frames": 11,
+      "sheet_crop": [
+        384,
+        36,
+        704,
+        72
+      ],
+      "people": "people row 0 sequential poses on diagonal",
+      "key": 0
+    },
+    {
+      "id": "89E8",
+      "width": 984,
+      "height": 36,
+      "raw": true,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "chunks": 3,
+      "variant": 0
+    },
+    {
+      "id": "89E9",
+      "width": 984,
+      "height": 36,
+      "raw": true,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "chunks": 3,
+      "variant": 1
+    },
+    {
+      "id": "89EA",
+      "width": 984,
+      "height": 36,
+      "raw": true,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "chunks": 3,
+      "variant": 2
+    },
+    {
+      "id": "8A28",
+      "width": 656,
+      "height": 36,
+      "raw": true,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "chunks": 2,
+      "variant": 0
+    },
+    {
+      "id": "8A29",
+      "width": 656,
+      "height": 36,
+      "raw": true,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "chunks": 2,
+      "variant": 1
+    },
+    {
+      "id": "8A2A",
+      "width": 656,
+      "height": 36,
+      "raw": true,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "chunks": 2,
+      "variant": 2
+    },
+    {
+      "id": "8A68",
+      "width": 328,
+      "height": 36,
+      "raw": true,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "chunks": 1,
+      "variant": 0
+    },
+    {
+      "id": "8A69",
+      "width": 328,
+      "height": 36,
+      "raw": true,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "chunks": 1,
+      "variant": 1
+    },
+    {
+      "id": "8A6A",
+      "width": 328,
+      "height": 36,
+      "raw": true,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "chunks": 1,
+      "variant": 2
+    },
+    {
+      "id": "8AA8",
+      "width": 768,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        8
+      ],
+      "frames": 12,
+      "sheet_crop": [
+        0,
+        0,
+        768,
+        36
+      ],
+      "people": "people row 0 sequential poses on diagonal",
+      "key": 0
+    },
+    {
+      "id": "8AE8",
+      "width": 768,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        8
+      ],
+      "frames": 12,
+      "sheet_crop": [
+        0,
+        36,
+        768,
+        72
+      ],
+      "people": "people row 0 sequential poses on diagonal",
+      "key": 0
+    },
+    {
+      "id": "8B28",
+      "width": 576,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        9
+      ],
+      "frames": 3,
+      "dark": [
+        0
+      ],
+      "sheet_crop": [
+        0,
+        0,
+        576,
+        36
+      ]
+    },
+    {
+      "id": "8B68",
+      "width": 576,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        9
+      ],
+      "frames": 3,
+      "dark": [
+        0
+      ],
+      "sheet_crop": [
+        0,
+        36,
+        576,
+        72
+      ]
+    },
+    {
+      "id": "8BA8",
+      "width": 360,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        11
+      ],
+      "transport_cell": 10,
+      "sheet_crop": [
+        0,
+        0,
+        360,
+        36
+      ],
+      "frames": 3,
+      "key": 0
+    },
+    {
+      "id": "8BA9",
+      "width": 360,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        11
+      ],
+      "transport_cell": 10,
+      "sheet_crop": [
+        360,
+        0,
+        720,
+        36
+      ],
+      "frames": 3,
+      "key": 0
+    },
+    {
+      "id": "8BE8",
+      "width": 360,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        11
+      ],
+      "transport_cell": 10,
+      "sheet_crop": [
+        0,
+        36,
+        360,
+        72
+      ],
+      "frames": 3,
+      "key": 0
+    },
+    {
+      "id": "8BE9",
+      "width": 360,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        11
+      ],
+      "transport_cell": 10,
+      "sheet_crop": [
+        360,
+        36,
+        720,
+        72
+      ],
+      "frames": 3,
+      "key": 0
+    },
+    {
+      "id": "8C28",
+      "width": 360,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        11
+      ],
+      "transport_cell": 10,
+      "sheet_crop": [
+        0,
+        72,
+        360,
+        108
+      ],
+      "frames": 3,
+      "key": 0
+    },
+    {
+      "id": "8C29",
+      "width": 360,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        11
+      ],
+      "transport_cell": 10,
+      "sheet_crop": [
+        360,
+        72,
+        720,
+        108
+      ],
+      "frames": 3,
+      "key": 0
+    },
+    {
+      "id": "8C68",
+      "width": 192,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        10
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8C69",
+      "width": 192,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        10
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8CA8",
+      "width": 192,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        10
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8CA9",
+      "width": 192,
+      "height": 36,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        10
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8CE8",
+      "width": 448,
+      "height": 36,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        10
+      ],
+      "scene_crop": [
+        0,
+        0,
+        224,
+        36
+      ],
+      "daynight": true,
+      "key": 18
+    },
+    {
+      "id": "8CE9",
+      "width": 224,
+      "height": 36,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        11
+      ],
+      "scene_crop": [
+        0,
+        0,
+        224,
+        36
+      ],
+      "daynight": false,
+      "key": 18
+    },
+    {
+      "id": "8D28",
+      "width": 448,
+      "height": 36,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        10
+      ],
+      "scene_crop": [
+        0,
+        36,
+        224,
+        72
+      ],
+      "daynight": true,
+      "key": 18
+    },
+    {
+      "id": "8D29",
+      "width": 224,
+      "height": 36,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        11
+      ],
+      "scene_crop": [
+        0,
+        36,
+        224,
+        72
+      ],
+      "daynight": false,
+      "key": 18
+    },
+    {
+      "id": "8D68",
+      "width": 448,
+      "height": 36,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        10
+      ],
+      "scene_crop": [
+        0,
+        72,
+        224,
+        108
+      ],
+      "daynight": true,
+      "key": 18
+    },
+    {
+      "id": "8D69",
+      "width": 224,
+      "height": 36,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        11
+      ],
+      "scene_crop": [
+        0,
+        72,
+        224,
+        108
+      ],
+      "daynight": false,
+      "key": 18
+    },
+    {
+      "id": "8DA8",
+      "width": 448,
+      "height": 36,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        10
+      ],
+      "scene_crop": [
+        0,
+        108,
+        224,
+        144
+      ],
+      "daynight": true,
+      "key": 18
+    },
+    {
+      "id": "8DA9",
+      "width": 224,
+      "height": 36,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        11
+      ],
+      "scene_crop": [
+        0,
+        108,
+        224,
+        144
+      ],
+      "daynight": false,
+      "key": 18
+    },
+    {
+      "id": "8DE8",
+      "width": 448,
+      "height": 36,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        10
+      ],
+      "scene_crop": [
+        0,
+        144,
+        224,
+        180
+      ],
+      "daynight": true,
+      "key": 18
+    },
+    {
+      "id": "8DE9",
+      "width": 224,
+      "height": 36,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        11
+      ],
+      "scene_crop": [
+        0,
+        144,
+        224,
+        180
+      ],
+      "daynight": false,
+      "key": 18
+    },
+    {
+      "id": "8DEA",
+      "width": 224,
+      "height": 36,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        11
+      ],
+      "scene_crop": [
+        0,
+        180,
+        224,
+        216
+      ],
+      "daynight": false,
+      "key": 18
+    },
+    {
+      "id": "8E28",
+      "width": 64,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        15
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8E29",
+      "width": 64,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        15
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8EE8",
+      "width": 128,
+      "height": 24,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        12
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8EE9",
+      "width": 128,
+      "height": 24,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        12
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8EEA",
+      "width": 128,
+      "height": 24,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        12
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8F28",
+      "width": 32,
+      "height": 36,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        6
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8F68",
+      "width": 96,
+      "height": 36,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        7
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8F69",
+      "width": 96,
+      "height": 36,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        8
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8F6A",
+      "width": 96,
+      "height": 36,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        9
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8F6B",
+      "width": 96,
+      "height": 36,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        7
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8F6D",
+      "width": 96,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        14
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8FA8",
+      "width": 96,
+      "height": 36,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        6
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "8FE9",
+      "width": 4416,
+      "height": 36,
+      "raw": true,
+      "source": "transport",
+      "cells": [
+        6
+      ],
+      "frames": 69,
+      "sheet_crop": [
+        0,
+        0,
+        4416,
+        36
+      ],
+      "people": "people row 0 sequential poses on diagonal",
+      "key": 0
+    },
+    {
+      "id": "8FEA",
+      "width": 5888,
+      "height": 36,
+      "raw": true,
+      "source": "transport",
+      "cells": [
+        6
+      ],
+      "frames": 92,
+      "sheet_crop": [
+        0,
+        0,
+        5888,
+        36
+      ],
+      "people": "people row 0 sequential poses on diagonal",
+      "key": 0
+    },
+    {
+      "id": "A710",
+      "width": 76,
+      "height": 67,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        14
+      ],
+      "key": 0
+    },
+    {
+      "id": "A711",
+      "width": 96,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        14
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "A712",
+      "width": 96,
+      "height": 36,
+      "raw": false,
+      "source": "transport",
+      "cells": [
+        13
+      ],
+      "operation": "crop alpha bounds and resize",
+      "key": 0
+    },
+    {
+      "id": "A714",
+      "width": 76,
+      "height": 60,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        14
+      ],
+      "key": 0
+    },
+    {
+      "id": "A716",
+      "width": 64,
+      "height": 64,
+      "raw": false,
+      "source": "exterior-effects",
+      "cells": [
+        15
+      ],
+      "key": 0
+    },
+    {
+      "id": "D308",
+      "width": 16,
+      "height": 24,
+      "raw": false,
+      "source": "rooms",
+      "cells": [
+        12
+      ],
+      "operation": "average generated lobby colors into UI surface",
+      "labels": [
+        [
+          4,
+          6,
+          "v"
+        ]
+      ],
+      "ui_icons": false
+    }
+  ]
+}

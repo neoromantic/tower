@@ -32,9 +32,9 @@ web:
 	mkdir -p $(WEBDIR)
 	sed 's/__CT_VERSION__/$(CT_VERSION)/g' web/shell.html > $(WEBDIR)/.shell.gen.html
 	cp web/hero.png $(WEBDIR)/hero.png
-	cp -R web/experiments $(WEBDIR)/
-	mkdir -p $(WEBDIR)/docs
-	cp -R docs/experiments $(WEBDIR)/docs/
+	cp web/app.js web/app.css web/manifest.webmanifest $(WEBDIR)/
+	sed 's/__CT_VERSION__/$(CT_VERSION)/g' web/sw.js > $(WEBDIR)/sw.js
+	cp -R web/art $(WEBDIR)/
 	emcc $(SRC) -o $(WEBDIR)/index.html \
 	  -std=gnu11 -O2 -DCT_BUILD_VERSION='"$(CT_VERSION)"' \
 	  -sUSE_SDL=2 -sUSE_SDL_TTF=2 \
@@ -45,7 +45,10 @@ web:
 	  -lidbfs.js \
 	  --shell-file $(WEBDIR)/.shell.gen.html \
 	  --embed-file web/fonts@/fonts \
-	  --embed-file data/tower.dat@/data/tower.dat
+	  --embed-file data/styles/schematic/tower.dat@/data/styles/schematic/tower.dat \
+	  --embed-file data/styles/modern-pixel/tower.dat@/data/styles/modern-pixel/tower.dat \
+	  --embed-file data/styles/warm-dollhouse/tower.dat@/data/styles/warm-dollhouse/tower.dat \
+	  --embed-file data/styles/miniature-3d/tower.dat@/data/styles/miniature-3d/tower.dat
 	rm -f $(WEBDIR)/.shell.gen.html
 
 webserve: web

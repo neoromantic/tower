@@ -355,7 +355,9 @@ typedef struct {
                                   * (the 14px bold overflows the DTMP
                                   * label rects; Jonah 2026-08-23) */
     int             running;
-    int             screen_w, screen_h;
+    int             screen_w, screen_h; /* UI logical units */
+    int             css_w, css_h, world_pass, style, pan_tool;
+    double          dpr, ui_scale, ui_size;
     int             show_debug;   /* Toggle diagnostic labels */
     int             show_stats;   /* Analytics window (F3) */
     int             show_tuning;  /* Tuning/modding window (F4) */
@@ -791,6 +793,9 @@ static void get_top_menu_rect(int idx, int *x, int *y, int *w, int *h)
         int tw = top_menu_width(i);
         if (i == idx) {
             *x = cx; *y = HUD_HEIGHT; *w = tw; *h = MENU_BAR_H;
+#ifdef __EMSCRIPTEN__
+            if (game.css_w < 900) *x = 4;
+#endif
             return;
         }
         cx += tw;
@@ -826,8 +831,15 @@ static const CloudPos CLOUD_POSITIONS[] = {
 
 static void screen_to_grid(int sx, int sy, int *floor, int *cell)
 {
-    int world_x = sx + (int)game.cam_fx - game.screen_w / 2;
-    int world_y = sy + (int)game.cam_fy - game.screen_h / 2;
+    double scale = 1;
+    int cx = game.screen_w / 2, cy = game.screen_h / 2;
+    if (!game.world_pass) {
+        scale = game.ui_scale / game.zoom;
+        cx = (int)ceil(game.css_w / game.zoom) / 2;
+        cy = (int)ceil(game.css_h / game.zoom) / 2;
+    }
+    int world_x = (int)floorf(sx * scale - cx) + (int)game.cam_fx;
+    int world_y = (int)floorf(sy * scale - cy) + (int)game.cam_fy;
 
     /* True floor-division by CELL_H. Plain integer division truncates toward
      * zero, which picks the wrong floor (off by one) above ground where
@@ -962,7 +974,7 @@ static void ambient_tick(void)
  * the deepest basement, or absurdly far above the build ceiling. */
 static void clamp_camera(void)
 {
-    float half = game.screen_h / 2.0f;
+    float half = game.screen_h * game.ui_scale / game.zoom / 2.0f;
     /* Bottom: one row PAST B10's lower edge — pit machinery draws a row
      * below a shaft's last segment, and a legacy B10-reaching shaft
      * (possible before the B9 extend gate, 2026-08-12) needs its pit
@@ -975,7 +987,7 @@ static void clamp_camera(void)
     if (game.cam_fy < top)    game.cam_fy = top;
 
     /* Horizontal: keep at least part of the tower's width on screen. */
-    float halfw = game.screen_w / 2.0f;
+    float halfw = game.screen_w * game.ui_scale / game.zoom / 2.0f;
     float right = (float)(TOWER_WIDTH * CELL_W) - halfw;
     float left  = halfw;
     if (left > right) left = right;
@@ -5429,6 +5441,9 @@ static int draw_menu_text(const char *text, int x, int y, int state)
 
 static void render_menu_bar(void)
 {
+#ifdef __EMSCRIPTEN__
+    if (game.css_w < 900) return;
+#endif
     /* Win3.1 menu bar: gray with raised border */
     int bar_y = HUD_HEIGHT;
     draw_win31_rect(0, bar_y, game.screen_w, MENU_BAR_H, 1);
@@ -5474,6 +5489,9 @@ static void render_dropdown(void)
     int drop_y = my + MENU_BAR_H;
     int drop_w = 180;
     int item_h = 18;
+#ifdef __EMSCRIPTEN__
+    if (game.css_w < 900) item_h = 30;
+#endif
     int sep_h = 6;
     
     /* Calculate total dropdown height */
@@ -7226,6 +7244,7 @@ static void draw_tenant_picture(const Tenant *t, SDL_Rect box)
     }
     if (tgt) {
         SDL_SetRenderTarget(game.renderer, tgt);
+        game.world_pass = 1;
         float sx = game.cam_fx, sy = game.cam_fy;
         game.cam_fx = (float)(wx0 + game.screen_w / 2);
         game.cam_fy = (float)(wy0 + game.screen_h / 2);
@@ -7233,6 +7252,7 @@ static void draw_tenant_picture(const Tenant *t, SDL_Rect box)
         render_tower();
         render_people();
         game.cam_fx = sx; game.cam_fy = sy;
+        game.world_pass = 0;
         SDL_SetRenderTarget(game.renderer, NULL);
     }
 
@@ -7462,6 +7482,8 @@ static void person_where_line(const Person *p, char *buf, int bufn)
  * through the elevator dialog). Returns people[] slot + 1, or 0. */
 static uint16_t person_hit_test(int mx, int my)
 {
+    mx = mx * game.ui_scale / game.zoom - (int)ceil(game.css_w / game.zoom) / 2 + game.screen_w / 2;
+    my = my * game.ui_scale / game.zoom - (int)ceil(game.css_h / game.zoom) / 2 + game.screen_h / 2;
     if (!game.anim_people) return 0;   /* hidden crowd isn't clickable */
     PeopleSim *ps = &game.sim.people;
     for (int i = 0; i < ps->shaft_count; i++) {
@@ -8261,6 +8283,11 @@ static void render(void)
     SDL_SetRenderDrawColor(game.renderer, 0, 0, 0, 255);
     SDL_RenderClear(game.renderer);
 
+    int ui_w = game.screen_w, ui_h = game.screen_h;
+    game.screen_w = (int)ceil(game.css_w / game.zoom);
+    game.screen_h = (int)ceil(game.css_h / game.zoom);
+    game.world_pass = 1;
+    SDL_RenderSetScale(game.renderer, game.dpr * game.zoom, game.dpr * game.zoom);
     render_sky();
     if (game.elv_edit_mode) {
         render_elv_edit_mode();   /* silhouette tower + isolated shaft */
@@ -8290,6 +8317,9 @@ static void render(void)
         render_crane();
         render_build_ghost();
     }
+    game.world_pass = 0;
+    game.screen_w = ui_w; game.screen_h = ui_h;
+    SDL_RenderSetScale(game.renderer, game.dpr * game.ui_scale, game.dpr * game.ui_scale);
     render_ui();
     render_stats_window();
     render_tuning_window();
@@ -8759,6 +8789,9 @@ static int minimap_click(int mx, int my)
 
 static int menu_bar_hit_test(int mx, int my)
 {
+#ifdef __EMSCRIPTEN__
+    if (game.css_w < 900) return -1;
+#endif
     if (my < HUD_HEIGHT || my >= HUD_HEIGHT + MENU_BAR_H) return -1;
     int cx = 8;
     for (int i = 0; i < TOP_MENU_COUNT; i++) {
@@ -8780,6 +8813,9 @@ static int dropdown_hit_test(int mx, int my)
     int drop_y = dy + MENU_BAR_H;
     int drop_w = 180;
     int item_h = 18;
+#ifdef __EMSCRIPTEN__
+    if (game.css_w < 900) item_h = 30;
+#endif
     int sep_h = 6;
     
     if (mx < drop_x || mx >= drop_x + drop_w) return -1;
@@ -8794,7 +8830,7 @@ static int dropdown_hit_test(int mx, int my)
 }
 
 /* Save/load/export bodies shared by the F-keys and the Game menu. */
-static void do_save_game(void)
+static int do_save_game(void)
 {
     /* Never serialize the Simulate mode's transient state (isolated shaft
      * flags, settled car positions): resolve it first, exactly as if
@@ -8804,9 +8840,10 @@ static void do_save_game(void)
     if (game_save(&game.sim, &game.tower, save_path()) == 0) {
         add_event_message("Game saved.");
         game.autosave_blocked = 0;   /* a deliberate save re-arms autosave */
-        web_syncfs();
-    } else
-        add_event_message("Save FAILED!");
+        return 1;
+    }
+    add_event_message("Save FAILED!");
+    return 0;
 }
 
 static void do_load_game(void)
@@ -8896,6 +8933,7 @@ static void execute_menu_item(const MenuItem *item)
             game.menu_open = -1;
             return;
         }
+        game.pan_tool = 0;
         game.build_type = item->build_type;
         /* Toolbar-button click (#7002), suppressed during fire/emergency like
          * the EXE (event_flags & 9 == 0). referee_sound_events row 20. */
@@ -8948,7 +8986,7 @@ static void execute_menu_item(const MenuItem *item)
         add_event_message("New tower started.");
         break;
     case ACT_FINANCE: toggle_fin_dialog(); break;
-    case ACT_SAVE:       do_save_game();  break;
+    case ACT_SAVE:       if (do_save_game()) web_syncfs();  break;
     case ACT_LOAD:       do_load_game();  break;
     case ACT_EXPORT_TDT: do_export_tdt(); break;
     case ACT_EXPORT_SAV: do_export_sav(); break;
@@ -9101,6 +9139,16 @@ static void cap_drag_track(void)
 /* ---------- Input handling ---------- */
 static void handle_event(SDL_Event *ev)
 {
+    if (ev->type == SDL_MOUSEMOTION) {
+        ev->motion.x /= game.dpr * game.ui_scale;
+        ev->motion.y /= game.dpr * game.ui_scale;
+    }
+    if (ev->type == SDL_MOUSEBUTTONDOWN || ev->type == SDL_MOUSEBUTTONUP) {
+        ev->button.x /= game.dpr * game.ui_scale;
+        ev->button.y /= game.dpr * game.ui_scale;
+        game.mouse_x = ev->button.x; game.mouse_y = ev->button.y;
+        screen_to_grid(game.mouse_x, game.mouse_y, &game.mouse_floor, &game.mouse_cell);
+    }
     /* Quit save-prompt: fully modal, topmost. */
     if (game.quit_confirm) {
         switch (ev->type) {
@@ -9221,6 +9269,7 @@ static void handle_event(SDL_Event *ev)
         break;
         
     case SDL_KEYDOWN:
+        game.pan_tool = 0;
         switch (ev->key.keysym.sym) {
         case SDLK_ESCAPE:
             /* Esc closes the topmost thing — never the game. It used to
@@ -9289,11 +9338,11 @@ static void handle_event(SDL_Event *ev)
          * Ctrl/Cmd+S aliases F5 — in a browser F5 fights the reload key
          * (Phase D1). */
         case SDLK_F5:
-            do_save_game();
+            if (do_save_game()) web_syncfs();
             break;
         case SDLK_s:
             if (ev->key.keysym.mod & (KMOD_CTRL | KMOD_GUI))
-                do_save_game();
+                if (do_save_game()) web_syncfs();
             break;
         /* Export as an original-format save (SimTower 1.1 .TDT) */
         case SDLK_F6:
@@ -9409,8 +9458,8 @@ static void handle_event(SDL_Event *ev)
         if (game.cam_panning) {
             int dx = ev->motion.x - game.cam_pan_last_x;
             int dy = ev->motion.y - game.cam_pan_last_y;
-            game.cam_fx -= dx;
-            game.cam_fy -= dy;
+            game.cam_fx -= dx * game.ui_scale / game.zoom;
+            game.cam_fy -= dy * game.ui_scale / game.zoom;
             game.cam_anim = 0;
             game.cam_pan_last_x = ev->motion.x;
             game.cam_pan_last_y = ev->motion.y;
@@ -9613,6 +9662,8 @@ static void handle_event(SDL_Event *ev)
 
             /* Block clicks that land on any window body from reaching the game */
             if (point_in_any_window(ev->button.x, ev->button.y)) break;
+
+            if (game.pan_tool) break;
 
             /* Fire/bomb lockout (world-click dispatcher 1058:0000 gate,
              * [0xB406]&9): during an emergency the WORLD takes no clicks —
@@ -9852,11 +9903,11 @@ static void handle_event(SDL_Event *ev)
         
     case SDL_WINDOWEVENT:
 #ifndef __EMSCRIPTEN__
-        /* Web canvas is fixed 960x720 — browser-side CSS resize events
-         * must never shrink the game's render size. */
+        /* Native window dimensions are logical pixels. Web uses ct_resize. */
         if (ev->window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
             game.screen_w = ev->window.data1;
             game.screen_h = ev->window.data2;
+            game.css_w = game.screen_w; game.css_h = game.screen_h;
         }
 #endif
         break;
@@ -9977,96 +10028,10 @@ static void snd_tally_dump(void)
  * audio device, records the sim's sounds, and writes a WAV at exit. */
 static int g_sound_capture = 0;
 
-int main(int argc, char *argv[])
+static void load_style_sprites(void)
 {
-    const char *resource_path = "data/tower.dat";
-    int auto_screenshot = 0;
-    const char *screenshot_path = "/tmp/simtower_screenshot.bmp";
-
-    for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "--screenshot") == 0) {
-            auto_screenshot = 1;
-            if (i + 1 < argc && argv[i+1][0] != '-') {
-                screenshot_path = argv[++i];
-            }
-        } else if (strncmp(argv[i], "--save=", 7) == 0) {
-            save_path_override = argv[i] + 7;
-        }
-    }
-    
-#ifndef CT_BUILD_VERSION
-#define CT_BUILD_VERSION "dev"
-#endif
-    printf("ConciliaTower — SimTower for Linux (build %s)\n", CT_BUILD_VERSION);
-    printf("Loading resources from: %s\n", resource_path);
-
-    /* Load bundled NE resources */
-    if (ne_load(&game.exe, resource_path) != 0) {
-        fprintf(stderr, "Failed to load %s\n", resource_path);
-        return 1;
-    }
-
-    exe_strings_init(&game.exe);   /* 0x7f06 string tables + dialog texts */
-    
-    /* Initialize SDL */
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
-        fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
-        return 1;
-    }
-    
-    game.screen_w = WINDOW_W;
-    game.screen_h = WINDOW_H;
-    Uint32 wflags = SDL_WINDOW_SHOWN;
-#ifndef __EMSCRIPTEN__
-    /* Fixed canvas on the web: under Emscripten RESIZABLE binds the
-     * window to the canvas's CSS box, whose transition fired a
-     * SIZE_CHANGED that shrank the render target to a dot (Jonah's
-     * first web bug report, 2026-08-09). */
-    wflags |= SDL_WINDOW_RESIZABLE;
-#endif
-    game.window = SDL_CreateWindow("ConciliaTower",
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        WINDOW_W, WINDOW_H, wflags);
-    
-    /* Software renderer for VNC visibility */
-#ifdef __EMSCRIPTEN__
-    /* In a browser the software renderer means CPU-compositing every frame
-     * inside wasm — Jonah's beta tab ran at ~25fps, which stretched the
-     * tick-paced sounds and starved the audio callback (2026-08-10). WebGL
-     * does it on the GPU; TARGETTEXTURE is for texture_to_surface's
-     * readback path in sprite loading. */
-    game.renderer = SDL_CreateRenderer(game.window, -1,
-        SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
-    if (!game.renderer)
-#endif
-    /* Native stays software: the service runs under Xvfb/VNC with no GPU. */
-    game.renderer = SDL_CreateRenderer(game.window, -1, SDL_RENDERER_SOFTWARE);
-
-    /* Replace the bare X-server root cursor with a proper arrow; the bulldozer
-     * gets a crosshair. (SimTower swaps the cursor per active tool.) */
-    game.cursor_arrow    = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
-    game.cursor_demolish = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_CROSSHAIR);
-    SDL_ShowCursor(SDL_ENABLE);
-    if (game.cursor_arrow) SDL_SetCursor(game.cursor_arrow);
-
-    /* Initialize SDL_ttf fonts */
-    init_fonts();
-    
     /* Load sprites */
     sprites_init(&game.sprites, &game.exe, game.renderer);
-
-    /* Audio: decode the EXE's 55 WAV effects and wire the sim's sound hook.
-     * CT_SOUND_CAPTURE=<path> renders a WAV headless (no device) instead of
-     * playing live. Event->sound map: referee_sound_events_2026-07-13.md. */
-    g_sound_capture = getenv("CT_SOUND_CAPTURE") != NULL;
-    if (g_sound_capture ? (audio_init_capture() == 0) : (audio_init() == 0)) {
-        int nclips = audio_load_from_ne(&game.exe);
-        printf("Audio: %d sound effects loaded%s\n", nclips,
-               g_sound_capture ? " (capture mode)" : "");
-        g_sound_hook = sound_shim;
-        if (g_sound_capture) audio_capture_begin();
-        play_snd(SND_STARTUP);          /* intro jingle (referee row 23) */
-    }
 
     /* Queue silhouettes use white as transparent */
     sprites_apply_white_key(&game.sprites, game.renderer, SPR_ELEV_QUEUE);
@@ -10365,8 +10330,6 @@ int main(int argc, char *argv[])
     }
     
     /* Load decorative sprites with white transparency */
-    game.crane_floor = CRANE_NONE;  /* no crane until the tower has a top */
-    game.crane_x = 0;
     {
         struct { uint16_t id; Sprite **target; const char *name; } decos[] = {
             { SPR_ENTRANCES,    &game.entrances,      "Entrance awning" },
@@ -10632,6 +10595,248 @@ int main(int argc, char *argv[])
         }
     }
     
+}
+
+
+#ifdef __EMSCRIPTEN__
+EMSCRIPTEN_KEEPALIVE
+int ct_set_style(int style)
+{
+    static const char *paths[] = {
+        "data/styles/schematic/tower.dat", "data/styles/modern-pixel/tower.dat",
+        "data/styles/warm-dollhouse/tower.dat", "data/styles/miniature-3d/tower.dat"
+    };
+    if (style < 0 || style > 3) return 0;
+    NEResourceTable next;
+    if (ne_load(&next, paths[style]) != 0) return 0;
+    sprites_free(&game.sprites);
+    SDL_DestroyTexture(game.queue_hot);
+    SDL_DestroyTexture(game.ui_items);
+    SDL_DestroyTexture(game.ui_timebar);
+    SDL_DestroyTexture(game.ui_star[0]);
+    SDL_DestroyTexture(game.ui_star[1]);
+    SDL_DestroyTexture(game.ui_speed);
+    SDL_DestroyTexture(game.ui_tools);
+    SDL_DestroyTexture(game.ui_map);
+    ne_free(&game.exe);
+    game.exe = next;
+    SDL_RenderSetScale(game.renderer, 1, 1);
+    load_style_sprites();
+    game.style = style;
+    return 1;
+}
+
+EMSCRIPTEN_KEEPALIVE
+void ct_resize(int width, int height, double dpr)
+{
+    game.css_w = width; game.css_h = height; game.dpr = dpr;
+    game.ui_scale = fmin(game.ui_size, fmin(width / 380.0, height / 560.0));
+    game.screen_w = width / game.ui_scale;
+    game.screen_h = height / game.ui_scale;
+    SDL_SetWindowSize(game.window, (int)round(width * dpr), (int)round(height * dpr));
+    int classic = width >= 900;
+    game.win_toolbar = game.win_infobar = game.win_map = classic;
+    game.info_x = game.screen_w - INFO_BAR_W;
+    game.inspect_x = (game.screen_w - INSPECT_W) / 2;
+    game.inspect_y = 24;
+    game.elv_x = (game.screen_w - ELV_W) / 2;
+    game.elv_y = 24;
+    game.person_x = (game.screen_w - PINFO_W) / 2;
+    game.person_y = 24;
+    game.fin_x = (game.screen_w - FIN_DLG_W) / 2;
+    game.fin_y = 24;
+    clamp_camera();
+}
+
+EMSCRIPTEN_KEEPALIVE
+void ct_set_ui_scale(double scale)
+{
+    game.ui_size = scale;
+    ct_resize(game.css_w, game.css_h, game.dpr);
+}
+
+EMSCRIPTEN_KEEPALIVE
+void ct_set_zoom(double zoom)
+{
+    game.zoom = fmax(0.5, fmin(3, zoom));
+    clamp_camera();
+    screen_to_grid(game.mouse_x, game.mouse_y, &game.mouse_floor, &game.mouse_cell);
+}
+
+EMSCRIPTEN_KEEPALIVE
+void ct_pan(double dx, double dy)
+{
+    game.cam_fx -= dx / game.zoom;
+    game.cam_fy -= dy / game.zoom;
+    game.cam_anim = 0;
+    game.dragging = 0;
+    game.cap_drag = 0;
+    clamp_camera();
+}
+
+EMSCRIPTEN_KEEPALIVE
+void ct_tool(int tool)
+{
+    if (tool >= ITEM_TYPE_COUNT || tool < -3) return;
+    if (tool > 0 && !item_unlocked(tool)) return;
+    game.build_type = ITEM_NONE;
+    if (tool > 0) game.build_type = tool;
+    game.demolish_mode = tool == -1;
+    game.inspect_mode = tool == -2;
+    game.pan_tool = tool == -3;
+    game.finger_mode = tool == 0;
+    game.dragging = 0;
+    game.cap_drag = 0;
+    game.tool_popup = -1;
+}
+
+EMSCRIPTEN_KEEPALIVE
+int ct_save(void)
+{
+    return do_save_game();
+}
+
+EMSCRIPTEN_KEEPALIVE
+void ct_control(int action)
+{
+    if (game.quit_confirm || game.route_confirm || game.notice_modal ||
+        game.disaster_modal || game.find_open || game.elv_edit_mode) return;
+    switch (action) {
+    case 0:
+        if (game.sim.speed == SPEED_PAUSED) game.sim.speed = SPEED_NORMAL;
+        else game.sim.speed = SPEED_PAUSED;
+        break;
+    case 1: game.sim.speed = SPEED_NORMAL; break;
+    case 2: game.sim.speed = SPEED_FAST; break;
+    case 3: if (ct_save()) web_syncfs(); break;
+    }
+}
+
+/* Show the existing menu, including game decisions, inside the phone viewport. */
+EMSCRIPTEN_KEEPALIVE
+void ct_menu(int menu)
+{
+    game.menu_open = menu;
+    game.menu_hover = -1;
+}
+
+EMSCRIPTEN_KEEPALIVE
+const char *ct_ui_state(void)
+{
+    static char state[512];
+    int tool = game.build_type;
+    if (game.demolish_mode) tool = -1;
+    if (game.inspect_mode) tool = -2;
+    if (game.pan_tool) tool = -3;
+    snprintf(state, sizeof state,
+        "{\"money\":%ld,\"day\":%d,\"hour\":%d,\"minute\":%d,"
+        "\"stars\":%d,\"population\":%d,\"paused\":%d,\"currentTool\":%d,"
+        "\"style\":%d,\"zoom\":%.3f,\"saveBlocked\":%d,\"modal\":%d}",
+        game.tower.money, game.tower.day, game.sim.hour, game.sim.minute,
+        game.tower.star_rating, game.tower.population, game.sim.speed == SPEED_PAUSED,
+        tool, game.style, game.zoom, game.autosave_blocked,
+        game.quit_confirm || game.route_confirm || game.notice_modal ||
+        game.disaster_modal || game.find_open || game.name_edit_open ||
+        game.movie_dlg_open || game.elv_open || game.inspect_open || game.person_open ||
+        game.fin_open || game.menu_open >= 0);
+    return state;
+}
+#endif
+
+int main(int argc, char *argv[])
+{
+    const char *resource_path = "data/tower.dat";
+#ifdef __EMSCRIPTEN__
+    resource_path = "data/styles/schematic/tower.dat";
+#endif
+    int auto_screenshot = 0;
+    const char *screenshot_path = "/tmp/simtower_screenshot.bmp";
+
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "--screenshot") == 0) {
+            auto_screenshot = 1;
+            if (i + 1 < argc && argv[i+1][0] != '-') {
+                screenshot_path = argv[++i];
+            }
+        } else if (strncmp(argv[i], "--save=", 7) == 0) {
+            save_path_override = argv[i] + 7;
+        }
+    }
+
+#ifndef CT_BUILD_VERSION
+#define CT_BUILD_VERSION "dev"
+#endif
+    printf("ConciliaTower — SimTower for Linux (build %s)\n", CT_BUILD_VERSION);
+    printf("Loading resources from: %s\n", resource_path);
+
+    /* Load bundled NE resources */
+    if (ne_load(&game.exe, resource_path) != 0) {
+        fprintf(stderr, "Failed to load %s\n", resource_path);
+        return 1;
+    }
+
+    exe_strings_init(&game.exe);   /* 0x7f06 string tables + dialog texts */
+
+    /* Initialize SDL */
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
+        fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
+        return 1;
+    }
+
+    game.dpr = game.ui_scale = game.ui_size = game.zoom = 1;
+    game.screen_w = WINDOW_W;
+    game.screen_h = WINDOW_H;
+    game.css_w = WINDOW_W; game.css_h = WINDOW_H;
+    Uint32 wflags = SDL_WINDOW_SHOWN;
+#ifndef __EMSCRIPTEN__
+    /* Web resizing is driven explicitly by ct_resize (CSS box + DPR). */
+    wflags |= SDL_WINDOW_RESIZABLE;
+#endif
+    game.window = SDL_CreateWindow("ConciliaTower",
+        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        WINDOW_W, WINDOW_H, wflags);
+
+    /* Software renderer for VNC visibility */
+#ifdef __EMSCRIPTEN__
+    /* In a browser the software renderer means CPU-compositing every frame
+     * inside wasm — Jonah's beta tab ran at ~25fps, which stretched the
+     * tick-paced sounds and starved the audio callback (2026-08-10). WebGL
+     * does it on the GPU; TARGETTEXTURE is for texture_to_surface's
+     * readback path in sprite loading. */
+    game.renderer = SDL_CreateRenderer(game.window, -1,
+        SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+    if (!game.renderer)
+#endif
+    /* Native stays software: the service runs under Xvfb/VNC with no GPU. */
+    game.renderer = SDL_CreateRenderer(game.window, -1, SDL_RENDERER_SOFTWARE);
+
+    /* Replace the bare X-server root cursor with a proper arrow; the bulldozer
+     * gets a crosshair. (SimTower swaps the cursor per active tool.) */
+    game.cursor_arrow    = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
+    game.cursor_demolish = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_CROSSHAIR);
+    SDL_ShowCursor(SDL_ENABLE);
+    if (game.cursor_arrow) SDL_SetCursor(game.cursor_arrow);
+
+    /* Initialize SDL_ttf fonts */
+    init_fonts();
+
+    load_style_sprites();
+
+    /* Audio: decode the EXE's 55 WAV effects and wire the sim's sound hook.
+     * CT_SOUND_CAPTURE=<path> renders a WAV headless (no device) instead of
+     * playing live. Event->sound map: referee_sound_events_2026-07-13.md. */
+    g_sound_capture = getenv("CT_SOUND_CAPTURE") != NULL;
+    if (g_sound_capture ? (audio_init_capture() == 0) : (audio_init() == 0)) {
+        int nclips = audio_load_from_ne(&game.exe);
+        printf("Audio: %d sound effects loaded%s\n", nclips,
+               g_sound_capture ? " (capture mode)" : "");
+        g_sound_hook = sound_shim;
+        if (g_sound_capture) audio_capture_begin();
+        play_snd(SND_STARTUP);          /* intro jingle (referee row 23) */
+    }
+
+    game.crane_floor = CRANE_NONE;
+
     /* Print key sprite info for debugging */
     {
         struct { uint16_t id; const char *name; } checks[] = {

@@ -1,10 +1,14 @@
 # ConciliaTower
 
 A tower-building simulation in C and SDL2, with a WebAssembly browser build.
+Based on [ConciliaTower by Jonahss](https://github.com/Jonahss/concilia-tower),
+the original C/SDL browser port.
 Build offices, homes, hotels and transport, manage tenants and finances, and
 advance through the star ratings. Sandbox mode unlocks every building.
 
 ![Gameplay with bundled original resources](screenshots/original-gameplay.png)
+
+Play at [tower.sergeybaus.com](https://tower.sergeybaus.com).
 
 ## Browser
 
@@ -20,10 +24,19 @@ Open <http://localhost:8611>. Graphics and sound are bundled; choose **New tower
 or **Play** to start. Check **Sandbox** to start a new tower with all buildings
 unlocked.
 
-The **Эксперименты** button opens the experiment menu over the current session.
-Switch visual proposals and read architecture concepts in place, then return to
-the game. These are prototypes and unapproved designs, not alternate engines.
-See [the discussion brief](docs/experiments/README.md).
+**Settings** switches four complete gameplay styles in the current tower:
+architectural schematic, modern pixel art, warm dollhouse and stylized 3D
+miniature. Camera zoom and interface size are independent. The responsive
+browser controls support touch construction, pan, inspection and zoom.
+
+Install from Settings for standalone play on a phone. On iPhone/iPad, use
+Safari's **Share → Add to Home Screen → Open as Web App**; a page cannot hide
+Safari's toolbar itself. Progress and settings are local to this browser and
+origin. A completed save message means the IndexedDB sync finished; export a
+backup for a copy outside browser storage. See [mobile play](docs/mobile.md).
+
+Architecture concepts remain [discussion documents](docs/experiments/README.md),
+not game settings or implemented alternative engines.
 
 Saves stay in this browser. The title screen lets you rename, duplicate, delete,
 import and download towers. Import `.sav` browser backups or SimTower 1.1
@@ -55,7 +68,8 @@ an existing tower:
 - Space: pause or resume; `+` / `-`: change simulation speed.
 - F5 or Ctrl/Cmd+S: save; F9: load.
 - F6: export `.TDT`; F7: financial report; F8: toggle campaign/sandbox.
-- Browser buttons: fullscreen and mute.
+- Browser toolbar: Pan, Build, Use, Inspect, Bulldoze, pause/speed and Save.
+- Settings: live style, camera zoom, interface size, fullscreen, install and exports.
 
 ## Resources and provenance
 
@@ -63,7 +77,11 @@ The game ships its own graphics and synthesized sounds in `data/tower.dat`.
 It does not require an original executable. Resource sources, generation details
 and regeneration instructions are documented in [the art provenance](data/art/PROVENANCE.md)
 and [the audio provenance](data/RESOURCE-AUDIO.md).
-The browser landing illustration is documented in [web/art/README.md](web/art/README.md).
+The new splash is documented in [its provenance](web/art/splash-provenance.json).
+The four complete style packs and source mappings are documented in
+[style packs](docs/style-packs.md). New generated source sheets use explicitly
+selected Images 2.6 Flare with model-routing metadata; deterministic packing
+keeps the engine resource geometry, states and synthesized audio.
 
 The simulation reimplements SimTower mechanics in C. Historical research notes
 remain in [docs/](docs/), including

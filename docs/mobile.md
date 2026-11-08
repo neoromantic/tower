@@ -1,0 +1,13 @@
+# Mobile and installed play
+
+The browser shell uses crisp DOM controls around the existing SDL/Wasm world. It fits the visible viewport in portrait and landscape, including device safe areas. Drag the world to pan, pinch or use Settings to zoom, and tap to build, inspect or bulldoze. With Pan selected, a drag never places a building. With Build selected, dragging builds a row or extends an elevator; a pinch cancels placement. Use opens elevator controls and other existing interactive objects. The toolbar exposes building categories, speed, pause and save; Settings contains four live gameplay styles, interface size, camera zoom, fullscreen, load and exports.
+
+Style, zoom and interface size are stored locally. The active tower resumes from IDBFS on the next visit. Saves run every 30 seconds and on visibility/page lifecycle events. “Saved in this browser” appears only after the engine write succeeds and the IndexedDB sync callback succeeds. A browser can terminate a page before a final asynchronous write finishes; export backups for durable copies. Towers / Load saves first and opens the existing tower manager without automatically resuming. Existing .sav and original .TDT/.TWR imports remain available there.
+
+Install from Settings. On iPhone/iPad, Safari’s Share → Add to Home Screen flow offers Open as Web App. The installed app uses standalone display; a web page cannot programmatically hide Safari’s toolbar. Install guidance appears only after requesting installation. Fullscreen is separate from camera zoom and interface size.
+
+The service worker precaches one complete version of the shell, JavaScript and Wasm. It waits for existing clients to close before activating an update. No forced reload interrupts a tower. The build must substitute `__CT_VERSION__` in `sw.js` for every release and copy the referenced shell assets. Offline use is available after a successful initial cache installation; a first visit needs the network. Browser storage eviction can remove offline files and saves.
+
+The splash is newly generated art. `web/art/splash-provenance.json` records the exact Gateway model, prompt, request, response metadata and output hashes; app icons are deterministic center crops of that source.
+
+Primary documentation checked 2026-11-08: [Apple: turn a website into an app](https://support.apple.com/guide/iphone/open-as-web-app-iphea86e5236/ios), [MDN service worker lifecycle](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers), [MDN offline app caching](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Tutorials/CycleTracker/Service_workers). MDN lifecycle and caching guidance was also retrieved through Context7 (`/mdn/content`).
