@@ -1930,8 +1930,8 @@ static int shaft_extreme(const ElevatorShaft *s, int top)
 
 /* Re-derive a car's target in place (the UpdateCarState tail used by
  * CallElevator/ReassignCalls). Mid-boarding cars finish the door cycle
- * first; an in-flight car takes ANY fresh target along its travel
- * direction — nearer (stop for a new call on the way) or FARTHER (the
+ * first; an in-flight car takes a fresh target at its next segment
+ * boundary along its travel direction — nearer (stop for a new call on the way) or FARTHER (the
  * sweep's reversal point deepened: a call beyond the old turnaround
  * extends the run, no wasted stop at the stale extreme). The EXE's
  * UpdateCarState re-derives fully mid-run; only a target behind the
@@ -1941,7 +1941,7 @@ static int shaft_extreme(const ElevatorShaft *s, int top)
  * while down-queues starved. Trace 2026-08-03 rush_test t048-t059.) */
 static void car_retarget(ElevatorShaft *s, ElevatorCar *c, int ci)
 {
-    if (c->door_timer) return;
+    if (c->door_timer || c->move_timer) return;
     int tgt = find_target_floor(s, c, ci);
     if (tgt < 0 && !c->passengers && c->floor != s->home[ci])
         tgt = s->home[ci];
@@ -2107,6 +2107,7 @@ static void car_tick(PeopleSim *ps, Tower *tower, ElevatorShaft *s,
         if (c->move_timer) c->move_timer--;
         if (c->move_timer) return;
         int stride=(c->move_total>>6)+1;
+        car_retarget(s,c,ci);
         int left=abs((int)c->target-(int)c->floor);
         if(stride>left) stride=left;
         if(c->dir) c->floor+=stride;

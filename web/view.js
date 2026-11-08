@@ -258,7 +258,7 @@ window.ctView = {
   update() {
     for(const group of [rooms,structure,figures,effects])group.visible=!world.edit.active;
     for(const [id,mesh] of cabinViews)mesh.visible=!world.edit.active || mesh.userData.shaft===world.edit.shaft;
-    const nextSignature=styleIndex+':'+world.debug+':'+JSON.stringify([world.floors,world.shafts,world.rooms.map(room=>[room.id,room.type,room.x,room.floor,room.width,room.height,Boolean(room.construction),room.burned,room.state,room.occupied])]);
+    const nextSignature=styleIndex+':'+world.debug+':'+JSON.stringify([world.floors,world.shafts,world.rooms.map(room=>[room.id,room.type,room.x,room.floor,room.width,room.height,room.construction>0,room.burned,room.state,room.occupied])]);
     if(nextSignature!==signature) {
       signature=nextSignature;
       for(const material of ownedMaterials)material.dispose();
@@ -314,7 +314,7 @@ window.ctView = {
             part.scale.set(cw,ch,1);part.position.set(room.x*8+x,(room.floor-1)*36+y,-2);part.userData.color=color;rooms.add(part);mesh.userData.contents.push(part);
           }
         }
-        if(room.type>=3 && room.type<=12 && !room.construction && (room.state===2 || room.state===7)) {
+        if(room.type>=3 && room.type<=12 && room.construction<=0 && (room.state===2 || room.state===7)) {
           const label=document.createElement('canvas');label.width=256;label.height=64;
           const context=label.getContext('2d');context.fillStyle='#263d3b';context.fillRect(0,0,256,64);
           context.fillStyle='#f5deae';context.font='600 32px system-ui';context.textAlign='center';context.textBaseline='middle';
@@ -329,7 +329,7 @@ window.ctView = {
         border.scale.set(1.5,room.height*36-4,10);
         border.position.set(room.x*8,(room.floor+room.height/2-1)*36,1);
         structure.add(border);
-        if(room.construction) {
+        if(room.construction>0) {
           const panel=new THREE.Mesh(plane,new THREE.MeshBasicMaterial({color:0xa68b5d,transparent:true,opacity:0.76}));
           ownedMaterials.push(panel.material);
           panel.scale.set(w,h,1);panel.position.copy(mesh.position);panel.position.z=4;

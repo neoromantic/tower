@@ -41,7 +41,7 @@ The renderer linearly interpolates only successive authoritative simulation
 samples over a bounded 50 ms interval. It does not restart interpolation on a
 repeated frame, invent trips, ease a competing movement profile, or advance
 boarding. Stopped cars and opening doors snap to the authoritative arrival. `paused` snaps to the
-current sample. Acceleration, cruise, braking, arrival and speed remain C-owned.
+current sample. Acceleration, cruise, braking, arrival and speed remain C-owned. New calls retarget at committed segment boundaries so a changing target cannot move the cabin without a simulation tick. Completed construction uses the native non-positive sentinel and never receives scaffolding.
 Disappearance removes actor views; frame rewind clears interpolation and
 selection. Load/new tower also reloads the browser session.
 

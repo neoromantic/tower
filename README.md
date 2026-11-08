@@ -72,7 +72,9 @@ an existing tower:
 - Space: pause or resume; `+` / `-`: change simulation speed.
 - F5 or Ctrl/Cmd+S: save; F9: load.
 - F6: export `.TDT`; F7: financial report; F8: toggle campaign/sandbox.
-- Browser toolbar: Pan, Build, Use, Inspect, Bulldoze, pause/speed and Save.
+- Browser toolbar: Build, Inspect, Pan and pause/speed; secondary tools include removal and shaft editing.
+- Construction: tap or stretch a preview across free and occupied spans, review its price, then Build or Cancel. Existing rooms remain in place.
+- Minimap: tap or drag to navigate the tower, basements and elevator shafts.
 - Settings: live style, camera zoom, interface size, fullscreen, install and exports.
 
 ## Resources and provenance

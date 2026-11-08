@@ -40,7 +40,7 @@ const tool=id=>evaluate(`(()=>{selectTool(${id});return true})()`);
     assert(world().rooms.length===state.rooms.length && world().rooms.find(room=>room.id===id).rent===2,`Style ${index} preserves rooms and rent`);
   }
   await evaluate('(async()=>{await ctView.style(2);return true})()');
-  const anchor=evaluate('ctView.pick(640,350)');evaluate('ctView.zoom(2,640,350)');await new Promise(r=>setTimeout(r,120));
+  const anchor=evaluate('ctView.pick(640,350)');evaluate('(()=>{ctView.zoom(2,640,350);return true})()');await new Promise(r=>setTimeout(r,120));
   const after=evaluate('ctView.pick(640,350)');assert(Math.hypot(anchor.x-after.x,anchor.y-after.y)<1,'Zoom preserves pointer anchor');
   assert(evaluate('(async()=>{const blob=await ctView.capture();return blob.size>10000})()'),'Three screenshot is a real nonempty PNG');
   ui('menu',800);assert(evaluate('JSON.parse(Module.ccall("ct_panel_state","string",[],[])).panels.some(p=>p.kind==="finance")'),'Finance statement reachable');ui('close',0,'finance');

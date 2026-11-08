@@ -47,7 +47,9 @@ int main(void)
     printf("office %u: construction -> moving -> leased -> overnight -> abandoned -> rate rescue -> mover re-let\n",id);
 
     /* Direct state-machine fixture; no simulation spawning or economy ticks. */
-    for(int express=0;express<2;express++) for(int floors=1;floors<=20;floors+=19) for(int loading=0;loading<3;loading++) {
+    const int distances[]={1,20,100};
+    for(int express=0;express<2;express++) for(int route=0;route<3;route++) for(int loading=0;loading<3;loading++) {
+        int floors=distances[route];
         people_init(&sim.people);
         ElevatorShaft *s=&sim.people.shafts[0]; s->active=1; s->capacity=21;
         s->type=ITEM_ELEVATOR_SHAFT; if(express) { s->type=ITEM_ELEVATOR_EXPRESS; s->capacity=42; }
@@ -79,4 +81,19 @@ int main(void)
         assert(!c->passengers);
         printf("motion express=%d floors=%d load=%d arrival=%d first=%.5f peak=%.5f last=%.5f; doors/unboard ordered\n",express,floors,load,ticks-1,first,peak,last);
     }
+    people_init(&sim.people);
+    ElevatorShaft *s=&sim.people.shafts[0];
+    s->active=1; s->capacity=21; s->type=ITEM_ELEVATOR_SHAFT; s->lo=0; s->hi=100;
+    ElevatorCar *c=&s->car[0];
+    c->active=1; c->floor=2; c->leg_start=0; c->target=80; c->dir=1;
+    car_start_step(s,c); c->move_timer/=2;
+    int stride; double before,after;
+    people_car_motion(s,c,&stride,&before);
+    s->up_call_car[4]=1; c->assigned_calls=1;
+    car_retarget(s,c,0);
+    people_car_motion(s,c,&stride,&after);
+    assert(before==after && c->target==80);
+    car_tick(&sim.people,&tw,s,0,1);
+    assert(c->floor==3 && c->target==4 && !c->door_timer);
+    printf("retarget preserves position %.9f until the committed segment ends\n",before);
 }

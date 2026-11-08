@@ -567,7 +567,7 @@ const char *ct_world_state(void)
             int count=o->count;
             if(t->type==ITEM_OFFICE) {
                 count=people_office_workers(&game.tower,t);
-                if(t->state<TENANT_OCCUPIED || t->state==TENANT_ABANDONED || t->construction || t->burned) count=0;
+                if(t->state<TENANT_OCCUPIED || t->state==TENANT_ABANDONED || t->construction>0 || t->burned) count=0;
                 if(count>o->count) count=o->count;
             }
             for(int k=0;k<count;k++) {
