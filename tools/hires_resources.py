@@ -75,7 +75,13 @@ for style in ['schematic', 'modern-pixel', 'warm-dollhouse', 'miniature-3d']:
             continue
         w, h = rec['width'], rec['height']
         category = rec['source']
-        if 'chunks' in rec:
+        if 0x8384 <= rid < 0x8388:
+            row_h = h // 4
+            image = Image.new('RGBA', (w * SCALE, h * SCALE))
+            cloud = fit(cells['exterior-effects'][3], w, row_h)
+            for row in range(4):
+                image.alpha_composite(cloud, (0, row * row_h * SCALE))
+        elif 'chunks' in rec:
             image = Image.new('RGBA', (w*SCALE, h*SCALE))
             for x in range(0, w, 328):
                 image.alpha_composite(fit(cells['rooms'][12],328,h,True), (x*SCALE,0))

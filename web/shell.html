@@ -503,7 +503,6 @@
   };
 
   startBtn.addEventListener('click', function () {
-    ENV.CT_MODE = String(Number(document.getElementById('sandbox').checked));
     if (pendingTdt && pendingTdt.slot === currentSlot) {
       /* Staged original-format tower: hand it to the engine's boot
        * importer; the engine persists it into the slot immediately. */
@@ -514,7 +513,9 @@
     try { localStorage.setItem('ct-slot', currentSlot); } catch (e) {}
     document.getElementById('stage').style.display = 'none';
     document.getElementById('canvaswrap').hidden = false;
-    Module.callMain(['--save=' + slotPath(currentSlot)]);
+    var args = ['--save=' + slotPath(currentSlot)];
+    if (document.getElementById('sandbox').checked) args.push('--sandbox');
+    Module.callMain(args);
     ctStartShell();
     Module.canvas.focus();
   });

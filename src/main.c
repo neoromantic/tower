@@ -1125,7 +1125,7 @@ static void render_sky(void)
      * but our sprite loader doesn't do palette patching yet. So we use
      * a clean gradient that matches the original's daytime sky color. */
     {
-        int sky_h = lobby_sy;
+        int sky_h = lobby_sy + CELL_H;
         if (sky_h > game.screen_h) sky_h = game.screen_h;
         /* Overcast while it rains — the original's rainy sky bitmaps are
          * grey cloud cover, not blue-with-streaks. Same window as the
@@ -1157,7 +1157,7 @@ static void render_sky(void)
         if (ta > 0) {
             SDL_SetRenderDrawBlendMode(game.renderer, SDL_BLENDMODE_BLEND);
             SDL_SetRenderDrawColor(game.renderer, tr, tg, tb, ta);
-            int sky_bottom = lobby_sy;
+            int sky_bottom = lobby_sy + CELL_H;
             if (sky_bottom > game.screen_h) sky_bottom = game.screen_h;
             SDL_Rect tint_rect = { 0, 0, game.screen_w, sky_bottom };
             SDL_RenderFillRect(game.renderer, &tint_rect);

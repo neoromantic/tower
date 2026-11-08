@@ -27,7 +27,11 @@ unlocked.
 **Settings** switches four complete gameplay styles in the current tower:
 architectural schematic, modern pixel art, warm dollhouse and stylized 3D
 miniature. Camera zoom and interface size are independent. The responsive
-browser controls support touch construction, pan, inspection and zoom.
+browser controls use ordinary pan/pinch gestures and tap-to-inspect. **Build**
+opens a visual catalog; position the preview, then choose **Place** or **Cancel**.
+HD world textures derive directly from the original source plates, preserving
+object proportions instead of enlarging the indexed NE sprites. See the
+[HD renderer](docs/hires-renderer.md) and [touch interface](docs/touch-ui.md).
 
 Install from Settings for standalone play on a phone. On iPhone/iPad, use
 Safari's **Share → Add to Home Screen → Open as Web App**; a page cannot hide
@@ -68,7 +72,9 @@ an existing tower:
 - Space: pause or resume; `+` / `-`: change simulation speed.
 - F5 or Ctrl/Cmd+S: save; F9: load.
 - F6: export `.TDT`; F7: financial report; F8: toggle campaign/sandbox.
-- Browser toolbar: Pan, Build, Use, Inspect, Bulldoze, pause/speed and Save.
+- Browser: drag to pan, pinch/wheel to zoom, tap an object to inspect.
+- Build opens the catalog; Place confirms a preview and Cancel discards it.
+- The object inspector offers controls and confirmed deletion; saving is automatic.
 - Settings: live style, camera zoom, interface size, fullscreen, install and exports.
 
 ## Resources and provenance
@@ -79,9 +85,11 @@ and regeneration instructions are documented in [the art provenance](data/art/PR
 and [the audio provenance](data/RESOURCE-AUDIO.md).
 The new splash is documented in [its provenance](web/art/splash-provenance.json).
 The four complete style packs and source mappings are documented in
-[style packs](docs/style-packs.md). New generated source sheets use explicitly
-selected Images 2.6 Flare with model-routing metadata; deterministic packing
-keeps the engine resource geometry, states and synthesized audio.
+[style packs](docs/style-packs.md). The existing generated source sheets used explicitly selected Images 2.6 Flare
+with model-routing metadata. Their provenance records the historical route and
+costs. Current HD packs and catalog images are deterministic derivatives of
+those sources, with no new image generation. Engine geometry, states, saves and
+synthesized audio remain shared.
 
 The simulation reimplements SimTower mechanics in C. Historical research notes
 remain in [docs/](docs/), including

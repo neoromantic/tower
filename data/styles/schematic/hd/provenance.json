@@ -8,7 +8,7 @@
     "ui.png": "f2c86c0a172cbf1fdbb96692e5ab192231d8afe54e016a6dfbee2019455fbf36"
   },
   "operation": "LANCZOS cover for room footprints; contain for objects; bottom-center registered people; deduplicated 64x36 logical tiles; metadata composites",
-  "tiles": 407,
+  "tiles": 398,
   "pages": [
     [
       2048,
@@ -20,13 +20,13 @@
     ],
     [
       2048,
-      2048
+      2000
     ],
     [
       2048,
-      402
+      344
     ]
   ],
-  "gpu_bytes": 53559296,
-  "sha256": "ad2f76846b562e0a0d1094ec80f7b6446a8bff8212bd442ca9a492ae21296944"
+  "gpu_bytes": 52690944,
+  "sha256": "0d86f45dddafb09d7e363caaa4939780d281724553b5905b4e8a2f774207e6b3"
 }

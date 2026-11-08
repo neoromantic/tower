@@ -20,7 +20,8 @@ are authored before splitting. Repeated 64 × 36 logical tiles share physical
 pixels. Pages are at most 2048 × 2048, with replicated one-pixel gutters for
 linear filtering. Even the 92-frame tall-stair sheet never becomes an oversized
 GPU texture. Metadata composes rooms, stairs, cathedral, metro and other multipart
-objects without downsampling/readback. Palette-cycle derivatives use source-art
+objects without downsampling/readback. Cloud sheets retain four complete time/weather rows so source selection never clips a single cloud into quarters. Sky fills through the ground baseline behind transparent skyline art.
+Palette-cycle derivatives use source-art
 brightness changes and retain the existing frame IDs.
 
 `hd/world.gz` contains little-endian uint32 page count, sprite count and scale;
