@@ -1,6 +1,6 @@
 # Three.js browser presentation
 
-The `feat/three-renderer` branch replaces browser world drawing with Three.js and every in-game SDL panel with DOM controls. Native builds retain SDL. The existing C simulation, building rules and save layout remain authoritative; the browser consumes read-only world snapshots and semantic commands documented in [three-api.md](three-api.md).
+The default browser presentation uses Three.js for world drawing with Three.js and every in-game SDL panel with DOM controls. Native builds retain SDL. The existing C simulation, building rules and save layout remain authoritative; the browser consumes read-only world snapshots and semantic commands documented in [three-api.md](three-api.md).
 
 The orthographic scene uses source-resolution room, person, transport and effect crops, smooth filtering and a DPR-sized render buffer. Interior source aspect ratios are preserved: narrow footprints crop centrally; long rooms repeat the source horizontally. Concrete edges have real shallow geometry. Camera-dependent tilt, distant city and cloud layers provide restrained parallax during pan and zoom. Grid picking intersects the actual camera plane, including its tilt; zoom preserves the pointer's world anchor.
 
@@ -25,7 +25,7 @@ The verification command uses the installed ordinary Chrome through `agent-brows
 
 `tools/prepare_web_art.py` deterministically crops the existing `data/styles/*/sources/` plates. It does not generate or upscale images. The crop manifests record the source hashes and bounds. The only alpha processing follows the existing pack pipeline: connected white edge background is removed while enclosed details remain. Existing source provenance and its historical model/cost records remain untouched.
 
-This branch is an experimental delivery and does not change the production deployment. The browser now requires WebGL2. Source plates retain their original limitations (approximate pose registration and painted details); a scene uses flat illustrated interiors with shallow geometric structure, not a fully modeled freely navigable 3D tower. Construction remains on the original tower grid.
+Production distribution combines this default game with the landing page in the site integration pipeline. The engine repository builds an artifact; it does not deploy a separate competing game site. The browser now requires WebGL2. Source plates retain their original limitations (approximate pose registration and painted details); a scene uses flat illustrated interiors with shallow geometric structure, not a fully modeled freely navigable 3D tower. Construction remains on the original tower grid.
 
 ## Validation evidence
 

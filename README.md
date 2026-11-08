@@ -37,10 +37,10 @@ Safari's toolbar itself. Progress and settings are local to this browser and
 origin. A completed save message means the IndexedDB sync finished; export a
 backup for a copy outside browser storage. See [mobile play](docs/mobile.md).
 
-This branch implements the [Three.js browser presentation](docs/three-renderer.md):
+The game uses the [Three.js browser presentation](docs/three-renderer.md):
 source-resolution art, smooth DPR rendering, shallow geometry and camera parallax,
 DOM menus/panels and Web Audio synthesis. Native SDL remains available.
-The experimental branch does not replace the production deployment.
+The site integration pipeline publishes the game together with its landing page.
 
 Saves stay in this browser. The title screen lets you rename, duplicate, delete,
 import and download towers. Import `.sav` browser backups or SimTower 1.1
