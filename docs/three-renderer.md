@@ -29,8 +29,8 @@ This branch is an experimental delivery and does not change the production deplo
 
 ## Validation evidence
 
-The integrated browser check passed 19 assertions covering campaign/sandbox tool
-availability, full-span preview, placement, rent, all four style changes, anchored
+The integrated browser check passed 21 assertions covering campaign/sandbox tool
+availability, empty-tower save/reload, full-span preview, placement, rent, all four style changes, anchored
 zoom, Three PNG capture, financial panels, IndexedDB saving and a DPR-3 phone
 viewport. Manual browser passes also exercised elevator schedules/cars/Simulate,
 names/finding, tuning, fire and bomb decisions, star notice acknowledgement,

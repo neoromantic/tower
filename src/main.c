@@ -8857,7 +8857,7 @@ static int do_save_game(void)
     return 0;
 }
 
-static void do_load_game(void)
+static int do_load_game(void)
 {
     /* Roll the edit mode back against the CURRENT sim before the load
      * overwrites it — exiting afterwards would smear a stale snapshot
@@ -8870,9 +8870,10 @@ static void do_load_game(void)
                               game_is_weekend(&game.tower),
                               game.sim.hour >= 17 || game.sim.hour < 7);
         add_event_message("Game loaded.");
-    } else {
-        add_event_message("Load failed (no/old save).");
+        return 1;
     }
+    add_event_message("Load failed (no/old save).");
+    return 0;
 }
 
 static void do_export_tdt(void)
@@ -11012,8 +11013,7 @@ int main(int argc, char *argv[])
         FILE *sf = fopen(save_path(), "rb");
         if (sf) {
             fclose(sf);
-            do_load_game();
-            booted_from_save = game.tower.tenant_count > 0;
+            booted_from_save = do_load_game();
             printf("Boot autoload: %s (tenants=%d pop=%d money=%ld)\n",
                    save_path(), game.tower.tenant_count,
                    game.tower.population, (long)game.tower.money);

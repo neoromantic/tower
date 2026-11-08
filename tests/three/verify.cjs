@@ -16,6 +16,10 @@ const tool=id=>evaluate(`Module.ccall('ct_tool',null,['number'],[${id}])`);
   evaluate('(()=>{document.getElementById("sandbox").checked=true;startBtn.click();return true})()');
   await new Promise(r=>setTimeout(r,500));
   assert(evaluate('JSON.parse(Module.ccall("ct_panel_state","string",[],[])).catalog.every(item=>item.enabled)'),'Sandbox starts with all 25 tools unlocked');
+  assert(evaluate('(async()=>{return await saveTower()})()'),'Empty tower saves successfully');
+  browser('open','http://localhost:8620/');
+  for(let i=0;i<80;i++){if(evaluate('Boolean(Module.engineReady && playing)'))break;await new Promise(r=>setTimeout(r,250));}
+  assert(world().rooms.length===0 && evaluate('JSON.parse(Module.ccall("ct_ui_state","string",[],[])).saveBlocked===0 && JSON.parse(Module.ccall("ct_panel_state","string",[],[])).panels.length===0'),'Empty tower reloads without incompatible-save notice or blocked autosave');
   ui('menu',500);
   tool(1);ui('lobby-height',2);
   const before=evaluate('Module.ccall("ct_ui_state","string",[],[])');
