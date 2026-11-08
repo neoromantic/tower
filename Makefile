@@ -44,7 +44,7 @@ web:
 	  -sEXPORTED_RUNTIME_METHODS=callMain,FS,IDBFS,ENV,addRunDependency,removeRunDependency,ccall \
 	  -lidbfs.js \
 	  --shell-file $(WEBDIR)/.shell.gen.html \
-	  --embed-file web/fonts@/fonts \
+	  --preload-file web/fonts@/fonts \
 	  --preload-file data/styles/schematic/tower.dat@/data/styles/schematic/tower.dat \
 	  --preload-file data/styles/modern-pixel/tower.dat@/data/styles/modern-pixel/tower.dat \
 	  --preload-file data/styles/warm-dollhouse/tower.dat@/data/styles/warm-dollhouse/tower.dat \
