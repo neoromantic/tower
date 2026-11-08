@@ -28,6 +28,8 @@ jobs:
       - run: |
           sed -i 's,https://github.com/libsdl-org/SDL/archive/{TAG}.zip,https://codeload.github.com/libsdl-org/SDL/zip/{TAG},' .emsdk/upstream/emscripten/tools/ports/sdl2.py
           sed -i 's,https://github.com/libsdl-org/SDL_ttf/archive/{TAG}.zip,https://codeload.github.com/libsdl-org/SDL_ttf/zip/{TAG},' .emsdk/upstream/emscripten/tools/ports/sdl2_ttf.py
+          sed -i 's,https://github.com/freetype/freetype/archive/{TAG}.zip,https://codeload.github.com/freetype/freetype/zip/{TAG},' .emsdk/upstream/emscripten/tools/ports/freetype.py
+          sed -i 's,https://github.com/madler/zlib/archive/refs/tags/v{VERSION}.tar.gz,https://codeload.github.com/madler/zlib/tar.gz/refs/tags/v{VERSION},' .emsdk/upstream/emscripten/tools/ports/zlib.py
       - uses: oven-sh/setup-bun@v2
       - uses: astral-sh/setup-uv@v7
       - run: bun install --frozen-lockfile
