@@ -5442,7 +5442,7 @@ static int draw_menu_text(const char *text, int x, int y, int state)
 static void render_menu_bar(void)
 {
 #ifdef __EMSCRIPTEN__
-    if (game.css_w < 900) return;
+    return;
 #endif
     /* Win3.1 menu bar: gray with raised border */
     int bar_y = HUD_HEIGHT;
@@ -8790,7 +8790,7 @@ static int minimap_click(int mx, int my)
 static int menu_bar_hit_test(int mx, int my)
 {
 #ifdef __EMSCRIPTEN__
-    if (game.css_w < 900) return -1;
+    return -1;
 #endif
     if (my < HUD_HEIGHT || my >= HUD_HEIGHT + MENU_BAR_H) return -1;
     int cx = 8;
@@ -10634,8 +10634,7 @@ void ct_resize(int width, int height, double dpr)
     game.screen_w = width / game.ui_scale;
     game.screen_h = height / game.ui_scale;
     SDL_SetWindowSize(game.window, (int)round(width * dpr), (int)round(height * dpr));
-    int classic = width >= 900;
-    game.win_toolbar = game.win_infobar = game.win_map = classic;
+    game.win_toolbar = game.win_infobar = game.win_map = 0;
     game.info_x = game.screen_w - INFO_BAR_W;
     game.inspect_x = (game.screen_w - INSPECT_W) / 2;
     game.inspect_y = 24;

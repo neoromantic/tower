@@ -19,7 +19,7 @@ Call these through `Module.ccall` after `Module.callMain` has entered the game l
 
 Keep ordinary SDL mouse/click delivery on the canvas for placement, dragging a build, inspection, dialogs and elevator controls. The engine converts physical SDL coordinates into UI units once and converts the chosen world point through camera zoom once. Shell must not pre-transform SDL coordinates. Pan/pinch gestures must suppress SDL down/up delivery for that gesture; a drag recognized after a delivered SDL down must call `ct_pan` before release to cancel placement. Check `modal` before intercepting canvas gestures. Pan tool ignores background taps.
 
-Below 900 CSS pixels, the classic floating toolbar/info/map panes and menu bar start hidden. DOM must offer `ct_menu` access to Game/Options/Windows/View so all original decisions remain reachable. Legacy dialogs fit a real viewport of at least 380 × 560 logical UI units, scaled separately from the world; no fixed 960 × 720 frame is shrunk to fit the phone.
+The classic floating toolbar/info/map panes and menu bar start hidden in the browser. DOM must offer `ct_menu` access to Game/Options/Windows/View so all original decisions remain reachable. Legacy dialogs fit a real viewport of at least 380 × 560 logical UI units, scaled separately from the world; no fixed 960 × 720 frame is shrunk to fit the phone.
 
 Packs are embedded from `data/styles/{schematic,modern-pixel,warm-dollhouse,miniature-3d}/tower.dat`, without source images. Shell distribution files are `app.js`, `app.css`, `manifest.webmanifest`, version-stamped `sw.js` and `art/`.
 

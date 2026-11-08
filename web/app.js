@@ -181,9 +181,9 @@ setInterval(() => {
   else if (document.getElementById('speed').value === '0') document.getElementById('speed').value = '1';
   document.querySelectorAll('[data-tool]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.tool) === tool)));
   document.getElementById('buildbtn').setAttribute('aria-pressed', String(tool > 0));
-  document.getElementById('towerstats').textContent = fmtMoney(state.money) + ' · ' + starsTxt(state.stars) + ' · ' + state.population + ' people · Day ' + state.day + ' ' + String(state.hour).padStart(2, '0') + ':' + String(state.minute).padStart(2, '0');
+  document.getElementById('towerstats').textContent = fmtMoney(state.money) + ' · ' + starsTxt(state.stars) + ' · ' + state.population + ' people · Day ' + (state.day + 1) + ' ' + String(state.hour).padStart(2, '0') + ':' + String(state.minute).padStart(2, '0');
   if (state.saveBlocked) saveState.textContent = 'Saving blocked — export a backup';
-}, 1000);
+}, 100);
 setInterval(saveTower, 30000);
 document.addEventListener('visibilitychange', () => { if (document.hidden) saveTower(); });
 window.addEventListener('pagehide', saveTower);
