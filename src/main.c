@@ -564,6 +564,19 @@ typedef struct {
 } Game;
 
 static Game game;
+#ifdef __EMSCRIPTEN__
+static int web_visual, web_ghost, web_end_floor, web_end_cell;
+static int web_ghost_x, web_ghost_floor, web_ghost_width, web_ghost_height, web_ghost_valid, web_ghost_count;
+static long web_ghost_cost;
+static char web_ghost_reason[160];
+static Tower web_before, web_plan;
+static int web_type, web_start_floor, web_start_cell, web_add_car, web_car_shaft, web_car_count;
+static int web_skipped_count;
+static struct { int x, floor; long cost; } web_ops[TOWER_WIDTH+TOWER_FLOOR_COUNT];
+static struct { int x, floor; char reason[160]; } web_skipped[TOWER_WIDTH+TOWER_FLOOR_COUNT];
+EM_JS(void, web_sound, (int id), { window.ctSound(id); });
+EM_JS(void, web_sound_loop, (int id, int on), { window.ctSoundLoop(id, on); });
+#endif
 
 /* Route-loss confirmation (defined with the other modals below; the
  * stop-toggle and demolish paths above them need the entry points). */
@@ -726,7 +739,7 @@ static const MenuItem menu_file[] = {
     { NULL, ITEM_NONE, ACT_NONE },     /* separator */
     { "Quit\tQ",           ITEM_NONE,  ACT_QUIT },
 };
-#define MENU_FILE_COUNT 10
+#define MENU_FILE_COUNT 11
 
 /* Options menu — the original's Animation/Sound toggle block (menu ids
  * 40009-40013) plus Call Fire Rescue (40008): the EXE's hidden mid-fire
@@ -3857,12 +3870,9 @@ static void render_shaft(ElevatorShaft *s)
              * against the exposed building (Jonah 2026-08-07,
              * byte-verified). The old `if (s->hidden) continue` here
              * wrongly hid them. */
-            float truef = (float)index_to_floor(c->floor);
-            if (c->target != c->floor && c->move_total) {
-                float prog = (float)(c->move_total - c->move_timer) /
-                             (float)c->move_total;
-                truef += c->dir ? prog : -prog;
-            }
+            double position; int stride;
+            people_car_motion(s,c,&stride,&position);
+            float truef=(float)(position+TOWER_MIN_FLOOR);
             float *pv = &car_prev[si][ci], *cu = &car_cur[si][ci];
             if (car_tick[si][ci] != game.sim.frame + 1) {
                 /* new sim tick for this car: shift the history. Stored
@@ -8316,6 +8326,9 @@ static void find_dialog_click(int mx, int my, int clicks)
 
 static void render(void)
 {
+#ifdef __EMSCRIPTEN__
+    if (web_visual) return;
+#endif
     /* Cursor follows the active tool: crosshair while bulldozing, else arrow. */
     SDL_Cursor *want = game.demolish_mode ? game.cursor_demolish : game.cursor_arrow;
     if (want && SDL_GetCursor() != want) SDL_SetCursor(want);
@@ -8892,6 +8905,9 @@ static int do_load_game(void)
      * overwrites it — exiting afterwards would smear a stale snapshot
      * over the freshly loaded state. */
     elv_edit_exit();
+#ifdef __EMSCRIPTEN__
+    web_ghost = 0;
+#endif
     audio_stop_all();   /* the outgoing world's sounds stop with it */
     if (game_load(&game.sim, &game.tower, save_path()) == 0) {
         game.elv_open = 0;          /* dialog target may be gone */
@@ -9022,6 +9038,9 @@ static void execute_menu_item(const MenuItem *item)
         /* The old tower's sounds stop with it (pending queue dies with the
          * sim memset; this kills the already-ringing voices too). */
         audio_stop_all();
+#ifdef __EMSCRIPTEN__
+        web_ghost = 0;
+#endif
         tower_init(&game.tower);
         game_init(&game.sim);
         add_event_message("New tower started.");
@@ -9180,6 +9199,9 @@ static void cap_drag_track(void)
 /* ---------- Input handling ---------- */
 static void handle_event(SDL_Event *ev)
 {
+#ifdef __EMSCRIPTEN__
+    if (web_visual && ev->type != SDL_QUIT && ev->type != SDL_WINDOWEVENT) return;
+#endif
     if (ev->type == SDL_MOUSEMOTION) {
         ev->motion.x /= game.dpr * game.ui_scale;
         ev->motion.y /= game.dpr * game.ui_scale;
@@ -10048,6 +10070,9 @@ static void sound_shim(int wav_id)
                wav_id == AMB_SEASON_SANTA ||
                (wav_id >= 0xA329 && wav_id <= 0xA337));   /* cinema soundtracks */
     if (amb ? !game.snd_bg : sound_muted(wav_id)) return;
+#ifdef __EMSCRIPTEN__
+    if (web_visual) { web_sound(wav_id); return; }
+#endif
     audio_play((uint16_t)wav_id, amb ? 0.35f : 0.55f);
 }
 
@@ -10723,6 +10748,7 @@ void ct_tool(int tool)
 {
     if (tool >= ITEM_TYPE_COUNT || tool < -3) return;
     if (tool > 0 && !item_unlocked(tool)) return;
+    web_ghost = 0;
     game.preview_count = game.preview_valid = game.preview_add_car = 0;
     game.build_type = ITEM_NONE;
     if (tool > 0) game.build_type = tool;
@@ -10750,6 +10776,7 @@ void ct_set_zoom_at(double zoom, double x, double y)
 EMSCRIPTEN_KEEPALIVE
 void ct_cancel_preview(void)
 {
+    web_ghost = 0;
     game.preview_count = game.preview_valid = game.preview_add_car = 0;
     game.dragging = game.cap_drag = 0;
 }
@@ -10999,34 +11026,25 @@ void ct_menu(int menu)
 EMSCRIPTEN_KEEPALIVE
 const char *ct_ui_state(void)
 {
-    static char state[1024];
+    static char state[512];
     int tool = game.build_type;
     if (game.demolish_mode) tool = -1;
     if (game.inspect_mode) tool = -2;
     if (game.pan_tool) tool = -3;
-    int speed = game.sim.speed;
-    if (speed > 2) speed = 2;
     snprintf(state, sizeof state,
         "{\"money\":%ld,\"day\":%d,\"hour\":%d,\"minute\":%d,"
         "\"stars\":%d,\"population\":%d,\"paused\":%d,\"currentTool\":%d,"
-        "\"style\":%d,\"zoom\":%.3f,\"saveBlocked\":%d,\"modal\":%d,\"speed\":%d,\"unlocked\":[",
+        "\"style\":%d,\"zoom\":%.3f,\"speed\":%d,\"running\":%d,\"mapMode\":%d,\"debug\":%d,\"saveBlocked\":%d,\"modal\":%d}",
         game.tower.money, game.tower.day, game.sim.hour, game.sim.minute,
         game.tower.star_rating, game.tower.population, game.sim.speed == SPEED_PAUSED,
-        tool, game.style, game.zoom, game.autosave_blocked,
+        tool, game.style, game.zoom, game.sim.speed, game.running, game.map_mode, game.show_debug, game.autosave_blocked,
         game.quit_confirm || game.route_confirm || game.notice_modal ||
         game.disaster_modal || game.find_open || game.name_edit_open ||
         game.movie_dlg_open || game.elv_open || game.inspect_open || game.person_open ||
-        game.fin_open || game.menu_open >= 0, speed);
-    int used = strlen(state), first = 1;
-    for (int i = 1; i < ITEM_TYPE_COUNT; i++) {
-        if (!item_unlocked(i)) continue;
-        if (!first) state[used++] = ',';
-        used += snprintf(state + used, sizeof state - used, "%d", i);
-        first = 0;
-    }
-    snprintf(state + used, sizeof state - used, "]}");
+        game.fin_open || game.menu_open >= 0);
     return state;
 }
+#include "web_view.inc"
 #endif
 
 int main(int argc, char *argv[])
@@ -11118,6 +11136,10 @@ int main(int argc, char *argv[])
      * CT_SOUND_CAPTURE=<path> renders a WAV headless (no device) instead of
      * playing live. Event->sound map: referee_sound_events_2026-07-13.md. */
     g_sound_capture = getenv("CT_SOUND_CAPTURE") != NULL;
+#ifdef __EMSCRIPTEN__
+    if (web_visual) { g_sound_hook = sound_shim; play_snd(SND_STARTUP); }
+    else
+#endif
     if (g_sound_capture ? (audio_init_capture() == 0) : (audio_init() == 0)) {
         int nclips = audio_load_from_ne(&game.exe);
         printf("Audio: %d sound effects loaded%s\n", nclips,
@@ -11538,8 +11560,16 @@ int main(int argc, char *argv[])
                                             build_origin_floor(game.build_type,
                                                                game.mouse_floor),
                                             build_origin_cell(game.mouse_cell)));
-            if (drag_now && !prev_drag)      audio_start_loop(SND_BUILD_DRAG, 0.5f);
-            else if (!drag_now && prev_drag) audio_stop_loop();
+#ifdef __EMSCRIPTEN__
+            if (web_visual) {
+                if (drag_now && !prev_drag) web_sound_loop(SND_BUILD_DRAG, 1);
+                else if (!drag_now && prev_drag) web_sound_loop(SND_BUILD_DRAG, 0);
+            } else
+#endif
+            {
+                if (drag_now && !prev_drag) audio_start_loop(SND_BUILD_DRAG, 0.5f);
+                else if (!drag_now && prev_drag) audio_stop_loop();
+            }
             prev_drag = drag_now;
         }
 
@@ -11610,9 +11640,18 @@ int main(int argc, char *argv[])
                  * fire burned silently (Jonah, 2026-08-12). */
                 int want = (game.sim.event.active &&
                             game.sim.event.type == EVENT_FIRE) ? 1 : 0;
+#ifdef __EMSCRIPTEN__
+                if (web_visual && sound_muted(SND_FIRE_LOOP)) want = 0;
+#endif
                 if (want != prev_loop) {
-                    audio_stop_loop();
-                    if (want == 1) audio_start_loop(SND_FIRE_LOOP, 0.5f);
+#ifdef __EMSCRIPTEN__
+                    if (web_visual) web_sound_loop(SND_FIRE_LOOP, want);
+                    else
+#endif
+                    {
+                        audio_stop_loop();
+                        if (want == 1) audio_start_loop(SND_FIRE_LOOP, 0.5f);
+                    }
                     prev_loop = want;
                 }
                 /* #10014 is the BOMB-HUNT search tick (census: guard

@@ -68,3 +68,11 @@ for deterministic bytes and distinct hashes across clips. Feed the resources to
 `audio_load_from_ne` and `exe_strings_init` to verify the actual SDL decoder,
 mixer and string/dialog parsers; compare every exported text slot with the
 parsed result. No proprietary resource file is needed for these checks.
+
+## Browser realtime audio
+
+The Three.js frontend synthesizes the same 52 semantic IDs directly through the
+Web Audio API in `web/audio.js`. It uses original sine/noise/envelope synthesis,
+not extracted samples. Category buses, gain, mute and visibility suspend the audio
+context; fire and construction have start/stop loop callbacks. Native builds
+continue using the bundled WAV clips above.

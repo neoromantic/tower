@@ -17,15 +17,16 @@
  *        transfer lobby), unboard, re-plan if not home yet
  *     -> arrival delivers banked frustration to the home tenant
  *
- * Simplifications vs the EXE (documented, to revisit):
- *   - cars use a flat ticks-per-floor speed instead of the 4-level
- *     accel curve
+ * Motion uses a continuous acceleration/cruise/braking profile in place
+ * of the original discrete four-gear floor jumps.
  * (The chain/slot transfer tables are the EXE's own since 2026-08-02 —
  * see the TransferT block below; routing consumes them one transfer
  * deep, exactly as deep as the tables themselves go.)
  */
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
 
 #include "people.h"
 #include "game.h"
@@ -1087,7 +1088,12 @@ static int select_car(const PeopleSim *ps, ElevatorShaft *s, int floor,
     for (int ci = 0; ci < s->num_cars; ci++) {
         ElevatorCar *c = &s->car[ci];
         if (!c->active) continue;
-        int d = floor - c->floor;
+        int approach_floor=c->floor;
+        if(c->move_total) {
+            if(c->dir) approach_floor++;
+            else approach_floor--;
+        }
+        int d = floor - approach_floor;
         int toward = up ? d : -d;
         int busy = c->assigned_calls || c->distinct_dests ||
                    c->door_timer || c->target != c->floor;
@@ -1838,41 +1844,56 @@ static void clear_call(ElevatorShaft *s, ElevatorCar *c, int ci, int floor)
     }
 }
 
-/* CalcMoveSpeed (1090:209f): the accel/decel curve, as ticks per floor.
- * The EXE's 4 levels: slow near either end of the run, full speed only in
- * the middle of a long haul. The gear-3 turbo belongs to the EXPRESS
- * (type 0 — globals.md #52); standard/service get a medium band instead.
- * dist-from-start needs the run's departure floor (last_floor in the
- * EXE; leg_start here). */
-/* CalcMoveSpeed (1090:209f) + StopAndDispatch execution (1090:10e4):
- * gear 0 = 1 floor + 5-tick tail (~6 ticks/floor, the docking crawl),
- * gear 1 = 1 floor + 2-tick tail, gear 2 = a floor EVERY tick, and the
- * express-only gear 3 = THREE floors per tick (cur +/- 3, raw 1150-66)
- * — the original's signature rocket. The old 5/4/3/2-tick costs ran
- * standard cars ~3x and the express ~6x too slow (referee H3), which
- * also made the EXE-calibrated 300-tick watchdog feel merciless.
- * Returns the tail ticks; *stride = floors covered by this step. */
-static int car_move_ticks(const ElevatorShaft *s, const ElevatorCar *c,
-                          int *stride)
+/* Continuous symmetric acceleration/braking, sampled by the simulation and
+ * both renderers. Short runs are triangular; longer runs reach cruise speed.
+ * move_total packs duration in six bits and (stride-1) in the upper two;
+ * the saved car layout is unchanged. Dispatch and door/boarding rules stay here. */
+int people_car_motion(const ElevatorShaft *s, const ElevatorCar *c,
+                      int *stride, double *position)
 {
-    int dt = c->target - c->floor;   if (dt < 0) dt = -dt;
-    int ds = c->floor - c->leg_start; if (ds < 0) ds = -ds;
-    *stride = 1;
-    if (s->type == ITEM_ELEVATOR_EXPRESS) {
-        if (dt < 2 || ds < 2) return 5;   /* gear 0 */
-        if (dt > 4 && ds > 4) { *stride = 3; return 0; }   /* gear 3 */
-        return 0;                         /* gear 2: floor per tick */
+    double distance=abs((int)c->target-(int)c->leg_start);
+    double start=abs((int)c->floor-(int)c->leg_start);
+    double remaining=abs((int)c->target-(int)c->floor);
+    double acceleration=0.125, peak=1.0;
+    if(s->type==ITEM_ELEVATOR_EXPRESS) peak=3.0;
+    if(peak*peak>acceleration*distance) peak=sqrt(acceleration*distance);
+    *position=c->floor;
+    *stride=1;
+    if(!distance || !remaining || c->door_timer) return 0;
+    double ramp=peak*peak/(2*acceleration);
+    if(s->type==ITEM_ELEVATOR_EXPRESS && start>=ramp && remaining>ramp+3) *stride=3;
+    if(c->move_total) *stride=(c->move_total>>6)+1;
+    if(*stride>remaining) *stride=(int)remaining;
+    double total=distance/peak+peak/acceleration;
+    double boundary[2]={start,start+*stride}, times[2];
+    for(int i=0;i<2;i++) {
+        double d=boundary[i];
+        if(d<ramp) times[i]=sqrt(2*d/acceleration);
+        else if(d>distance-ramp) times[i]=total-sqrt(2*(distance-d)/acceleration);
+        else times[i]=peak/acceleration+(d-ramp)/peak;
     }
-    if (dt < 2 || ds < 2) return 5;       /* gear 0 */
-    if (dt < 4 || ds < 4) return 2;       /* gear 1 */
-    return 0;                             /* gear 2 */
+    int duration=(int)ceil(times[1]-times[0]);
+    if(duration<1) duration=1;
+    if(c->move_total) {
+        int ticks=c->move_total & 63;
+        double t=times[0]+(times[1]-times[0])*(ticks-c->move_timer)/ticks;
+        double d;
+        if(t<peak/acceleration) d=acceleration*t*t/2;
+        else if(t>total-peak/acceleration) d=distance-acceleration*(total-t)*(total-t)/2;
+        else d=ramp+peak*(t-peak/acceleration);
+        double offset=d-start;
+        if(c->dir) *position+=offset;
+        else *position-=offset;
+    }
+    return duration;
 }
 
 static void car_start_step(ElevatorShaft *s, ElevatorCar *c)
 {
-    int stride;
-    c->move_timer = (uint8_t)car_move_ticks(s, c, &stride);
-    c->move_total = c->move_timer;
+    int stride; double position;
+    c->move_total=0;
+    c->move_timer=(uint8_t)people_car_motion(s,c,&stride,&position);
+    c->move_total=c->move_timer | ((stride-1)<<6);
 }
 
 /* UpdateDirection (1090:1d2f) essence: a car that stopped to answer a call
@@ -1909,8 +1930,8 @@ static int shaft_extreme(const ElevatorShaft *s, int top)
 
 /* Re-derive a car's target in place (the UpdateCarState tail used by
  * CallElevator/ReassignCalls). Mid-boarding cars finish the door cycle
- * first; an in-flight car takes ANY fresh target along its travel
- * direction — nearer (stop for a new call on the way) or FARTHER (the
+ * first; an in-flight car takes a fresh target at its next segment
+ * boundary along its travel direction — nearer (stop for a new call on the way) or FARTHER (the
  * sweep's reversal point deepened: a call beyond the old turnaround
  * extends the run, no wasted stop at the stale extreme). The EXE's
  * UpdateCarState re-derives fully mid-run; only a target behind the
@@ -1920,7 +1941,7 @@ static int shaft_extreme(const ElevatorShaft *s, int top)
  * while down-queues starved. Trace 2026-08-03 rush_test t048-t059.) */
 static void car_retarget(ElevatorShaft *s, ElevatorCar *c, int ci)
 {
-    if (c->door_timer) return;
+    if (c->door_timer || c->move_timer) return;
     int tgt = find_target_floor(s, c, ci);
     if (tgt < 0 && !c->passengers && c->floor != s->home[ci])
         tgt = s->home[ci];
@@ -1933,6 +1954,10 @@ static void car_retarget(ElevatorShaft *s, ElevatorCar *c, int ci)
         c->leg_start = c->floor;
         car_start_step(s, c);
     } else if (c->dir ? tgt > c->floor : tgt < c->floor) {
+        /* A late call inside an already moving express segment waits for
+         * the return sweep; shortening it would teleport the physical car. */
+        int committed=(c->move_total>>6)+1;
+        if(c->move_total && abs(tgt-(int)c->floor)<committed) return;
         c->target = (uint8_t)tgt;
     }
 }
@@ -1982,10 +2007,7 @@ static void car_depart_or_idle(PeopleSim *ps, ElevatorShaft *s,
     /* The EXE's exact departure order (MoveElevator decomp 712-736):
      * 1. ClearFloorCall — own slot, departing direction only at mode 0.
      * 2. Sample which directions still queue with no owning car.
-     * 3. StopAndDispatch — fresh target AND the floor stepped
-     *    IMMEDIATELY (raw 1150-1179); the speed tail is served at the
-     *    NEW floor. An EXE car is never "still at" a departed floor,
-     *    not even for one tick.
+     * 3. Select the fresh target and begin continuous travel from this floor.
      * 4. Re-press the sampled directions.
      * The port used to re-press FIRST, while the car still stood on the
      * served floor scoring approach-cost 0 — so it re-won its own
@@ -2010,12 +2032,7 @@ static void car_depart_or_idle(PeopleSim *ps, ElevatorShaft *s,
         c->target = (uint8_t)tgt;
         c->dir = (uint8_t)(tgt > c->floor);
         c->leg_start = c->floor;
-        int stride;
-        car_move_ticks(s, c, &stride);     /* gear for the departure step */
-        int left = c->dir ? c->target - c->floor : c->floor - c->target;
-        if (stride > left) stride = left;
-        c->floor = (uint8_t)(c->floor + (c->dir ? stride : -stride));
-        car_start_step(s, c);              /* tail at the NEW floor */
+        car_start_step(s,c);
     }
 
     if (press_up) call_elevator(ps, s, from, 1);
@@ -2087,14 +2104,15 @@ static void car_tick(PeopleSim *ps, Tower *tower, ElevatorShaft *s,
     }
 
     if (c->target != c->floor) {
-        if (c->move_timer) { c->move_timer--; return; }
-        {
-            int stride;
-            car_move_ticks(s, c, &stride);      /* gear for THIS step */
-            int left = c->dir ? c->target - c->floor : c->floor - c->target;
-            if (stride > left) stride = left;
-            c->floor = (uint8_t)(c->floor + (c->dir ? stride : -stride));
-        }
+        if (c->move_timer) c->move_timer--;
+        if (c->move_timer) return;
+        int stride=(c->move_total>>6)+1;
+        car_retarget(s,c,ci);
+        int left=abs((int)c->target-(int)c->floor);
+        if(stride>left) stride=left;
+        if(c->dir) c->floor+=stride;
+        else c->floor-=stride;
+        c->move_total=0;
         if (c->floor == c->target) {
             adopt_call_direction(s, c, ci);
             c->door_timer = DOOR_OPEN_TICKS;
@@ -2105,10 +2123,7 @@ static void car_tick(PeopleSim *ps, Tower *tower, ElevatorShaft *s,
         return;
     }
 
-    /* Landing tail: a departure step that lands directly on its target
-     * serves the speed tail here, at the NEW floor, before the doors
-     * open (EXE MoveElevator's moving branch counts +0x298b down before
-     * the arrival pass). Ordinary idle cars carry no tail. */
+    /* An idle car carries no motion tail. */
     if (c->move_timer) { c->move_timer--; return; }
 
     /* idle at a floor: the EXE's parked cars rest DOORS OPEN and re-run

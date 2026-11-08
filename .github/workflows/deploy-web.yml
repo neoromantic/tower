@@ -1,27 +1,16 @@
-# Builds the wasm bundle and deploys it to GitHub Pages on every push to
-# master. The Pi never needs emsdk for production — CI owns the toolchain
-# (Phase E of docs/WEB-PLAN.md).
-#
-# The deployed dist contains ONLY our own artifacts (index.html/js/wasm
-# with embedded Liberation fonts). SIMTOWER.EXE is never in git or CI:
-# players bring their own copy, parsed client-side.
-#
-# One-time setup owed by the repo owner: Settings -> Pages -> Source:
-# "GitHub Actions". Custom domain (kvetch.io) comes later with DNS.
-name: deploy-web
+name: build-web
 
 on:
   push:
     branches: [master]
+  pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
+  group: web-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -29,20 +18,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: emscripten-core/setup-emsdk@v14
+      - uses: actions/checkout@v4
         with:
-          version: 6.0.6   # match the Pi's emsdk — same wasm we've been testing
-      - run: make web
-      - uses: actions/upload-pages-artifact@v3
+          repository: emscripten-core/emsdk
+          ref: 7.0.0
+          path: .emsdk
+          persist-credentials: false
+      - run: .emsdk/emsdk install 7.0.0 && .emsdk/emsdk activate 7.0.0
+      - run: |
+          sed -i 's,https://github.com/libsdl-org/SDL/archive/{TAG}.zip,https://codeload.github.com/libsdl-org/SDL/zip/{TAG},' .emsdk/upstream/emscripten/tools/ports/sdl2.py
+          sed -i 's,https://github.com/libsdl-org/SDL_ttf/archive/{TAG}.zip,https://codeload.github.com/libsdl-org/SDL_ttf/zip/{TAG},' .emsdk/upstream/emscripten/tools/ports/sdl2_ttf.py
+          sed -i 's,https://github.com/freetype/freetype/archive/{TAG}.zip,https://codeload.github.com/freetype/freetype/zip/{TAG},' .emsdk/upstream/emscripten/tools/ports/freetype.py
+          sed -i 's,https://github.com/madler/zlib/archive/refs/tags/v{VERSION}.tar.gz,https://codeload.github.com/madler/zlib/tar.gz/refs/tags/v{VERSION},' .emsdk/upstream/emscripten/tools/ports/zlib.py
+          sed -i "/url_filename = url.rsplit/a\    if '/zip/' in url: url_filename = 'archive.zip'\n    if '/tar.gz/' in url: url_filename = 'archive.tar.gz'" .emsdk/upstream/emscripten/tools/ports/__init__.py
+      - uses: oven-sh/setup-bun@v2
+      - uses: astral-sh/setup-uv@v7
+      - run: bun install --frozen-lockfile
+      - run: source .emsdk/emsdk_env.sh && make web
+      - uses: actions/upload-artifact@v4
         with:
+          name: tower-web
           path: web/dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4

@@ -43,31 +43,31 @@
     <footer id="pagefoot"><a href="https://github.com/neoromantic/tower" target="_blank" rel="noopener">Tower · Open source</a><a href="https://github.com/Jonahss/concilia-tower" target="_blank" rel="noopener">Original port: Jonahss / ConciliaTower</a><span>Your towers stay in this browser. Export a backup to keep a copy.</span></footer>
   </div>
   <main id="canvaswrap" hidden>
-    <header id="hud"><div id="towerstats"><output id="money"></output><output id="clock"></output></div><button id="settingsbtn" aria-label="Open settings">•••</button></header>
-    <div id="world"><canvas id="canvas" width="960" height="720" tabindex="-1" aria-label="Tower world. Drag to pan, pinch to zoom, tap a room to inspect."></canvas></div>
-    <nav id="toolbar" aria-label="Tower controls">
-      <div id="normaltools"><button id="buildbtn" class="start">＋ Build</button><label class="speedlabel"><span>Speed</span><select id="speed" aria-label="Simulation speed"><option value="0">Ⅱ Paused</option><option value="1" selected>▷ Normal</option><option value="2">▷▷ Fast</option></select></label><output id="savestate" role="status">Saving…</output></div>
-      <div id="placement" hidden><div><strong id="placementname"></strong><small id="placementhint">Tap or drag to position</small></div><button id="cancelbuild">Cancel</button><button id="placebtn" class="start" disabled>Place</button></div>
+    <header id="hud"><strong>Tower</strong><output id="towerstats"></output><button id="menubtn">Game</button><button id="settingsbtn">Settings</button></header>
+    <div id="world"><canvas id="canvas" tabindex="0" aria-label="Tower world. Tap to inspect, drag to pan. In Build mode, tap or drag to plan; use Pan to move. Pinch to zoom."></canvas></div>
+    <nav id="toolbar" aria-label="Tower tools">
+      <div class="toolrow" id="normaltools"><button id="buildbtn" aria-pressed="false" title="Choose a building"><img id="buildimage" alt="" hidden><span id="buildlabel">＋ Build</span></button><button data-tool="-2" aria-pressed="true">Inspect</button><button id="panbtn" data-tool="-3" aria-pressed="false">Pan</button><button id="quickspeed" aria-label="Simulation speed: Normal. Tap to change" title="Normal speed · tap to change">▷</button><button id="toolsbtn" aria-label="More tower tools">•••</button></div>
+      <div class="toolrow" id="placement" hidden><strong id="placementname"></strong><output id="placementhint" role="status">Tap or drag to plan · Pan moves the view</output><button id="cancelplacebtn">Cancel</button><button id="placebtn" disabled>Build</button></div>
+      <output id="toolhint">Tap to inspect · drag to explore · pinch to zoom</output>
     </nav>
+    <details id="minimap" open><summary>Map</summary><div id="minimapview"><button class="towermap" aria-label="Tower overview. Tap or drag to move the camera; Enter centers the tower."><svg aria-hidden="true"></svg></button></div></details>
+    <details id="events"><summary>Events</summary><ol id="eventlist"></ol></details>
   </main>
-  <dialog id="catalog" class="sheet" aria-labelledby="catalogtitle">
-    <form method="dialog" class="dialoghead"><div><small>MAKE ROOM FOR MORE</small><h2 id="catalogtitle">Build your tower</h2></div><button aria-label="Close catalog">✕</button></form>
-    <div id="categories" role="group" aria-label="Building categories"></div>
-    <div id="cards"></div>
-  </dialog>
-  <dialog id="inspector" class="sheet" aria-labelledby="objectname">
-    <form method="dialog" class="dialoghead"><h2 id="objectname"></h2><button aria-label="Close inspector">✕</button></form>
-    <p id="objectdetails"></p><div class="toolrow"><button id="useobject">Open controls</button><button id="deleteobject" class="destructive">Delete object</button></div>
-  </dialog>
-  <dialog id="settings" class="sheet" aria-label="Settings">
-    <form method="dialog" class="dialoghead"><h2>Settings</h2><button>Done</button></form>
-    <label>Gameplay style <select id="style"><option value="0">Architectural schematic</option><option value="1">Modern pixel art</option><option value="2">Warm dollhouse</option><option value="3">Miniature</option></select></label>
+  <canvas id="engine-canvas" hidden tabindex="-1" aria-hidden="true"></canvas>
+  <dialog id="tools" aria-labelledby="toolstitle"><form method="dialog" class="dialoghead"><h2 id="toolstitle">Tower tools</h2><button>Done</button></form><div class="toolrow"><button data-tool="0" aria-pressed="false">Use room</button><button data-tool="-1" aria-pressed="false">Bulldoze</button><button id="shaftbtn" aria-pressed="false">Edit shaft</button></div><div class="toolrow"><label>Speed <select id="speed"><option value="0">Paused</option><option value="1" selected>Normal</option><option value="2">Fast</option></select></label><button id="savebtn">Save</button><output id="savestate" role="status">Not saved yet</output></div></dialog>
+  <dialog id="catalog" aria-labelledby="catalogtitle"><form method="dialog" class="dialoghead"><h2 id="catalogtitle">Build your tower</h2><button>Done</button></form><label>Find a building <input id="catalogsearch" type="search" placeholder="Rooms, transport, services…"></label><div id="catalogitems"></div></dialog>
+  <dialog id="gamemenus" aria-labelledby="menutitle"><form method="dialog" class="dialoghead"><h2 id="menutitle">Tower</h2><button>Done</button></form><div id="menuitems"></div></dialog>
+  <dialog id="panels" aria-labelledby="paneltitle"><div class="dialoghead"><h2 id="paneltitle"></h2><button id="panelclose" aria-label="Close panel">Close</button></div><div id="panelcontent"></div></dialog>
+  <dialog id="settings" aria-labelledby="settingstitle">
+    <form method="dialog" class="dialoghead"><h2 id="settingstitle">Settings</h2><button>Done</button></form>
+    <label>Gameplay style <select id="style"><option value="0">Architectural schematic</option><option value="1">Modern pixel art</option><option value="2" selected>Warm dollhouse</option><option value="3">Miniature</option></select></label>
     <label>Camera zoom <input id="zoom" type="range" min="0.5" max="3" step="0.05" value="1"><output id="zoomvalue">100%</output></label>
     <label>Interface size <input id="uiscale" type="range" min="0.85" max="1.3" step="0.05" value="1"></label>
     <div class="toolrow"><button id="fsbtn">Fullscreen</button><button id="mutebtn">Mute sound</button><button id="installbtn">Install app</button></div>
     <p id="installhelp" hidden></p>
-    <details><summary>Advanced game menus</summary><div class="toolrow"><label>Game menu <select id="gamemenu"><option value="0">Game</option><option value="1">Build residential</option><option value="2">Build commercial</option><option value="3">Transport</option><option value="4">Services</option><option value="5">Speed</option><option value="6">Options / Rescue</option><option value="7">People / Windows</option><option value="8">Reports / View</option><option value="9">Help</option></select></label><button id="openmenubtn">Open</button></div></details>
-    <div class="toolrow"><button id="savebtn">Save now</button><button id="exportbtn">Export .sav</button><button id="exporttdtbtn">Export .TDT</button><button id="loadbtn">Towers / Load</button></div>
+    <label>Sound volume <input id="volume" type="range" min="0" max="0.6" step="0.01" value="0.35"></label>
+    <div class="toolrow"><label><input id="audio-effects" type="checkbox" checked> Effects</label><label><input id="audio-ambient" type="checkbox" checked> Ambience</label><label><input id="audio-music" type="checkbox" checked> Music</label></div>
+    <div class="toolrow"><button id="exportbtn">Export .sav</button><button id="exporttdtbtn">Export .TDT</button><button id="loadbtn">Towers / Load</button></div>
     <p>Based on <a href="https://github.com/Jonahss/concilia-tower" target="_blank" rel="noopener">ConciliaTower by Jonahss</a>.</p>
     <p>Automatic saves every 30 seconds and when leaving the game. Export a backup before clearing browser data.</p>
   </dialog>
@@ -137,7 +137,7 @@
     modalState = null;
     modalEl.style.display = 'none';
     if (st) st.resolve(value);
-    if (playing) Module.canvas.focus();
+    if (playing) document.getElementById('canvas').focus();
   }
   function modalValidate() {
     if (!modalState || !modalState.hasInput) return null;
@@ -471,7 +471,7 @@
   });
 
   var Module = {
-    canvas: document.getElementById('canvas'),
+    canvas: document.getElementById('engine-canvas'),
     noInitialRun: true,
     preRun: [function () {
       /* Persistent save mount + env before main ever runs. */
@@ -485,15 +485,26 @@
         Module.removeRunDependency('idbfs');
       });
     }],
-    onRuntimeInitialized: function () {
+    onRuntimeInitialized: async function () {
       if (Module.persistError) {
         statusEl.textContent = 'Could not load saved towers. Reload to try again: ' + Module.persistError.message;
         return;
       }
       Module.engineReady = true;
       renderSlots();    /* IDBFS is loaded (run dependency) — list towers */
+      await ctViewReady;
+      await ctView.init(document.getElementById('canvas'), Module);
+      await ctView.style(Number(document.getElementById('style').value));
       startBtn.disabled = false;
       statusEl.textContent = '';
+      const newSlot = sessionStorage.getItem('ct-new-slot');
+      sessionStorage.removeItem('ct-new-slot');
+      if (newSlot) {
+        draftSlots.push(newSlot);
+        selectSlot(newSlot);
+        startBtn.click();
+        return;
+      }
       const pickTower = sessionStorage.getItem('ct-pick-tower');
       sessionStorage.removeItem('ct-pick-tower');
       if (!pickTower && slotExists(currentSlot)) startBtn.click();
@@ -503,48 +514,24 @@
   };
 
   startBtn.addEventListener('click', function () {
+    var args = ['--save=' + slotPath(currentSlot), '--campaign'];
+    if (document.getElementById('sandbox').checked) args[1] = '--sandbox';
     if (pendingTdt && pendingTdt.slot === currentSlot) {
       /* Staged original-format tower: hand it to the engine's boot
        * importer; the engine persists it into the slot immediately. */
       FS.writeFile('/import.tdt', pendingTdt.bytes);
-      ENV.CT_TWR = '/import.tdt';
+      args.push('/import.tdt');
       pendingTdt = null;
     }
     try { localStorage.setItem('ct-slot', currentSlot); } catch (e) {}
     document.getElementById('stage').style.display = 'none';
     document.getElementById('canvaswrap').hidden = false;
-    var args = ['--save=' + slotPath(currentSlot)];
-    if (document.getElementById('sandbox').checked) args.push('--sandbox');
+    ctAudio.unlock();
+    Module.ccall('ct_visual_enable', null, ['number'], [1]);
     Module.callMain(args);
     ctStartShell();
-    Module.canvas.focus();
+    document.getElementById('canvas').focus();
   });
-
-  /* Audio gate — hidden tab OR the mute button suspends the Web Audio
-   * context; the sim keeps running either way (design D5). The SDL audio
-   * object lives at Module.SDL2 (emscripten scopes it there, NOT a global
-   * — the old `typeof SDL2` check never fired, hence tab-switching kept
-   * playing; Jonah's report 2026-08-10). */
-  var userMuted = false;
-  var muteBtn = document.getElementById('mutebtn');
-  function audioCtx() {
-    return (Module.SDL2 && Module.SDL2.audioContext) || null;
-  }
-  function applyAudioGate() {
-    var ctx = audioCtx();
-    if (!ctx) return;
-    if (userMuted || document.hidden) ctx.suspend();
-    else ctx.resume();
-    muteBtn.textContent = 'Mute sound';
-    if (userMuted) muteBtn.textContent = 'Unmute sound';
-    muteBtn.title = userMuted ? 'Unmute sound' : 'Mute sound';
-  }
-  muteBtn.addEventListener('click', function () {
-    userMuted = !userMuted;
-    applyAudioGate();
-    Module.canvas.focus();     /* give the keys back to the tower */
-  });
-  document.addEventListener('visibilitychange', applyAudioGate);
 
   /* Wasm abort → a readable apology instead of a frozen canvas (E5).
    * Saves are on IDBFS and synced at save-time, so a reload recovers. */
@@ -570,6 +557,8 @@
       ev.preventDefault();
   }, true);
 </script>
+<script src="audio.js"></script>
+<script>var ctViewReady = import('./view.js');</script>
 <script src="app.js"></script>
 {{{ SCRIPT }}}
 </body>

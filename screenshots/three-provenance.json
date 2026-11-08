@@ -1,0 +1,33 @@
+{
+  "runtimeSource": "e5cef55b5f29f2914d4c01cdeaa686144d30ad34",
+  "synthetic": true,
+  "style": "warm-dollhouse",
+  "method": "Unmodified headless browser screenshots of a seeded tower advanced by the C simulation; existing source artwork only.",
+  "scene": {
+    "officeFloors": 14,
+    "usableParkingBays": 57,
+    "parkedCars": 16,
+    "stairs": 3,
+    "escalators": 2
+  },
+  "files": [
+    {
+      "file": "three-gameplay.png",
+      "sha256": "b1f1044af808baa8366f6d4a89809113b36f22275dd9e9cd2f71062609251283",
+      "viewport": [
+        1600,
+        1000
+      ],
+      "dpr": 1
+    },
+    {
+      "file": "three-mobile.png",
+      "sha256": "05743a6884a2badd07c17a9f0268367f25aaf5e166841628ccd4c9d9e8afaa08",
+      "viewport": [
+        390,
+        844
+      ],
+      "dpr": 1
+    }
+  ]
+}

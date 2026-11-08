@@ -233,6 +233,11 @@ typedef struct {
     uint8_t  down_call_car[TOWER_FLOOR_COUNT];
 } ElevatorShaft;
 
+/* Authoritative fractional floor index; returns the next segment duration. */
+int people_car_motion(const ElevatorShaft *shaft, const ElevatorCar *car,
+                      int *stride, double *position);
+
+
 typedef struct {
     Person   people[MAX_PEOPLE];
     int      people_high;       /* slots ever used (scan bound) */
