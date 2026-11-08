@@ -21,6 +21,36 @@ Keep ordinary SDL mouse/click delivery on the canvas for placement, dragging a b
 
 The classic floating toolbar/info/map panes and menu bar start hidden in the browser. DOM must offer `ct_menu` access to Game/Options/Windows/View so all original decisions remain reachable. Legacy dialogs fit a real viewport of at least 380 × 560 logical UI units, scaled separately from the world; no fixed 960 × 720 frame is shrunk to fit the phone.
 
-Packs are embedded from `data/styles/{schematic,modern-pixel,warm-dollhouse,miniature-3d}/tower.dat`, without source images. Shell distribution files are `app.js`, `app.css`, `manifest.webmanifest`, version-stamped `sw.js` and `art/`.
+Legacy packs are preloaded from `data/styles/{schematic,modern-pixel,warm-dollhouse,miniature-3d}/tower.dat`, along with the HD packs, without source images. Shell distribution files are `app.js`, `app.css`, `manifest.webmanifest`, version-stamped `sw.js`, `index.data` and `art/`.
 
 Integration build: `make web` (requires the installed `emcc` toolchain). Worker changes deliberately do not run a build; the controller performs the integrated build and browser smoke once all packs and shell files are ready.
+
+## Confirmed touch placement and object selection
+
+All new coordinates are CSS pixels relative to the canvas. These calls are
+renderer-independent boundaries; see [touch-ui.md](touch-ui.md) for shell flows.
+
+| Export | Contract |
+| --- | --- |
+| `ct_set_zoom_at(double zoom, double x, double y)` | Clamps zoom and preserves the anchor's world point, subject to camera bounds and logical-pixel raster registration. |
+| `ct_preview(double x1, double y1, double x2, double y2)` | Returns 1 for a legal preview of the positive tool. Stores world cells and draws a ghost; it changes no Tower, money, save or random stream. Rooms form rows, shafts form vertical runs, floor uses a continuous span. A trial Tower uses the actual placement/charge rules. |
+| `ct_place()` | Revalidates and commits the stored preview once. Returns 1 on success and clears it; 0 restores the Tower with no partial row or charge. Calls the existing build notification/audio path on success. |
+| `ct_cancel_preview()` | Clears pending ghost/drag state. Tool changes also clear it. |
+| `ct_inspect(double x, double y)` | JSON `{name,details,canDelete,canUse}`. Selects a tenant/shaft/stair or queue person without opening a window; empty name for empty space. |
+| `ct_delete_selected()` | Returns 1 if the selected target was removed. Uses its ID/type/world registration, independent of camera motion. A shaft selection deletes the shaft, not a moving car. The DOM caller confirms deletion before calling this export; no second SDL confirmation opens. Protected/construction units report canDelete=0. |
+| `ct_use_selected()` | Opens the selected tenant, elevator or person controls in the existing SDL dialog. Revalidates identity. |
+| `ct_render_stats()` | JSON CPU render timing and allocation counters described in [hires-renderer.md](hires-renderer.md). Intended for bounded integration profiling. |
+
+`ct_ui_state` also includes numeric `speed` (0 paused, 1 normal, 2 fast; legacy
+turbo displays as fast) and `unlocked`, an array of positive ItemType IDs checked
+by the engine's existing campaign gate. Opening an advanced menu clears selection
+and pending placement, so a new/load action cannot reuse a previous selection.
+
+The trial placement boundary in `tower.h`, `tower_preview_place`, applies the
+same rules and charges to a caller-owned Tower copy without drawing a random
+cinema movie. It exists to keep touch preview validation aligned with placement,
+including deck/lobby charges and connected shaft segments. Actual placement's
+randomness and simulation rules are unchanged.
+
+HD packs are preloaded from each style's `hd/` directory. Distribution and offline
+caches now also require **index.data**; source plates are not distributed.

@@ -1,0 +1,1502 @@
+{
+  "schematic/1": {
+    "source": "data/styles/schematic/sources/rooms.png",
+    "source_sha256": "7dd520624ccdddfe58e6e996cc2379aac1c0c4cb3c2ec76aa00e5395c0892fb2",
+    "crop": [
+      256,
+      768,
+      512,
+      896
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "d31f7b1b68a34785258f9d4877408332b7e7e0c2435d6b4e217d9226f7300514"
+  },
+  "schematic/3": {
+    "source": "data/styles/schematic/sources/rooms.png",
+    "source_sha256": "7dd520624ccdddfe58e6e996cc2379aac1c0c4cb3c2ec76aa00e5395c0892fb2",
+    "crop": [
+      256,
+      0,
+      512,
+      128
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "26422490211cada31795b61c0ffd84ef4fc0654b8f23e858411bbdb19eaea1b3"
+  },
+  "schematic/4": {
+    "source": "data/styles/schematic/sources/rooms.png",
+    "source_sha256": "7dd520624ccdddfe58e6e996cc2379aac1c0c4cb3c2ec76aa00e5395c0892fb2",
+    "crop": [
+      1024,
+      0,
+      1280,
+      128
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "d1bc9914fdb79eb5522a4c71d6f7027cb7cff0b3d0a7b7eaf1da70a05e25e5bd"
+  },
+  "schematic/5": {
+    "source": "data/styles/schematic/sources/rooms.png",
+    "source_sha256": "7dd520624ccdddfe58e6e996cc2379aac1c0c4cb3c2ec76aa00e5395c0892fb2",
+    "crop": [
+      256,
+      128,
+      512,
+      256
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "d329cbffc42bd385f4bd087e050f64901e18f5d75de2a76353a0a12f8fd3b393"
+  },
+  "schematic/6": {
+    "source": "data/styles/schematic/sources/rooms.png",
+    "source_sha256": "7dd520624ccdddfe58e6e996cc2379aac1c0c4cb3c2ec76aa00e5395c0892fb2",
+    "crop": [
+      256,
+      128,
+      512,
+      256
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "d329cbffc42bd385f4bd087e050f64901e18f5d75de2a76353a0a12f8fd3b393"
+  },
+  "schematic/7": {
+    "source": "data/styles/schematic/sources/rooms.png",
+    "source_sha256": "7dd520624ccdddfe58e6e996cc2379aac1c0c4cb3c2ec76aa00e5395c0892fb2",
+    "crop": [
+      256,
+      128,
+      512,
+      256
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "d329cbffc42bd385f4bd087e050f64901e18f5d75de2a76353a0a12f8fd3b393"
+  },
+  "schematic/8": {
+    "source": "data/styles/schematic/sources/rooms.png",
+    "source_sha256": "7dd520624ccdddfe58e6e996cc2379aac1c0c4cb3c2ec76aa00e5395c0892fb2",
+    "crop": [
+      1024,
+      256,
+      1280,
+      384
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "41baf118dd4fb0bac9c5f104836be0ff692e30e14c5d6ef5c074c34b1178faa7"
+  },
+  "schematic/9": {
+    "source": "data/styles/schematic/sources/rooms.png",
+    "source_sha256": "7dd520624ccdddfe58e6e996cc2379aac1c0c4cb3c2ec76aa00e5395c0892fb2",
+    "crop": [
+      256,
+      256,
+      512,
+      384
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "192dee4fb0840dc8520ca414ce15a3495a7e8f3cf70f85da0604a5c1531b137f"
+  },
+  "schematic/10": {
+    "source": "data/styles/schematic/sources/rooms.png",
+    "source_sha256": "7dd520624ccdddfe58e6e996cc2379aac1c0c4cb3c2ec76aa00e5395c0892fb2",
+    "crop": [
+      1024,
+      128,
+      1280,
+      256
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "f95f28b865287dedf41d8aa5aedcf1ca68e49eb709bd9f3961a15e87d4708f5f"
+  },
+  "schematic/11": {
+    "source": "data/styles/schematic/sources/rooms.png",
+    "source_sha256": "7dd520624ccdddfe58e6e996cc2379aac1c0c4cb3c2ec76aa00e5395c0892fb2",
+    "crop": [
+      256,
+      640,
+      512,
+      768
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "cebb179a35529eb3addfc3149345a9c46b30c4180f43616902a4c2ecc04eedbf"
+  },
+  "schematic/12": {
+    "source": "data/styles/schematic/sources/rooms.png",
+    "source_sha256": "7dd520624ccdddfe58e6e996cc2379aac1c0c4cb3c2ec76aa00e5395c0892fb2",
+    "crop": [
+      1024,
+      512,
+      1280,
+      640
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "cb414dbbf99d6a532806840c2b131ddcf6360ab16d5d1a3a7a2b910a32f343c4"
+  },
+  "schematic/13": {
+    "source": "data/styles/schematic/sources/rooms.png",
+    "source_sha256": "7dd520624ccdddfe58e6e996cc2379aac1c0c4cb3c2ec76aa00e5395c0892fb2",
+    "crop": [
+      1024,
+      640,
+      1280,
+      768
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "00fe3ebfe4b3e8490c6b9d2bc39137f994818f09907a21a0cab1f30559b5e5df"
+  },
+  "schematic/14": {
+    "source": "data/styles/schematic/sources/rooms.png",
+    "source_sha256": "7dd520624ccdddfe58e6e996cc2379aac1c0c4cb3c2ec76aa00e5395c0892fb2",
+    "crop": [
+      1024,
+      768,
+      1280,
+      896
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "0a6f590006fde1bbb1af4b7079269adfddb26101ef69f7e7ec5c720acf445748"
+  },
+  "schematic/16": {
+    "source": "data/styles/schematic/sources/rooms.png",
+    "source_sha256": "7dd520624ccdddfe58e6e996cc2379aac1c0c4cb3c2ec76aa00e5395c0892fb2",
+    "crop": [
+      256,
+      384,
+      512,
+      512
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "7b1ecbea7387379efa60a5733c456546ee52795a4816496f698846bcfece98eb"
+  },
+  "schematic/17": {
+    "source": "data/styles/schematic/sources/rooms.png",
+    "source_sha256": "7dd520624ccdddfe58e6e996cc2379aac1c0c4cb3c2ec76aa00e5395c0892fb2",
+    "crop": [
+      1024,
+      384,
+      1280,
+      512
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "f5abb089e0538175a47b08d220f7e1d71601e89c6be6a8454f61cc6b674d2755"
+  },
+  "schematic/18": {
+    "source": "data/styles/schematic/sources/rooms.png",
+    "source_sha256": "7dd520624ccdddfe58e6e996cc2379aac1c0c4cb3c2ec76aa00e5395c0892fb2",
+    "crop": [
+      256,
+      896,
+      512,
+      1024
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "55d5aa402baaf8217027f4c2a4c10d5f6933dd4ed090ee5b028dfebb3283edb9"
+  },
+  "schematic/24": {
+    "source": "data/styles/schematic/sources/rooms.png",
+    "source_sha256": "7dd520624ccdddfe58e6e996cc2379aac1c0c4cb3c2ec76aa00e5395c0892fb2",
+    "crop": [
+      256,
+      512,
+      512,
+      640
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "af7daa770d6e6a32ea1013cebd845f72528f69e213c807dce6c2f643c0b2f087"
+  },
+  "schematic/25": {
+    "source": "data/styles/schematic/sources/rooms.png",
+    "source_sha256": "7dd520624ccdddfe58e6e996cc2379aac1c0c4cb3c2ec76aa00e5395c0892fb2",
+    "crop": [
+      1024,
+      768,
+      1280,
+      896
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "0a6f590006fde1bbb1af4b7079269adfddb26101ef69f7e7ec5c720acf445748"
+  },
+  "schematic/19": {
+    "source": "data/styles/schematic/sources/transport.png",
+    "source_sha256": "e6149ad021ef94a4102f65b0356653c08b15b60d263e8abbf328cc8796992627",
+    "crop": [
+      768,
+      256,
+      1152,
+      512
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "05618a16ede51a27c32bade7f2b142491c3ab5147b3d32630463cbd654a5b325"
+  },
+  "schematic/20": {
+    "source": "data/styles/schematic/sources/transport.png",
+    "source_sha256": "e6149ad021ef94a4102f65b0356653c08b15b60d263e8abbf328cc8796992627",
+    "crop": [
+      0,
+      512,
+      384,
+      768
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "1b751e923c44f9f496c31a9364b3ec7d9709c0633200f9a342add80f7084e5c5"
+  },
+  "schematic/21": {
+    "source": "data/styles/schematic/sources/transport.png",
+    "source_sha256": "e6149ad021ef94a4102f65b0356653c08b15b60d263e8abbf328cc8796992627",
+    "crop": [
+      0,
+      0,
+      384,
+      256
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "2f58bd96879f1739a7226925017d7af3118254811e1c2871c403c64fe6a64ea4"
+  },
+  "schematic/22": {
+    "source": "data/styles/schematic/sources/transport.png",
+    "source_sha256": "e6149ad021ef94a4102f65b0356653c08b15b60d263e8abbf328cc8796992627",
+    "crop": [
+      1152,
+      0,
+      1536,
+      256
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "5922161ff4061fb57147d9317691558520392cf36ac3198c4bc8ddd8bb565b28"
+  },
+  "schematic/23": {
+    "source": "data/styles/schematic/sources/transport.png",
+    "source_sha256": "e6149ad021ef94a4102f65b0356653c08b15b60d263e8abbf328cc8796992627",
+    "crop": [
+      384,
+      0,
+      768,
+      256
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "1b5e8a25e104916ac2cd71a719d6e24353294d6824dea3ff209c5394db79c00e"
+  },
+  "schematic/2": {
+    "source": "data/styles/schematic/sources/exterior-effects.png",
+    "source_sha256": "1f27b0b22a75d06f4b31e22aa779ae7fa052d016b8c49dd66d36947d5ffbf2a3",
+    "crop": [
+      1152,
+      256,
+      1536,
+      512
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "2017b00925b0b4fc2112e8edadc048476db5ede908c1dd9ac994c511d22431f3"
+  },
+  "schematic/15": {
+    "source": "data/styles/schematic/sources/exterior-effects.png",
+    "source_sha256": "1f27b0b22a75d06f4b31e22aa779ae7fa052d016b8c49dd66d36947d5ffbf2a3",
+    "crop": [
+      768,
+      256,
+      1152,
+      512
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "90d075581b1914063649bce006541775bf2504e010eb5c7d00b822541c3cf236"
+  },
+  "modern-pixel/1": {
+    "source": "data/styles/modern-pixel/sources/rooms.png",
+    "source_sha256": "67eab1f5b4ae7175e50fff575d4948b91dfb228505a9658b5a7e8f5b570d12d2",
+    "crop": [
+      256,
+      768,
+      512,
+      896
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "d8ec93846c6bb37e99b7c41891338ad73144a1035b051c75ffa3a30b4155cc0a"
+  },
+  "modern-pixel/3": {
+    "source": "data/styles/modern-pixel/sources/rooms.png",
+    "source_sha256": "67eab1f5b4ae7175e50fff575d4948b91dfb228505a9658b5a7e8f5b570d12d2",
+    "crop": [
+      256,
+      0,
+      512,
+      128
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "6004b3a5ebb40144a4cfda9d747fb70609e1c1574509e8ea88cd940714cd3b14"
+  },
+  "modern-pixel/4": {
+    "source": "data/styles/modern-pixel/sources/rooms.png",
+    "source_sha256": "67eab1f5b4ae7175e50fff575d4948b91dfb228505a9658b5a7e8f5b570d12d2",
+    "crop": [
+      1024,
+      0,
+      1280,
+      128
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "fbe275c3c523fabc94baf0fece5374b1521e93c35b266d1ece24d98fd8f69b5e"
+  },
+  "modern-pixel/5": {
+    "source": "data/styles/modern-pixel/sources/rooms.png",
+    "source_sha256": "67eab1f5b4ae7175e50fff575d4948b91dfb228505a9658b5a7e8f5b570d12d2",
+    "crop": [
+      256,
+      128,
+      512,
+      256
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "774e5667ee917273f83c8e59b0e4cc3f691659c895ab7539bbb8553d9fe8f311"
+  },
+  "modern-pixel/6": {
+    "source": "data/styles/modern-pixel/sources/rooms.png",
+    "source_sha256": "67eab1f5b4ae7175e50fff575d4948b91dfb228505a9658b5a7e8f5b570d12d2",
+    "crop": [
+      256,
+      128,
+      512,
+      256
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "774e5667ee917273f83c8e59b0e4cc3f691659c895ab7539bbb8553d9fe8f311"
+  },
+  "modern-pixel/7": {
+    "source": "data/styles/modern-pixel/sources/rooms.png",
+    "source_sha256": "67eab1f5b4ae7175e50fff575d4948b91dfb228505a9658b5a7e8f5b570d12d2",
+    "crop": [
+      256,
+      128,
+      512,
+      256
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "774e5667ee917273f83c8e59b0e4cc3f691659c895ab7539bbb8553d9fe8f311"
+  },
+  "modern-pixel/8": {
+    "source": "data/styles/modern-pixel/sources/rooms.png",
+    "source_sha256": "67eab1f5b4ae7175e50fff575d4948b91dfb228505a9658b5a7e8f5b570d12d2",
+    "crop": [
+      1024,
+      256,
+      1280,
+      384
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "91744d4923738bd08ba0c868244654e6d31e36be5264af12052c6ec116d7b268"
+  },
+  "modern-pixel/9": {
+    "source": "data/styles/modern-pixel/sources/rooms.png",
+    "source_sha256": "67eab1f5b4ae7175e50fff575d4948b91dfb228505a9658b5a7e8f5b570d12d2",
+    "crop": [
+      256,
+      256,
+      512,
+      384
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "6a55ed25a06e29a3c41065b08817bb80958341a242a027b4566544c2b12c457a"
+  },
+  "modern-pixel/10": {
+    "source": "data/styles/modern-pixel/sources/rooms.png",
+    "source_sha256": "67eab1f5b4ae7175e50fff575d4948b91dfb228505a9658b5a7e8f5b570d12d2",
+    "crop": [
+      1024,
+      128,
+      1280,
+      256
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "cf535f1f27f0c7730778df5d2bb23af6057bdcaf4e2c857324fb2d81cce874f8"
+  },
+  "modern-pixel/11": {
+    "source": "data/styles/modern-pixel/sources/rooms.png",
+    "source_sha256": "67eab1f5b4ae7175e50fff575d4948b91dfb228505a9658b5a7e8f5b570d12d2",
+    "crop": [
+      256,
+      640,
+      512,
+      768
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "a08f4283927e1e824acc22f7f6419e6b1dcb2d9731253366506afefbb8911942"
+  },
+  "modern-pixel/12": {
+    "source": "data/styles/modern-pixel/sources/rooms.png",
+    "source_sha256": "67eab1f5b4ae7175e50fff575d4948b91dfb228505a9658b5a7e8f5b570d12d2",
+    "crop": [
+      1024,
+      512,
+      1280,
+      640
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "fbd528be036a8b7f0e3bf815cddfa329c9bf68e8436ce7bdb3074518dc782265"
+  },
+  "modern-pixel/13": {
+    "source": "data/styles/modern-pixel/sources/rooms.png",
+    "source_sha256": "67eab1f5b4ae7175e50fff575d4948b91dfb228505a9658b5a7e8f5b570d12d2",
+    "crop": [
+      1024,
+      640,
+      1280,
+      768
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "595e748fc26afb5db8e7ef5f86b8c2fe20374614b72009e5810fdcb7a28ae284"
+  },
+  "modern-pixel/14": {
+    "source": "data/styles/modern-pixel/sources/rooms.png",
+    "source_sha256": "67eab1f5b4ae7175e50fff575d4948b91dfb228505a9658b5a7e8f5b570d12d2",
+    "crop": [
+      1024,
+      768,
+      1280,
+      896
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "37ac49579172f1caabbc393ed2ea7407a211d914569d72ae4b44bab87c8a1707"
+  },
+  "modern-pixel/16": {
+    "source": "data/styles/modern-pixel/sources/rooms.png",
+    "source_sha256": "67eab1f5b4ae7175e50fff575d4948b91dfb228505a9658b5a7e8f5b570d12d2",
+    "crop": [
+      256,
+      384,
+      512,
+      512
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "7445bf3c1b1968752163543b00dda7cc79da73044d2ddb45d6902060b0f0e5e1"
+  },
+  "modern-pixel/17": {
+    "source": "data/styles/modern-pixel/sources/rooms.png",
+    "source_sha256": "67eab1f5b4ae7175e50fff575d4948b91dfb228505a9658b5a7e8f5b570d12d2",
+    "crop": [
+      1024,
+      384,
+      1280,
+      512
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "4fa6fae86cc43522c46e21567829a6e87e1fbaa1ec43fbe058642a20e7d52cc1"
+  },
+  "modern-pixel/18": {
+    "source": "data/styles/modern-pixel/sources/rooms.png",
+    "source_sha256": "67eab1f5b4ae7175e50fff575d4948b91dfb228505a9658b5a7e8f5b570d12d2",
+    "crop": [
+      256,
+      896,
+      512,
+      1024
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "7efce2705371186a4803d2e74ac5a35bb019986012c9d27778957fd856117de5"
+  },
+  "modern-pixel/24": {
+    "source": "data/styles/modern-pixel/sources/rooms.png",
+    "source_sha256": "67eab1f5b4ae7175e50fff575d4948b91dfb228505a9658b5a7e8f5b570d12d2",
+    "crop": [
+      256,
+      512,
+      512,
+      640
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "5d4597b5c0a6a9ea291073dac8284b1517eb85a3d8b14fde96546ea84f657085"
+  },
+  "modern-pixel/25": {
+    "source": "data/styles/modern-pixel/sources/rooms.png",
+    "source_sha256": "67eab1f5b4ae7175e50fff575d4948b91dfb228505a9658b5a7e8f5b570d12d2",
+    "crop": [
+      1024,
+      768,
+      1280,
+      896
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "37ac49579172f1caabbc393ed2ea7407a211d914569d72ae4b44bab87c8a1707"
+  },
+  "modern-pixel/19": {
+    "source": "data/styles/modern-pixel/sources/transport.png",
+    "source_sha256": "c2f1077bc0d0c50870146b17bfa5103f7691f369baa76d1f58d358e3a67d2913",
+    "crop": [
+      768,
+      256,
+      1152,
+      512
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "2e15bfbdf71a67eefb72c5aa6979201f091ba1a79057e35cd4f12add5aeb4d2e"
+  },
+  "modern-pixel/20": {
+    "source": "data/styles/modern-pixel/sources/transport.png",
+    "source_sha256": "c2f1077bc0d0c50870146b17bfa5103f7691f369baa76d1f58d358e3a67d2913",
+    "crop": [
+      0,
+      512,
+      384,
+      768
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "67f423abefd99e32f5fa6cc4d401713db89ad4ebb87c4c856e3d69cf32a18edf"
+  },
+  "modern-pixel/21": {
+    "source": "data/styles/modern-pixel/sources/transport.png",
+    "source_sha256": "c2f1077bc0d0c50870146b17bfa5103f7691f369baa76d1f58d358e3a67d2913",
+    "crop": [
+      0,
+      0,
+      384,
+      256
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "a49c2ea36b98f1a4276b6764a9d548d8376d1c0e938198bfe418118c0a2ef911"
+  },
+  "modern-pixel/22": {
+    "source": "data/styles/modern-pixel/sources/transport.png",
+    "source_sha256": "c2f1077bc0d0c50870146b17bfa5103f7691f369baa76d1f58d358e3a67d2913",
+    "crop": [
+      1152,
+      0,
+      1536,
+      256
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "d22a74108c2e25d7fb22fabd1ad1167f9a6c2e90784d20770d0920011e7859f6"
+  },
+  "modern-pixel/23": {
+    "source": "data/styles/modern-pixel/sources/transport.png",
+    "source_sha256": "c2f1077bc0d0c50870146b17bfa5103f7691f369baa76d1f58d358e3a67d2913",
+    "crop": [
+      384,
+      0,
+      768,
+      256
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "3d3e9d36843e5980f1b682d21e2563648fa9f6e658c2eefd3e99bfb1cf60226f"
+  },
+  "modern-pixel/2": {
+    "source": "data/styles/modern-pixel/sources/exterior-effects.png",
+    "source_sha256": "d91f108fc15e3153d27156c980f643820998375ec8cc80e89df39aff6ffe8240",
+    "crop": [
+      1152,
+      256,
+      1536,
+      512
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "31241198994a4ad1b17f04b6fa1cff4b130e3b67f25353aadaddb8d4d3f67ca9"
+  },
+  "modern-pixel/15": {
+    "source": "data/styles/modern-pixel/sources/exterior-effects.png",
+    "source_sha256": "d91f108fc15e3153d27156c980f643820998375ec8cc80e89df39aff6ffe8240",
+    "crop": [
+      768,
+      256,
+      1152,
+      512
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "cb18504c613aacbde0997a66ccdecd97322daa1c877e392e5d1129e9f01d3f97"
+  },
+  "warm-dollhouse/1": {
+    "source": "data/styles/warm-dollhouse/sources/rooms.png",
+    "source_sha256": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+    "crop": [
+      256,
+      768,
+      512,
+      896
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "2e8c44711621f734d2a566102166c141a0099885c66b2f2453c29403ed63f8b9"
+  },
+  "warm-dollhouse/3": {
+    "source": "data/styles/warm-dollhouse/sources/rooms.png",
+    "source_sha256": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+    "crop": [
+      256,
+      0,
+      512,
+      128
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "8942075641951259c06f0b1de0ec01084d65ebeda32704a3a23ac65bd227c900"
+  },
+  "warm-dollhouse/4": {
+    "source": "data/styles/warm-dollhouse/sources/rooms.png",
+    "source_sha256": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+    "crop": [
+      1024,
+      0,
+      1280,
+      128
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "894d2bd95137e1548e73c7b1de4dddcd613568b8802f8e0b99928924803d10ee"
+  },
+  "warm-dollhouse/5": {
+    "source": "data/styles/warm-dollhouse/sources/rooms.png",
+    "source_sha256": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+    "crop": [
+      256,
+      128,
+      512,
+      256
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "18e6ec19b9d1f8177ca08ff84b52c89347ace6f56d73333e0ba83d34c3800c7f"
+  },
+  "warm-dollhouse/6": {
+    "source": "data/styles/warm-dollhouse/sources/rooms.png",
+    "source_sha256": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+    "crop": [
+      256,
+      128,
+      512,
+      256
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "18e6ec19b9d1f8177ca08ff84b52c89347ace6f56d73333e0ba83d34c3800c7f"
+  },
+  "warm-dollhouse/7": {
+    "source": "data/styles/warm-dollhouse/sources/rooms.png",
+    "source_sha256": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+    "crop": [
+      256,
+      128,
+      512,
+      256
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "18e6ec19b9d1f8177ca08ff84b52c89347ace6f56d73333e0ba83d34c3800c7f"
+  },
+  "warm-dollhouse/8": {
+    "source": "data/styles/warm-dollhouse/sources/rooms.png",
+    "source_sha256": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+    "crop": [
+      1024,
+      256,
+      1280,
+      384
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "cb734cff1bcc8c758afc629ad3a0d3d9b3b92aa2af02351c01476b5c96ba6aec"
+  },
+  "warm-dollhouse/9": {
+    "source": "data/styles/warm-dollhouse/sources/rooms.png",
+    "source_sha256": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+    "crop": [
+      256,
+      256,
+      512,
+      384
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "ac39f92ed0556cc9fc7406cfe5777066161c05002d68e55bf08d5bcebae36942"
+  },
+  "warm-dollhouse/10": {
+    "source": "data/styles/warm-dollhouse/sources/rooms.png",
+    "source_sha256": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+    "crop": [
+      1024,
+      128,
+      1280,
+      256
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "02cc60bfd45c09b33d8aa820681ec5c6bbc95cd8efb549eb224a384e0fabd046"
+  },
+  "warm-dollhouse/11": {
+    "source": "data/styles/warm-dollhouse/sources/rooms.png",
+    "source_sha256": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+    "crop": [
+      256,
+      640,
+      512,
+      768
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "39c00b4a2ebcd9ce8d8d19cbcd7396f9800cd1f0422dfefb07894456f398f1a3"
+  },
+  "warm-dollhouse/12": {
+    "source": "data/styles/warm-dollhouse/sources/rooms.png",
+    "source_sha256": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+    "crop": [
+      1024,
+      512,
+      1280,
+      640
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "cd3f068784342f8067b11127f05560d07c9489bf18a4eb56ae917383e5245816"
+  },
+  "warm-dollhouse/13": {
+    "source": "data/styles/warm-dollhouse/sources/rooms.png",
+    "source_sha256": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+    "crop": [
+      1024,
+      640,
+      1280,
+      768
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "3d834969c49ecd945e2c5859b4472091f448d54ed7737afc0194a1ddcf18bcd6"
+  },
+  "warm-dollhouse/14": {
+    "source": "data/styles/warm-dollhouse/sources/rooms.png",
+    "source_sha256": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+    "crop": [
+      1024,
+      768,
+      1280,
+      896
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "9792d08a16942e1cfa6078d53e03f9bdd036969df269481fc465bb28154ca12b"
+  },
+  "warm-dollhouse/16": {
+    "source": "data/styles/warm-dollhouse/sources/rooms.png",
+    "source_sha256": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+    "crop": [
+      256,
+      384,
+      512,
+      512
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "2cb7f128d8ed35f29290f938073be5c8020eef935f8d0443325f8596f7a1edfc"
+  },
+  "warm-dollhouse/17": {
+    "source": "data/styles/warm-dollhouse/sources/rooms.png",
+    "source_sha256": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+    "crop": [
+      1024,
+      384,
+      1280,
+      512
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "c01a376da865aeacee7b23f51fbf2ef94202570557b9cc5167a2674ba75e6a40"
+  },
+  "warm-dollhouse/18": {
+    "source": "data/styles/warm-dollhouse/sources/rooms.png",
+    "source_sha256": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+    "crop": [
+      256,
+      896,
+      512,
+      1024
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "af103556e4d76b81e6cd0dc1a97c6af8b5041482be57dfe6234fc4facd3b49e8"
+  },
+  "warm-dollhouse/24": {
+    "source": "data/styles/warm-dollhouse/sources/rooms.png",
+    "source_sha256": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+    "crop": [
+      256,
+      512,
+      512,
+      640
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "69440214322f2c7c17f1e1c349edc6cd2163a5fd65855c03a09ba3defc137cc3"
+  },
+  "warm-dollhouse/25": {
+    "source": "data/styles/warm-dollhouse/sources/rooms.png",
+    "source_sha256": "75d873a5fcb097644e863f009806d43e35d79382a075d62fe0800bc440306bc8",
+    "crop": [
+      1024,
+      768,
+      1280,
+      896
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "9792d08a16942e1cfa6078d53e03f9bdd036969df269481fc465bb28154ca12b"
+  },
+  "warm-dollhouse/19": {
+    "source": "data/styles/warm-dollhouse/sources/transport.png",
+    "source_sha256": "4b8f22470b3ffa3b49984574182181ffca8a9e1ee607268169652411a17ad659",
+    "crop": [
+      768,
+      256,
+      1152,
+      512
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "63ef7f9878e3ef2b44a5699afe6df84799c9a9f6d4561cca2a12c4e0b5997e1a"
+  },
+  "warm-dollhouse/20": {
+    "source": "data/styles/warm-dollhouse/sources/transport.png",
+    "source_sha256": "4b8f22470b3ffa3b49984574182181ffca8a9e1ee607268169652411a17ad659",
+    "crop": [
+      0,
+      512,
+      384,
+      768
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "aeb363490a4d4521189d747732eaceda5c86596fb25157777efa09bcf86e75e8"
+  },
+  "warm-dollhouse/21": {
+    "source": "data/styles/warm-dollhouse/sources/transport.png",
+    "source_sha256": "4b8f22470b3ffa3b49984574182181ffca8a9e1ee607268169652411a17ad659",
+    "crop": [
+      0,
+      0,
+      384,
+      256
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "5f1fc5fedb04e43492901d7b44923439422cab5258a88140722d7b7c4b40fc85"
+  },
+  "warm-dollhouse/22": {
+    "source": "data/styles/warm-dollhouse/sources/transport.png",
+    "source_sha256": "4b8f22470b3ffa3b49984574182181ffca8a9e1ee607268169652411a17ad659",
+    "crop": [
+      1152,
+      0,
+      1536,
+      256
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "ed1501f3f85b064abbded9d76b371af9b1195434313ec71e443ab5528e3bb9e3"
+  },
+  "warm-dollhouse/23": {
+    "source": "data/styles/warm-dollhouse/sources/transport.png",
+    "source_sha256": "4b8f22470b3ffa3b49984574182181ffca8a9e1ee607268169652411a17ad659",
+    "crop": [
+      384,
+      0,
+      768,
+      256
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "f6f4a11a8d3b8c7225ca6e4a59904de875d425ed5238161b7e1713e727cf011a"
+  },
+  "warm-dollhouse/2": {
+    "source": "data/styles/warm-dollhouse/sources/exterior-effects.png",
+    "source_sha256": "200943773a0ff4a091784a8a2dce4d049ef4d47ee47eb2716fbedab7c630303f",
+    "crop": [
+      1152,
+      256,
+      1536,
+      512
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "8c5bc31a8eade84a7f0f59bf87e82cefb6107a6a60e6e839c35782d55216b8e2"
+  },
+  "warm-dollhouse/15": {
+    "source": "data/styles/warm-dollhouse/sources/exterior-effects.png",
+    "source_sha256": "200943773a0ff4a091784a8a2dce4d049ef4d47ee47eb2716fbedab7c630303f",
+    "crop": [
+      768,
+      256,
+      1152,
+      512
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "8f0790b3519da3131e8b97a1e251f1d0e8b1670797aaf7133db7d9111a454457"
+  },
+  "miniature-3d/1": {
+    "source": "data/styles/miniature-3d/sources/rooms.png",
+    "source_sha256": "14a6352f7eaffb6074b7ff1b2dfe16bf7a2a23039256503cafb09e72fc4c48e6",
+    "crop": [
+      274,
+      796,
+      494,
+      906
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "b561fd32434564a21af95c7725adaf9d73b7008e5e0b1fe7ac937444604ad609"
+  },
+  "miniature-3d/3": {
+    "source": "data/styles/miniature-3d/sources/rooms.png",
+    "source_sha256": "14a6352f7eaffb6074b7ff1b2dfe16bf7a2a23039256503cafb09e72fc4c48e6",
+    "crop": [
+      240,
+      0,
+      528,
+      144
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "5cce25efac4da1cfd43617c79e91258f98e4f0c1973a07f6d719aeaf99929f38"
+  },
+  "miniature-3d/4": {
+    "source": "data/styles/miniature-3d/sources/rooms.png",
+    "source_sha256": "14a6352f7eaffb6074b7ff1b2dfe16bf7a2a23039256503cafb09e72fc4c48e6",
+    "crop": [
+      1008,
+      0,
+      1296,
+      144
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "cfaeb62ee07fe26a624b11490353ca5fc7fa8b8ddbbec24a634176d57e5e7ff2"
+  },
+  "miniature-3d/5": {
+    "source": "data/styles/miniature-3d/sources/rooms.png",
+    "source_sha256": "14a6352f7eaffb6074b7ff1b2dfe16bf7a2a23039256503cafb09e72fc4c48e6",
+    "crop": [
+      244,
+      144,
+      524,
+      284
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "b62d39e9f42179c9a4f55c4c8dd62082176681d25140abee318b2fc9cc94c078"
+  },
+  "miniature-3d/6": {
+    "source": "data/styles/miniature-3d/sources/rooms.png",
+    "source_sha256": "14a6352f7eaffb6074b7ff1b2dfe16bf7a2a23039256503cafb09e72fc4c48e6",
+    "crop": [
+      244,
+      144,
+      524,
+      284
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "b62d39e9f42179c9a4f55c4c8dd62082176681d25140abee318b2fc9cc94c078"
+  },
+  "miniature-3d/7": {
+    "source": "data/styles/miniature-3d/sources/rooms.png",
+    "source_sha256": "14a6352f7eaffb6074b7ff1b2dfe16bf7a2a23039256503cafb09e72fc4c48e6",
+    "crop": [
+      244,
+      144,
+      524,
+      284
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "b62d39e9f42179c9a4f55c4c8dd62082176681d25140abee318b2fc9cc94c078"
+  },
+  "miniature-3d/8": {
+    "source": "data/styles/miniature-3d/sources/rooms.png",
+    "source_sha256": "14a6352f7eaffb6074b7ff1b2dfe16bf7a2a23039256503cafb09e72fc4c48e6",
+    "crop": [
+      1020,
+      284,
+      1284,
+      416
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "dd04e20d003b09023c9deb7f811eda6fccf156d26b4b9c96460b97c75ac5196f"
+  },
+  "miniature-3d/9": {
+    "source": "data/styles/miniature-3d/sources/rooms.png",
+    "source_sha256": "14a6352f7eaffb6074b7ff1b2dfe16bf7a2a23039256503cafb09e72fc4c48e6",
+    "crop": [
+      252,
+      284,
+      516,
+      416
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "de09782b2ac5a831c7d09badb98439b268b1725f54c886a99deb6cf29e31aceb"
+  },
+  "miniature-3d/10": {
+    "source": "data/styles/miniature-3d/sources/rooms.png",
+    "source_sha256": "14a6352f7eaffb6074b7ff1b2dfe16bf7a2a23039256503cafb09e72fc4c48e6",
+    "crop": [
+      1012,
+      144,
+      1292,
+      284
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "eb20de7a0078e110389df43ef5dbf172e43252cb8c0de4be87f3c239287531b9"
+  },
+  "miniature-3d/11": {
+    "source": "data/styles/miniature-3d/sources/rooms.png",
+    "source_sha256": "14a6352f7eaffb6074b7ff1b2dfe16bf7a2a23039256503cafb09e72fc4c48e6",
+    "crop": [
+      266,
+      678,
+      502,
+      796
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "a31718be18a16da8d4d0426282f9711dddd978d59456ab31cf1b4a325a015bfd"
+  },
+  "miniature-3d/12": {
+    "source": "data/styles/miniature-3d/sources/rooms.png",
+    "source_sha256": "14a6352f7eaffb6074b7ff1b2dfe16bf7a2a23039256503cafb09e72fc4c48e6",
+    "crop": [
+      1019,
+      545,
+      1285,
+      678
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "e085eed1a91837b0a5dea2c2cb5274c6868eb2f68af1c2976c332b6dfe341bdf"
+  },
+  "miniature-3d/13": {
+    "source": "data/styles/miniature-3d/sources/rooms.png",
+    "source_sha256": "14a6352f7eaffb6074b7ff1b2dfe16bf7a2a23039256503cafb09e72fc4c48e6",
+    "crop": [
+      1034,
+      678,
+      1270,
+      796
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "4e32da2637e20ceb96938aa6794ab74ad25dc8808c9518829174134dc466f105"
+  },
+  "miniature-3d/14": {
+    "source": "data/styles/miniature-3d/sources/rooms.png",
+    "source_sha256": "14a6352f7eaffb6074b7ff1b2dfe16bf7a2a23039256503cafb09e72fc4c48e6",
+    "crop": [
+      1042,
+      796,
+      1262,
+      906
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "b21e7ed61ba83cd1119346d9f1710c0d685f1c4727d25592e3b4849286b23f02"
+  },
+  "miniature-3d/16": {
+    "source": "data/styles/miniature-3d/sources/rooms.png",
+    "source_sha256": "14a6352f7eaffb6074b7ff1b2dfe16bf7a2a23039256503cafb09e72fc4c48e6",
+    "crop": [
+      255,
+      416,
+      513,
+      545
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "201e12e2a4fb9f1cc0b5d9bd681372a447bef6140e9f3bcd1ad13f136aefd8b8"
+  },
+  "miniature-3d/17": {
+    "source": "data/styles/miniature-3d/sources/rooms.png",
+    "source_sha256": "14a6352f7eaffb6074b7ff1b2dfe16bf7a2a23039256503cafb09e72fc4c48e6",
+    "crop": [
+      1023,
+      416,
+      1281,
+      545
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "2c76f4eac31eb11237a14dc2e8d3e682e223dfd23e728113044eb411229d6f2f"
+  },
+  "miniature-3d/18": {
+    "source": "data/styles/miniature-3d/sources/rooms.png",
+    "source_sha256": "14a6352f7eaffb6074b7ff1b2dfe16bf7a2a23039256503cafb09e72fc4c48e6",
+    "crop": [
+      266,
+      906,
+      502,
+      1024
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "1c25fcf3a3bc70ab316747481aa3dda496603bc00a34e43df919c408adb049d0"
+  },
+  "miniature-3d/24": {
+    "source": "data/styles/miniature-3d/sources/rooms.png",
+    "source_sha256": "14a6352f7eaffb6074b7ff1b2dfe16bf7a2a23039256503cafb09e72fc4c48e6",
+    "crop": [
+      251,
+      545,
+      517,
+      678
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "ec345bd63d889367d633515712149162007aced60e21a8d8bc1e9e0718a7ebad"
+  },
+  "miniature-3d/25": {
+    "source": "data/styles/miniature-3d/sources/rooms.png",
+    "source_sha256": "14a6352f7eaffb6074b7ff1b2dfe16bf7a2a23039256503cafb09e72fc4c48e6",
+    "crop": [
+      1042,
+      796,
+      1262,
+      906
+    ],
+    "size": [
+      320,
+      160
+    ],
+    "sha256": "b21e7ed61ba83cd1119346d9f1710c0d685f1c4727d25592e3b4849286b23f02"
+  },
+  "miniature-3d/19": {
+    "source": "data/styles/miniature-3d/sources/transport.png",
+    "source_sha256": "8c7e2acb78552fb173d293438529171f8e222847527db8c1c8a8c462390433d3",
+    "crop": [
+      768,
+      256,
+      1152,
+      512
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "79de6365dd52a33d2fe989846a574316322f358acc793d6749bd0e3792f6dadc"
+  },
+  "miniature-3d/20": {
+    "source": "data/styles/miniature-3d/sources/transport.png",
+    "source_sha256": "8c7e2acb78552fb173d293438529171f8e222847527db8c1c8a8c462390433d3",
+    "crop": [
+      0,
+      512,
+      384,
+      768
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "9d779eac1505c7cfdc750bb221b13dee4971f7d0eb60dbbac04899f77b6555d6"
+  },
+  "miniature-3d/21": {
+    "source": "data/styles/miniature-3d/sources/transport.png",
+    "source_sha256": "8c7e2acb78552fb173d293438529171f8e222847527db8c1c8a8c462390433d3",
+    "crop": [
+      0,
+      0,
+      384,
+      256
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "5701ac7e28a2003797af899b93a68bd5c8d632340901659c6ac22af172fa64de"
+  },
+  "miniature-3d/22": {
+    "source": "data/styles/miniature-3d/sources/transport.png",
+    "source_sha256": "8c7e2acb78552fb173d293438529171f8e222847527db8c1c8a8c462390433d3",
+    "crop": [
+      1152,
+      0,
+      1536,
+      256
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "840d5b0d94dae1bdfb5ad053d9c1617f7524674d8d32013880bff433e3af527f"
+  },
+  "miniature-3d/23": {
+    "source": "data/styles/miniature-3d/sources/transport.png",
+    "source_sha256": "8c7e2acb78552fb173d293438529171f8e222847527db8c1c8a8c462390433d3",
+    "crop": [
+      384,
+      0,
+      768,
+      256
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "6cda807e8cb8366cb5dfd8371c94e1b60292601faa4f0042026a8a2c7e26f8d6"
+  },
+  "miniature-3d/2": {
+    "source": "data/styles/miniature-3d/sources/exterior-effects.png",
+    "source_sha256": "cdd23de5e94222d5accd6f689a71828403645793a2dc51da5bbe82af6afc2ee1",
+    "crop": [
+      1152,
+      256,
+      1536,
+      512
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "6786a914ac89d76675fdfb6c04477c726e61b3fe7e7661075354f3e1f3572663"
+  },
+  "miniature-3d/15": {
+    "source": "data/styles/miniature-3d/sources/exterior-effects.png",
+    "source_sha256": "cdd23de5e94222d5accd6f689a71828403645793a2dc51da5bbe82af6afc2ee1",
+    "crop": [
+      768,
+      256,
+      1152,
+      512
+    ],
+    "size": [
+      240,
+      160
+    ],
+    "sha256": "e6c13e9372156a8e682d3c46d42701ca092480e8b6365fcdf2c5dc4f97eea7c8"
+  }
+}

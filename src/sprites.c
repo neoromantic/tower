@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <zlib.h>
 
 /* ---------- Palette loading ---------- */
 static int load_palette(SpriteAtlas *atlas, NEResourceTable *exe)
@@ -379,9 +380,84 @@ int sprites_compose_v(SpriteAtlas *atlas, SDL_Renderer *renderer,
     return 0;
 }
 
+/* HD is loaded after legacy UI keys/composites, which never touch these pixels. */
+int sprites_load_hd(SpriteAtlas *atlas, SDL_Renderer *renderer, const char *path)
+{
+    gzFile file = gzopen(path, "rb");
+    if (!file) return -1;
+    unsigned header[3];
+    gzread(file, header, sizeof header);
+    atlas->page_count = header[0];
+    atlas->hd_scale = header[2];
+    atlas->pages = calloc(atlas->page_count, sizeof *atlas->pages);
+    for (int i = 0; i < atlas->page_count; i++) {
+        unsigned size[2];
+        gzread(file, size, sizeof size);
+        atlas->hd_bytes += size[0] * size[1] * 4;
+        SDL_Surface *surface = SDL_CreateRGBSurfaceWithFormat(0, size[0], size[1], 32, SDL_PIXELFORMAT_RGBA32);
+        gzread(file, surface->pixels, surface->pitch * surface->h);
+        atlas->pages[i] = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_SetTextureBlendMode(atlas->pages[i], SDL_BLENDMODE_BLEND);
+        SDL_SetTextureScaleMode(atlas->pages[i], SDL_ScaleModeLinear);
+        SDL_FreeSurface(surface);
+        if (!atlas->pages[i]) { gzclose(file); return -1; }
+    }
+    for (unsigned i = 0; i < header[1]; i++) {
+        unsigned record[2];
+        gzread(file, record, sizeof record);
+        Sprite *sprite = sprites_find(atlas, record[0]);
+        for (unsigned j = 0; j < record[1]; j++) {
+            SpriteRegion region;
+            gzread(file, &region, sizeof region);
+            if (sprite) {
+                if (j == 0) {
+                    sprite->region_count = record[1];
+                    sprite->regions = malloc(record[1] * sizeof region);
+                }
+                sprite->regions[j] = region;
+            }
+        }
+    }
+    gzclose(file);
+    return 0;
+}
+
+void sprites_copy(SDL_Renderer *renderer, SpriteAtlas *atlas, Sprite *sprite,
+                  const SDL_Rect *src, const SDL_Rect *dst)
+{
+    if (!sprite->region_count) {
+        SDL_RenderCopy(renderer, sprite->texture, src, dst);
+        return;
+    }
+    SDL_Rect source = {0, 0, sprite->w, sprite->h};
+    if (src) source = *src;
+    Uint8 r, g, b, a;
+    SDL_GetTextureColorMod(sprite->texture, &r, &g, &b);
+    SDL_GetTextureAlphaMod(sprite->texture, &a);
+    for (int i = 0; i < sprite->region_count; i++) {
+        SpriteRegion *region = &sprite->regions[i];
+        SDL_Rect cut;
+        if (!SDL_IntersectRect(&source, &region->logical, &cut)) continue;
+        SDL_Rect physical = {region->x + (cut.x - region->logical.x) * atlas->hd_scale,
+                             region->y + (cut.y - region->logical.y) * atlas->hd_scale,
+                             cut.w * atlas->hd_scale, cut.h * atlas->hd_scale};
+        SDL_FRect target = {dst->x + (cut.x - source.x) * (float)dst->w / source.w,
+                            dst->y + (cut.y - source.y) * (float)dst->h / source.h,
+                            cut.w * (float)dst->w / source.w,
+                            cut.h * (float)dst->h / source.h};
+        SDL_Texture *page = atlas->pages[region->page];
+        SDL_SetTextureColorMod(page, r, g, b);
+        SDL_SetTextureAlphaMod(page, a);
+        SDL_RenderCopyF(renderer, page, &physical, &target);
+    }
+}
+
 void sprites_free(SpriteAtlas *atlas)
 {
+    for (int i = 0; i < atlas->page_count; i++) SDL_DestroyTexture(atlas->pages[i]);
+    free(atlas->pages);
     for (int i = 0; i < atlas->count; i++) {
+        free(atlas->sprites[i].regions);
         if (atlas->sprites[i].texture)
             SDL_DestroyTexture(atlas->sprites[i].texture);
     }
