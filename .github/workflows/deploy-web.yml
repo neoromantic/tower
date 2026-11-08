@@ -25,6 +25,9 @@ jobs:
           path: .emsdk
           persist-credentials: false
       - run: .emsdk/emsdk install 7.0.0 && .emsdk/emsdk activate 7.0.0
+      - run: |
+          sed -i 's,https://github.com/libsdl-org/SDL/archive/{TAG}.zip,https://codeload.github.com/libsdl-org/SDL/zip/{TAG},' .emsdk/upstream/emscripten/tools/ports/sdl2.py
+          sed -i 's,https://github.com/libsdl-org/SDL_ttf/archive/{TAG}.zip,https://codeload.github.com/libsdl-org/SDL_ttf/zip/{TAG},' .emsdk/upstream/emscripten/tools/ports/sdl2_ttf.py
       - uses: oven-sh/setup-bun@v2
       - uses: astral-sh/setup-uv@v7
       - run: bun install --frozen-lockfile
