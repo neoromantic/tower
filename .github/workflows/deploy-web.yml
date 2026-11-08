@@ -18,13 +18,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: emscripten-core/setup-emsdk@v14
+      - uses: actions/checkout@v4
         with:
-          version: 6.0.6   # match the Pi's emsdk — same wasm we've been testing
+          repository: emscripten-core/emsdk
+          ref: 7.0.0
+          path: .emsdk
+          persist-credentials: false
+      - run: .emsdk/emsdk install 7.0.0 && .emsdk/emsdk activate 7.0.0
       - uses: oven-sh/setup-bun@v2
       - uses: astral-sh/setup-uv@v7
       - run: bun install --frozen-lockfile
-      - run: make web
+      - run: source .emsdk/emsdk_env.sh && make web
       - uses: actions/upload-artifact@v4
         with:
           name: tower-web
