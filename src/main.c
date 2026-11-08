@@ -569,6 +569,11 @@ static int web_visual, web_ghost, web_end_floor, web_end_cell;
 static int web_ghost_x, web_ghost_floor, web_ghost_width, web_ghost_height, web_ghost_valid, web_ghost_count;
 static long web_ghost_cost;
 static char web_ghost_reason[160];
+static Tower web_before, web_plan;
+static int web_type, web_start_floor, web_start_cell, web_add_car, web_car_shaft, web_car_count;
+static int web_skipped_count;
+static struct { int x, floor; long cost; } web_ops[TOWER_WIDTH+TOWER_FLOOR_COUNT];
+static struct { int x, floor; char reason[160]; } web_skipped[TOWER_WIDTH+TOWER_FLOOR_COUNT];
 EM_JS(void, web_sound, (int id), { window.ctSound(id); });
 EM_JS(void, web_sound_loop, (int id, int on), { window.ctSoundLoop(id, on); });
 #endif
@@ -3865,12 +3870,9 @@ static void render_shaft(ElevatorShaft *s)
              * against the exposed building (Jonah 2026-08-07,
              * byte-verified). The old `if (s->hidden) continue` here
              * wrongly hid them. */
-            float truef = (float)index_to_floor(c->floor);
-            if (c->target != c->floor && c->move_total) {
-                float prog = (float)(c->move_total - c->move_timer) /
-                             (float)c->move_total;
-                truef += c->dir ? prog : -prog;
-            }
+            double position; int stride;
+            people_car_motion(s,c,&stride,&position);
+            float truef=(float)(position+TOWER_MIN_FLOOR);
             float *pv = &car_prev[si][ci], *cu = &car_cur[si][ci];
             if (car_tick[si][ci] != game.sim.frame + 1) {
                 /* new sim tick for this car: shift the history. Stored
@@ -8903,6 +8905,9 @@ static int do_load_game(void)
      * overwrites it — exiting afterwards would smear a stale snapshot
      * over the freshly loaded state. */
     elv_edit_exit();
+#ifdef __EMSCRIPTEN__
+    web_ghost = 0;
+#endif
     audio_stop_all();   /* the outgoing world's sounds stop with it */
     if (game_load(&game.sim, &game.tower, save_path()) == 0) {
         game.elv_open = 0;          /* dialog target may be gone */
@@ -9033,6 +9038,9 @@ static void execute_menu_item(const MenuItem *item)
         /* The old tower's sounds stop with it (pending queue dies with the
          * sim memset; this kills the already-ringing voices too). */
         audio_stop_all();
+#ifdef __EMSCRIPTEN__
+        web_ghost = 0;
+#endif
         tower_init(&game.tower);
         game_init(&game.sim);
         add_event_message("New tower started.");
@@ -10768,6 +10776,7 @@ void ct_set_zoom_at(double zoom, double x, double y)
 EMSCRIPTEN_KEEPALIVE
 void ct_cancel_preview(void)
 {
+    web_ghost = 0;
     game.preview_count = game.preview_valid = game.preview_add_car = 0;
     game.dragging = game.cap_drag = 0;
 }

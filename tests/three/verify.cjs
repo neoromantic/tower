@@ -1,6 +1,7 @@
-/* Drive an isolated installed ordinary Chrome; server: make web + port 8620. */
+/* Drive isolated installed ordinary Chrome: node tests/three/verify.cjs URL. */
 const {execFileSync}=require('node:child_process');
 const fs=require('node:fs');
+const url=process.argv[2];
 const session='tower-three-proof-'+process.pid;
 const results=[];
 const browser=(...args)=>execFileSync('agent-browser',['--session',session,'--engine','chrome','--headed','false',...args],{encoding:'utf8',maxBuffer:2**20}).trim();
@@ -9,15 +10,15 @@ const assert=(condition,label)=>{if(!condition)throw new Error(label);results.pu
 const world=()=>evaluate('JSON.parse(Module.ccall("ct_world_state","string",[],[]))');
 const command=(action,floor,cell,endFloor=floor,endCell=cell)=>evaluate(`Module.ccall('ct_world_command','number',['string','number','number','number','number'],${JSON.stringify([action,floor,cell,endFloor,endCell])})`);
 const ui=(action,value,text='')=>evaluate(`Module.ccall('ct_ui_action','number',['string','number','string'],${JSON.stringify([action,value,text])})`);
-const tool=id=>evaluate(`Module.ccall('ct_tool',null,['number'],[${id}])`);
+const tool=id=>evaluate(`(()=>{selectTool(${id});return true})()`);
 (async()=>{
-  browser('open','http://localhost:8620/');
+  browser('open',url);
   for(let i=0;i<80;i++){if(evaluate('Boolean(Module.engineReady && !startBtn.disabled)'))break;await new Promise(r=>setTimeout(r,250));}
   evaluate('(()=>{document.getElementById("sandbox").checked=true;startBtn.click();return true})()');
   await new Promise(r=>setTimeout(r,500));
   assert(evaluate('JSON.parse(Module.ccall("ct_panel_state","string",[],[])).catalog.every(item=>item.enabled)'),'Sandbox starts with all 25 tools unlocked');
   assert(evaluate('(async()=>{return await saveTower()})()'),'Empty tower saves successfully');
-  browser('open','http://localhost:8620/');
+  browser('open',url);
   for(let i=0;i<80;i++){if(evaluate('Boolean(Module.engineReady && playing)'))break;await new Promise(r=>setTimeout(r,250));}
   assert(world().rooms.length===0 && evaluate('JSON.parse(Module.ccall("ct_ui_state","string",[],[])).saveBlocked===0 && JSON.parse(Module.ccall("ct_panel_state","string",[],[])).panels.length===0'),'Empty tower reloads without incompatible-save notice or blocked autosave');
   ui('menu',500);
@@ -25,10 +26,10 @@ const tool=id=>evaluate(`Module.ccall('ct_tool',null,['number'],[${id}])`);
   const before=evaluate('Module.ccall("ct_ui_state","string",[],[])');
   command('preview',0,148,0,220);
   const preview=world().ghost;
-  assert(preview.valid && preview.width>4 && preview.count>1 && preview.cost>0,'Full row preview reports geometry/count/cost');
+  assert(preview.valid && preview.rects.length>0 && preview.count>1 && preview.cost>0,'Exact construction plan reports rectangles/count/cost');
   assert(before===evaluate('Module.ccall("ct_ui_state","string",[],[])'),'Preview leaves live HUD state unchanged');
   assert(command('drag',0,148,0,220)===1,'Previewed lobby row commits');
-  tool(3);assert(command('drag',2,160,2,195)===1,'Office row builds on chosen upper lobby');
+  tool(3);command('preview',2,160,2,195);assert(command('drag',2,160,2,195)===1,'Previewed office row builds on chosen upper lobby');
   const id=world().rooms.find(room=>room.type===3).id;
   tool(-2);command('inspect',2,160);
   assert(evaluate('JSON.parse(Module.ccall("ct_panel_state","string",[],[])).panels.some(p=>p.kind==="inspect")'),'Tenant inspection is structured DOM panel');
@@ -49,7 +50,7 @@ const tool=id=>evaluate(`Module.ccall('ct_tool',null,['number'],[${id}])`);
   browser('screenshot','/tmp/tower-three-proof-mobile.png');
   assert(browser('errors')==='','No browser errors');
   await evaluate('(async()=>{const registration=await navigator.serviceWorker.ready;return registration.active.state})()');
-  browser('set','offline','on');browser('open','http://localhost:8620/');
+  browser('set','offline','on');browser('open',url);
   for(let i=0;i<80;i++){if(evaluate('Boolean(Module.engineReady && playing)'))break;await new Promise(r=>setTimeout(r,250));}
   assert(evaluate('JSON.parse(Module.ccall("ct_world_state","string",[],[])).rooms.some(room=>room.type===3 && room.rent===2)'),'Offline reload restores saved room and rent');
   assert(await evaluate('(async()=>{await ctView.style(3);return !navigator.onLine})()'),'Full-resolution style switches offline');

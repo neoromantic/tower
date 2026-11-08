@@ -18,6 +18,7 @@ let panelSignature = '';
 let topPanel;
 let placement = null;
 let placing = false;
+let panning = false;
 let shaftEditing = false;
 let gesture = false;
 let pinching = false;
@@ -32,9 +33,12 @@ function selectTool(value) {
   Module.ccall('ct_ui_action', 'number', ['string', 'number', 'string'], ['build-loop', 0, '']);
   placement = null;
   placing = false;
+  panning = false;
   shaftEditing = false;
   document.getElementById('shaftbtn').setAttribute('aria-pressed', 'false');
-  document.getElementById('normaltools').hidden = false;
+  document.getElementById('toolhint').hidden = false;
+  document.getElementById('buildimage').hidden = true;
+  document.getElementById('buildlabel').textContent = '＋ Build';
   document.getElementById('placement').hidden = true;
   Module.ccall('ct_world_command', 'number', ['string', 'number', 'number', 'number', 'number'], ['preview-clear', 0, 0, 0, 0]);
   Module.ccall('ct_tool', null, ['number'], [value]);
@@ -43,10 +47,13 @@ function selectTool(value) {
   document.getElementById('buildbtn').setAttribute('aria-pressed', String(tool > 0));
   if (tool > 0) {
     placing = true;
-    document.getElementById('normaltools').hidden = true;
+    document.getElementById('toolhint').hidden = true;
+    document.getElementById('buildimage').hidden = false;
+    document.getElementById('buildimage').src = 'art/catalog/' + styleNames[Number(style.value)] + '/' + tool + '.png';
     document.getElementById('placement').hidden = false;
     document.getElementById('placementname').textContent = panelState.catalog.find(item => item.id === tool).label;
-    document.getElementById('placementhint').textContent = 'Tap or drag to position';
+    document.getElementById('buildlabel').textContent = document.getElementById('placementname').textContent;
+    document.getElementById('placementhint').textContent = 'Tap or drag to plan · Pan moves the view';
     document.getElementById('placebtn').disabled = true;
   }
   document.getElementById('toolhint').textContent = 'Tap a room to use it; drag to explore';
@@ -87,7 +94,7 @@ function ctStartShell() {
   ctView.start();
   ctView.resize();
   changeZoom(Number(zoom.value));
-  selectTool(-3);
+  selectTool(-2);
   refreshPanels();
   saveTower();
 }
@@ -113,6 +120,7 @@ function renderCatalog() {
   document.getElementById('catalogitems').replaceChildren(...panelState.catalog.filter(item => item.label.toLowerCase().includes(search)).map(item => {
     const button = document.createElement('button');
     button.className = 'buildingcard';
+    button.setAttribute('aria-pressed', String(item.id === tool));
     button.disabled = !item.enabled;
     const image = document.createElement('img');
     image.src = 'art/catalog/' + styleNames[Number(style.value)] + '/' + item.id + '.png';
@@ -138,34 +146,22 @@ function renderCatalog() {
 function refreshPanels() {
   panelState = JSON.parse(Module.ccall('ct_panel_state', 'string', [], []));
   if (modalState) return;
-  let signature = JSON.stringify([panelState.panels, panelState.history]);
-  let mapSnapshot;
-  if (panelState.panels.length && panelState.panels[panelState.panels.length - 1].kind === 'map') {
-    mapSnapshot = JSON.parse(Module.ccall('ct_world_state', 'string', [], []));
-    signature += JSON.stringify([mapSnapshot.floors, mapSnapshot.rooms.map(room => [room.x, room.floor, room.width, room.height, room.type]), mapSnapshot.camera]);
-  }
-  if (signature === panelSignature) return;
-  if (panels.contains(document.activeElement) && document.activeElement.matches('input')) return;
-  panelSignature = signature;
-  if (!panelState.panels.length) { panels.close(); topPanel = null; return; }
-  topPanel = panelState.panels[panelState.panels.length - 1];
-  document.getElementById('paneltitle').textContent = topPanel.title;
-  document.getElementById('panelclose').hidden = !topPanel.dismissible;
-  const content = document.getElementById('panelcontent');
-  const focusedAction = document.activeElement.dataset.action;
-  const focusedValue = document.activeElement.dataset.value;
-  content.replaceChildren();
-  if (topPanel.kind === 'map') {
-    const snapshot = mapSnapshot;
-    const low = Math.min(-72, ...snapshot.rooms.map(room => (room.floor - 1) * 36));
-    const high = Math.max(180, ...snapshot.rooms.map(room => (room.floor + room.height - 1) * 36));
-    const width = snapshot.bounds.width * 8;
-    const button = document.createElement('button');
-    button.className = 'towermap';
-    button.setAttribute('aria-label', 'Tower overview. Tap a location to move the camera; Enter centers the tower.');
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('viewBox', '0 ' + -high + ' ' + width + ' ' + (high - low));
-    svg.setAttribute('preserveAspectRatio', 'none');
+  const signature = JSON.stringify([panelState.panels, panelState.history]);
+  const mapPanel = panelState.panels.length > 0 && panelState.panels[panelState.panels.length - 1].kind === 'map';
+  const mapView = document.getElementById('minimapview');
+  if (!mapPanel) document.getElementById('minimap').append(mapView);
+  if (document.getElementById('minimap').open || mapPanel) {
+    const snapshot = JSON.parse(Module.ccall('ct_world_state', 'string', [], []));
+    const low = Math.min(-72, ...snapshot.floors.map(floor => (floor.floor - 1) * 36), ...snapshot.rooms.map(room => (room.floor - 1) * 36), ...snapshot.shafts.map(shaft => (shaft.lo - 1) * 36));
+    const high = Math.max(180, ...snapshot.floors.map(floor => floor.floor * 36), ...snapshot.rooms.map(room => (room.floor + room.height - 1) * 36), ...snapshot.shafts.map(shaft => shaft.hi * 36));
+    const left = Math.min(snapshot.bounds.width * 4 - 80, ...snapshot.floors.map(floor => floor.start * 8), ...snapshot.rooms.map(room => room.x * 8), ...snapshot.shafts.map(shaft => shaft.x * 8)) - 16;
+    const right = Math.max(snapshot.bounds.width * 4 + 80, ...snapshot.floors.map(floor => floor.end * 8), ...snapshot.rooms.map(room => (room.x + room.width) * 8), ...snapshot.shafts.map(shaft => (shaft.x + shaft.width) * 8)) + 16;
+    const width = right - left;
+    const button = mapView.firstElementChild;
+    const svg = button.firstElementChild;
+    svg.replaceChildren();
+    svg.setAttribute('viewBox', left + ' ' + -high + ' ' + width + ' ' + (high - low));
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     svg.setAttribute('aria-hidden', 'true');
     for (const floor of snapshot.floors) {
       const rect = document.createElementNS(svg.namespaceURI, 'rect');
@@ -185,31 +181,83 @@ function refreshPanels() {
       rect.setAttribute('fill', 'hsl(' + room.type * 37 % 360 + ' 40% 65%)');
       svg.append(rect);
     }
+    for (const shaft of snapshot.shafts) {
+      const rect = document.createElementNS(svg.namespaceURI, 'rect');
+      rect.setAttribute('x', shaft.x * 8);
+      rect.setAttribute('y', -shaft.hi * 36);
+      rect.setAttribute('width', shaft.width * 8);
+      rect.setAttribute('height', (shaft.hi - shaft.lo + 1) * 36);
+      rect.setAttribute('fill', '#142b30');
+      rect.setAttribute('stroke', '#8acdb9');
+      rect.setAttribute('stroke-width', '1');
+      rect.setAttribute('vector-effect', 'non-scaling-stroke');
+      svg.append(rect);
+    }
+    for (const cabin of snapshot.cabins) {
+      const rect = document.createElementNS(svg.namespaceURI, 'rect');
+      rect.setAttribute('x', cabin.x);
+      rect.setAttribute('y', -cabin.y - cabin.height);
+      rect.setAttribute('width', cabin.width);
+      rect.setAttribute('height', cabin.height);
+      rect.setAttribute('fill', '#f0ebdf');
+      if (cabin.occupancy > 0) rect.setAttribute('fill', '#e8bd78');
+      rect.setAttribute('stroke', '#f0ebdf');
+      rect.setAttribute('stroke-width', '2');
+      rect.setAttribute('vector-effect', 'non-scaling-stroke');
+      const title = document.createElementNS(svg.namespaceURI, 'title');
+      title.textContent = cabin.occupancy + '/' + cabin.capacity + ' passengers';
+      rect.append(title);
+      svg.append(rect);
+    }
+    const ground = document.createElementNS(svg.namespaceURI, 'path');
+    ground.setAttribute('d', 'M' + left + ',36 H' + right);
+    ground.setAttribute('stroke', '#c7d5cc');
+    ground.setAttribute('vector-effect', 'non-scaling-stroke');
+    svg.append(ground);
     const viewport = document.createElementNS(svg.namespaceURI, 'rect');
-    viewport.setAttribute('x', snapshot.camera.x - canvas.clientWidth / snapshot.camera.zoom / 2);
-    viewport.setAttribute('y', -snapshot.camera.y - canvas.clientHeight / snapshot.camera.zoom / 2);
-    viewport.setAttribute('width', canvas.clientWidth / snapshot.camera.zoom);
-    viewport.setAttribute('height', canvas.clientHeight / snapshot.camera.zoom);
+    const viewX = Math.max(left, snapshot.camera.x - canvas.clientWidth / snapshot.camera.zoom / 2);
+    const viewY = Math.max(-high, -snapshot.camera.y - canvas.clientHeight / snapshot.camera.zoom / 2);
+    viewport.setAttribute('x', viewX);
+    viewport.setAttribute('y', viewY);
+    viewport.setAttribute('width', Math.max(0, Math.min(right, snapshot.camera.x + canvas.clientWidth / snapshot.camera.zoom / 2) - viewX));
+    viewport.setAttribute('height', Math.max(0, Math.min(-low, -snapshot.camera.y + canvas.clientHeight / snapshot.camera.zoom / 2) - viewY));
     viewport.setAttribute('fill', 'none');
-    viewport.setAttribute('stroke', '#fff3ce');
+    viewport.setAttribute('stroke', '#a6bbec');
+    viewport.setAttribute('stroke-dasharray', '4 2');
     viewport.setAttribute('stroke-width', '2');
     viewport.setAttribute('vector-effect', 'non-scaling-stroke');
     svg.append(viewport);
-    button.append(svg);
+    button.onpointerdown = event => {
+      button.focus();
+      button.setPointerCapture(event.pointerId);
+      button.onclick(event);
+    };
+    button.onpointermove = event => { if (event.buttons === 1) button.onclick(event); };
     button.onclick = event => {
-      let x = width / 2;
+      let x = (left + right) / 2;
       let y = (high + low) / 2;
-      if (event.detail > 0) {
+      if (event.detail > 0 || event.type !== 'click') {
         const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(svg.getScreenCTM().inverse());
         x = point.x;
         y = -point.y;
       }
       const camera = JSON.parse(Module.ccall('ct_world_state', 'string', [], [])).camera;
       ctView.pan((camera.x - x) * camera.zoom, (y - camera.y) * camera.zoom);
-      uiAction('close', 0, topPanel.kind);
+      if (mapPanel && event.type === 'click') uiAction('close', 0, 'map');
     };
-    content.append(button);
   }
+  if (signature === panelSignature) return;
+  if (panels.contains(document.activeElement) && document.activeElement.matches('input')) return;
+  panelSignature = signature;
+  if (!panelState.panels.length) { panels.close(); topPanel = null; return; }
+  topPanel = panelState.panels[panelState.panels.length - 1];
+  document.getElementById('paneltitle').textContent = topPanel.title;
+  document.getElementById('panelclose').hidden = !topPanel.dismissible;
+  const content = document.getElementById('panelcontent');
+  const focusedAction = document.activeElement.dataset.action;
+  const focusedValue = document.activeElement.dataset.value;
+  content.replaceChildren();
+  if (mapPanel) content.append(mapView);
   if (topPanel.kind === 'analytics') {
     const series = panelState.history;
     if (!series.length) {
@@ -326,6 +374,7 @@ function refreshPanels() {
     if (button.dataset.action === focusedAction && button.dataset.value === focusedValue) button.focus();
   }
   catalog.close();
+  document.getElementById('tools').close();
   gameMenus.close();
   settings.close();
   if (!panels.open) panels.showModal();
@@ -338,10 +387,11 @@ panels.addEventListener('cancel', event => {
 document.getElementById('placebtn').onclick = () => {
   const [action, floor, cell, endFloor, endCell] = placement;
   const result = Module.ccall('ct_world_command', 'number', ['string', 'number', 'number', 'number', 'number'], [action, floor, cell, endFloor, endCell]);
-  document.getElementById('placementhint').textContent = 'Cannot build here — try another spot';
+  const ghost = JSON.parse(Module.ccall('ct_world_state', 'string', [], [])).ghost;
+  document.getElementById('placementhint').textContent = ghost.reason;
+  document.getElementById('placebtn').disabled = true;
   if (result) {
-    document.getElementById('placementhint').textContent = 'Built · tap to position another';
-    document.getElementById('placebtn').disabled = true;
+    document.getElementById('placementhint').textContent = 'Built · tap or drag to plan another';
     placement = null;
     Module.ccall('ct_world_command', 'number', ['string', 'number', 'number', 'number', 'number'], ['preview-clear', 0, 0, 0, 0]);
   }
@@ -349,6 +399,7 @@ document.getElementById('placebtn').onclick = () => {
 };
 document.getElementById('cancelplacebtn').onclick = () => selectTool(-3);
 document.getElementById('shaftbtn').onclick = () => {
+  document.getElementById('tools').close();
   selectTool(0);
   shaftEditing = true;
   document.getElementById('shaftbtn').setAttribute('aria-pressed', 'true');
@@ -357,7 +408,23 @@ document.getElementById('shaftbtn').onclick = () => {
 };
 document.getElementById('catalogsearch').oninput = renderCatalog;
 document.getElementById('buildbtn').onclick = () => { refreshPanels(); renderCatalog(); catalog.showModal(); };
-document.querySelectorAll('[data-tool]').forEach(button => { button.onclick = () => selectTool(Number(button.dataset.tool)); });
+document.getElementById('toolsbtn').onclick = () => document.getElementById('tools').showModal();
+document.querySelectorAll('[data-tool]').forEach(button => { button.onclick = () => {
+  document.getElementById('tools').close();
+  if (placing && Number(button.dataset.tool) === -3) {
+    panning = !panning;
+    button.setAttribute('aria-pressed', String(panning));
+    canvas.focus();
+    return;
+  }
+  selectTool(Number(button.dataset.tool));
+  canvas.focus();
+}; });
+document.getElementById('quickspeed').onclick = () => {
+  const speed = document.getElementById('speed');
+  speed.value = String((Number(speed.value) + 1) % 3);
+  speed.dispatchEvent(new Event('change'));
+};
 document.getElementById('speed').onchange = event => Module.ccall('ct_control', null, ['number'], [Number(event.target.value)]);
 document.getElementById('savebtn').onclick = saveTower;
 document.getElementById('menubtn').onclick = () => {
@@ -408,6 +475,7 @@ style.onchange = async () => {
   await ctView.style(Number(style.value));
   localStorage.setItem('ct-style', style.value);
   style.disabled = false;
+  if (placing) document.getElementById('buildimage').src = 'art/catalog/' + styleNames[Number(style.value)] + '/' + tool + '.png';
 };
 zoom.oninput = () => changeZoom(Number(zoom.value));
 uiScale.oninput = () => {
@@ -447,7 +515,7 @@ canvas.addEventListener('pointerdown', event => {
     pinchDistance = Math.hypot(a.x - b.x, a.y - b.y);
     placement = null;
     document.getElementById('placebtn').disabled = true;
-    document.getElementById('placementhint').textContent = 'Tap or drag to position';
+    document.getElementById('placementhint').textContent = 'Tap or drag to plan · Pan moves the view';
     Module.ccall('ct_world_command', 'number', ['string', 'number', 'number', 'number', 'number'], ['preview-clear', 0, 0, 0, 0]);
   }
 });
@@ -457,7 +525,7 @@ canvas.addEventListener('pointermove', event => {
   const previous = pointers.get(event.pointerId);
   if (!previous) {
     if (placement) return;
-    if (tool > 0) Module.ccall('ct_world_command', 'number', ['string', 'number', 'number', 'number', 'number'], ['preview', pick.floor, pick.cell, pick.floor, pick.cell]);
+    if (tool > 0 && !panning) Module.ccall('ct_world_command', 'number', ['string', 'number', 'number', 'number', 'number'], ['preview', pick.floor, pick.cell, pick.floor, pick.cell]);
     return;
   }
   const dx = event.clientX - previous.x;
@@ -472,8 +540,8 @@ canvas.addEventListener('pointermove', event => {
     ctView.pan(dx / 2, dy / 2);
   } else {
     if (Math.hypot(previous.x - previous.startX, previous.y - previous.startY) > 8) gesture = true;
-    if (gesture && tool <= 0 && !shaftEditing) ctView.pan(dx, dy);
-    if (tool > 0) {
+    if (gesture && (panning || (tool <= 0 && !shaftEditing))) ctView.pan(dx, dy);
+    if (tool > 0 && !panning) {
       Module.ccall('ct_world_command', 'number', ['string', 'number', 'number', 'number', 'number'], ['preview', previous.pick.floor, previous.pick.cell, pick.floor, pick.cell]);
       Module.ccall('ct_ui_action', 'number', ['string', 'number', 'string'], ['build-loop', Number(gesture), '']);
     }
@@ -484,7 +552,7 @@ canvas.addEventListener('pointerup', async event => {
   Module.ccall('ct_ui_action', 'number', ['string', 'number', 'string'], ['build-loop', 0, '']);
   const start = pointers.get(event.pointerId);
   pointers.delete(event.pointerId);
-  if (pinching) return;
+  if (pinching || panning) return;
   if (tool === -3) return;
   if (gesture && tool <= 0 && !shaftEditing) return;
   const pick = ctView.pick(event.clientX, event.clientY);
@@ -501,14 +569,19 @@ canvas.addEventListener('pointerup', async event => {
     action = 'delete';
   }
   if (placing) {
+    if (!gesture) { pick.floor = start.pick.floor; pick.cell = start.pick.cell; }
     action = 'place';
     if (gesture) action = 'drag';
     placement = [action, start.pick.floor, start.pick.cell, pick.floor, pick.cell];
     Module.ccall('ct_world_command', 'number', ['string', 'number', 'number', 'number', 'number'], ['preview', start.pick.floor, start.pick.cell, pick.floor, pick.cell]);
     const ghost = JSON.parse(Module.ccall('ct_world_state', 'string', [], [])).ghost;
     document.getElementById('placebtn').disabled = !ghost.valid;
-    document.getElementById('placementhint').textContent = ghost.reason;
-    if (ghost.valid) document.getElementById('placementhint').textContent = fmtMoney(ghost.cost) + ' · ' + ghost.count + ' to build · adjust or Place';
+    const funds = JSON.parse(Module.ccall('ct_ui_state', 'string', [], [])).money;
+    let operation = ' to build';
+    if (ghost.operation === 'add-car') operation = ' car to add';
+    document.getElementById('placementhint').textContent = fmtMoney(ghost.cost) + ' · ' + ghost.count + operation + ' · ' + ghost.skipped.length + ' skipped · Funds ' + fmtMoney(funds);
+    if (ghost.reason) document.getElementById('placementhint').textContent += ' · ' + ghost.reason;
+    document.getElementById('placementhint').title = ghost.skipped.map(skip => skip.reason).join('\n');
     ctView.selection(pick);
     return;
   }
@@ -521,6 +594,7 @@ canvas.addEventListener('pointercancel', event => {
   pointers.delete(event.pointerId);
   pinching = true;
   placement = null;
+  document.getElementById('placementhint').textContent = 'Tap or drag to plan · Pan moves the view';
   document.getElementById('placebtn').disabled = true;
   Module.ccall('ct_world_command', 'number', ['string', 'number', 'number', 'number', 'number'], ['preview-clear', 0, 0, 0, 0]);
 });
@@ -539,6 +613,9 @@ setInterval(() => {
   const state = JSON.parse(Module.ccall('ct_ui_state', 'string', [], []));
   if (tool !== state.currentTool) selectTool(state.currentTool);
   document.getElementById('speed').value = String(state.speed);
+  document.getElementById('quickspeed').textContent = ['Ⅱ', '▷', '▷▷'][state.speed];
+  document.getElementById('quickspeed').setAttribute('aria-label', 'Simulation speed: ' + ['Paused', 'Normal', 'Fast'][state.speed] + '. Tap to change');
+  document.getElementById('quickspeed').title = ['Paused', 'Normal speed', 'Fast speed'][state.speed] + ' · tap to change';
   document.getElementById('towerstats').textContent = fmtMoney(state.money) + ' · ' + starsTxt(state.stars) + ' · ' + state.population + ' people · Day ' + (state.day + 1) + ' ' + String(state.hour).padStart(2, '0') + ':' + String(state.minute).padStart(2, '0');
   if (state.saveBlocked) saveState.textContent = 'Saving blocked — export a backup';
   refreshPanels();
@@ -590,7 +667,7 @@ modalEl.addEventListener('keydown', event => {
     controls[(index + controls.length) % controls.length].focus();
   }
 });
-for (const dialog of [settings, modalEl, catalog, gameMenus, panels]) {
+for (const dialog of [settings, modalEl, catalog, gameMenus, panels, document.getElementById('tools')]) {
   for (const type of ['keydown', 'keyup']) dialog.addEventListener(type, event => event.stopPropagation());
 }
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(error => console.warn('Offline setup failed', error));

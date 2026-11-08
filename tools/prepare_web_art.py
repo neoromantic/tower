@@ -18,6 +18,7 @@ for style in ['schematic', 'modern-pixel', 'warm-dollhouse', 'miniature-3d']:
         if style == 'miniature-3d' and category == 'rooms':
             bands = [0, 144, 284, 416, 545, 678, 796, 906, 1024]
         sprites = []
+        frames = []
         for index in range(columns * rows):
             column, row = index % columns, index // columns
             box = [column * plate.width // columns, bands[row], (column + 1) * plate.width // columns, bands[row + 1]]
@@ -28,11 +29,36 @@ for style in ['schematic', 'modern-pixel', 'warm-dollhouse', 'miniature-3d']:
                     if min(sprite.getpixel(corner)[:3]) > 220:
                         ImageDraw.floodfill(sprite, corner, (255, 255, 255, 0), thresh=50)
                 bounds = sprite.getbbox()
-                if bounds:
+                if bounds and category != 'people' and not (category == 'transport' and index < 4):
                     sprite = sprite.crop(bounds)
+            frames.append(sprite)
+        # Preserve source registration across every pose and empty/loaded cabin.
+        registered = frames
+        if category == 'transport':
+            registered = frames[:4]
+        if category in ['people', 'transport']:
+            bounds = [frame.getbbox() for frame in registered]
+            union = (min(b[0] for b in bounds), min(b[1] for b in bounds),
+                     max(b[2] for b in bounds), max(b[3] for b in bounds))
+            for index in range(len(registered)):
+                frames[index] = frames[index].crop(union)
+        for index, sprite in enumerate(frames):
+            column, row = index % columns, index // columns
+            box = [column * plate.width // columns, bands[row], (column + 1) * plate.width // columns, bands[row + 1]]
+            if category == 'people':
+                # Source poses vary slightly in vertical placement; register feet.
+                aligned = Image.new('RGBA', sprite.size)
+                aligned.paste(sprite, (0, sprite.height - sprite.getbbox()[3]))
+                sprite = aligned
             name = f'{category}-{index}.png'
             sprite.save(destination / name, optimize=True)
-            sprites.append({'file': name, 'width': sprite.width, 'height': sprite.height, 'crop': box})
+            entry = {'file': name, 'width': sprite.width, 'height': sprite.height, 'crop': box}
+            if category == 'people':
+                silhouette = Image.new('RGBA', sprite.size, 'white')
+                silhouette.putalpha(sprite.getchannel('A'))
+                entry['silhouette'] = f'people-silhouette-{index}.png'
+                silhouette.save(destination / entry['silhouette'], optimize=True)
+            sprites.append(entry)
         manifest[category] = {'sha256': hashlib.sha256(source.read_bytes()).hexdigest(), 'sprites': sprites}
     # Same source crops power the build catalogue; use the full-resolution originals.
     catalogue = root / 'web/dist/art/catalog' / style

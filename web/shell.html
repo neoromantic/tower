@@ -44,15 +44,17 @@
   </div>
   <main id="canvaswrap" hidden>
     <header id="hud"><strong>Tower</strong><output id="towerstats"></output><button id="menubtn">Game</button><button id="settingsbtn">Settings</button></header>
-    <div id="world"><canvas id="canvas" tabindex="0" aria-label="Tower world. Tap to use tool; drag to pan; pinch to zoom."></canvas></div>
+    <div id="world"><canvas id="canvas" tabindex="0" aria-label="Tower world. Tap to inspect, drag to pan. In Build mode, tap or drag to plan; use Pan to move. Pinch to zoom."></canvas></div>
     <nav id="toolbar" aria-label="Tower tools">
-      <div class="toolrow" id="normaltools"><button id="buildbtn" aria-pressed="false">Build</button><button data-tool="0" aria-pressed="false">Use</button><button data-tool="-2" aria-pressed="false">Inspect</button><button data-tool="-1" aria-pressed="false">Bulldoze</button><button data-tool="-3" aria-pressed="true">Pan</button><button id="shaftbtn" aria-pressed="false">Edit shaft</button><output id="toolhint">Drag to explore your tower</output></div>
-      <div class="toolrow" id="placement" hidden><strong id="placementname"></strong><output id="placementhint" role="status">Tap or drag to position</output><button id="placebtn" disabled>Place</button><button id="cancelplacebtn">Cancel</button></div>
-      <div class="toolrow"><label>Speed <select id="speed"><option value="0">Paused</option><option value="1" selected>Normal</option><option value="2">Fast</option></select></label><button id="savebtn">Save</button><output id="savestate" role="status">Not saved yet</output></div>
+      <div class="toolrow" id="normaltools"><button id="buildbtn" aria-pressed="false" title="Choose a building"><img id="buildimage" alt="" hidden><span id="buildlabel">＋ Build</span></button><button data-tool="-2" aria-pressed="true">Inspect</button><button id="panbtn" data-tool="-3" aria-pressed="false">Pan</button><button id="quickspeed" aria-label="Simulation speed: Normal. Tap to change" title="Normal speed · tap to change">▷</button><button id="toolsbtn" aria-label="More tower tools">•••</button></div>
+      <div class="toolrow" id="placement" hidden><strong id="placementname"></strong><output id="placementhint" role="status">Tap or drag to plan · Pan moves the view</output><button id="cancelplacebtn">Cancel</button><button id="placebtn" disabled>Build</button></div>
+      <output id="toolhint">Tap to inspect · drag to explore · pinch to zoom</output>
     </nav>
+    <details id="minimap" open><summary>Map</summary><div id="minimapview"><button class="towermap" aria-label="Tower overview. Tap or drag to move the camera; Enter centers the tower."><svg aria-hidden="true"></svg></button></div></details>
     <details id="events"><summary>Events</summary><ol id="eventlist"></ol></details>
   </main>
   <canvas id="engine-canvas" hidden tabindex="-1" aria-hidden="true"></canvas>
+  <dialog id="tools" aria-labelledby="toolstitle"><form method="dialog" class="dialoghead"><h2 id="toolstitle">Tower tools</h2><button>Done</button></form><div class="toolrow"><button data-tool="0" aria-pressed="false">Use room</button><button data-tool="-1" aria-pressed="false">Bulldoze</button><button id="shaftbtn" aria-pressed="false">Edit shaft</button></div><div class="toolrow"><label>Speed <select id="speed"><option value="0">Paused</option><option value="1" selected>Normal</option><option value="2">Fast</option></select></label><button id="savebtn">Save</button><output id="savestate" role="status">Not saved yet</output></div></dialog>
   <dialog id="catalog" aria-labelledby="catalogtitle"><form method="dialog" class="dialoghead"><h2 id="catalogtitle">Build your tower</h2><button>Done</button></form><label>Find a building <input id="catalogsearch" type="search" placeholder="Rooms, transport, services…"></label><div id="catalogitems"></div></dialog>
   <dialog id="gamemenus" aria-labelledby="menutitle"><form method="dialog" class="dialoghead"><h2 id="menutitle">Tower</h2><button>Done</button></form><div id="menuitems"></div></dialog>
   <dialog id="panels" aria-labelledby="paneltitle"><div class="dialoghead"><h2 id="paneltitle"></h2><button id="panelclose" aria-label="Close panel">Close</button></div><div id="panelcontent"></div></dialog>

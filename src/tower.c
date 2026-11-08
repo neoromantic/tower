@@ -463,7 +463,7 @@ int tower_can_place(Tower *tower, ItemType type, int floor, int x)
      * item cost alone unaffordable -> msg #7; item + deck (TerrainCost
      * for footprint cells outside each floor's extent) -> msg #8. An
      * elevator segment extending an existing column has no item cost. */
-    {
+    if (type != ITEM_LOBBY) {
         long icost = cost;
         if (item_is_elevator(type) &&
             elevator_extends_column(tower, type, floor, x))
@@ -490,30 +490,27 @@ int tower_can_place(Tower *tower, ItemType type, int floor, int x)
         if (tower->money < lobby_charge(tower, floor, x, width))
             REJECT(floor == 0 ? "Not enough money to build floor"
                               : "Not enough money for construction");
-        /* Lobby segments CAN overlap existing lobby — that's how extension works.
-         * But they can't overlap non-lobby items. */
-        int fidx = floor_to_index(floor);
-        if (fidx >= 0 && fidx < TOWER_FLOOR_COUNT) {
-            for (int cx = x; cx < x + width; cx++) {
-                ItemType existing = tower->grid[fidx][cx].type;
-                if (item_is_elevator(existing)) continue;  /* lobby coexists with shafts */
-                if (existing != ITEM_NONE && existing != ITEM_LOBBY &&
-                    existing != ITEM_FLOOR)
-                    REJECT("Cannot place on top of other items");
-            }
+        int left=x, right=x+width, top=floor+1;
+        if (floor==0 && tower->lobby_height>1) top=tower->lobby_height;
+        for (int i=0;i<tower->tenant_count;i++) {
+            const Tenant *t=&tower->tenants[i];
+            if (t->type!=ITEM_LOBBY || t->floor<floor || t->floor>=top) continue;
+            if (t->x<left) left=t->x;
+            if (t->x+t->width>right) right=t->x+t->width;
         }
-        /* Floor 0: always allowed. Upper (sky) lobbies obey the same
-         * no-overhang rule as every other unit: the WHOLE footprint needs
-         * support directly below, not just one cell of it. The old
-         * "any cell below is built" test let a sky lobby cantilever past
-         * its support — even out over a fire escape (Jonah 2026-08-07). */
-        if (floor != 0) {
-            int below_idx = floor_to_index(floor - 1);
-            if (below_idx < 0 || below_idx >= TOWER_FLOOR_COUNT)
-                REJECT("Cannot place item there");
-            for (int cx = x; cx < x + width; cx++)
-                if (tower->grid[below_idx][cx].type == ITEM_NONE)
-                    REJECT("Cannot place items wider than floor below");
+        /* Validate the whole union and grand-lobby mirrors before stamping. */
+        for (int i=0;i<tower->tenant_count;i++) {
+            const Tenant *t=&tower->tenants[i];
+            if (t->type==ITEM_NONE || t->type==ITEM_FLOOR || t->type==ITEM_LOBBY || item_is_transport(t->type)) continue;
+            if (t->floor<top && t->floor+t->height>floor && t->x<right && t->x+t->width>left)
+                REJECT("Cannot place on top of other items");
+        }
+        for (int f=floor;f<top;f++) for (int cx=left;cx<right;cx++) {
+            ItemType existing=tower->grid[floor_to_index(f)][cx].type;
+            if (existing!=ITEM_NONE && existing!=ITEM_LOBBY && existing!=ITEM_FLOOR && !item_is_elevator(existing))
+                REJECT("Cannot place on top of other items");
+            if (f==floor && floor!=0 && tower->grid[floor_to_index(floor-1)][cx].type==ITEM_NONE)
+                REJECT("Cannot place items wider than floor below");
         }
         return 1;
     }
@@ -1016,6 +1013,24 @@ int tower_can_place(Tower *tower, ItemType type, int floor, int x)
                 REJECT("Cannot place item there");
         }
     }
+
+    /* Automatic deck gap fill must obey the same support rule as the deck tool. */
+    if (!is_transport && !item_is_elevator(type) && floor!=0) {
+        int support=floor_to_index(floor+height);
+        if (floor>0) support=floor_to_index(floor-1);
+        for (int f=floor;f<floor+height;f++) {
+            int left=x, right=x+width, L, R;
+            if (deck_extent(tower,floor_to_index(f),&L,&R)) {
+                if (L<left) left=L;
+                if (R>right) right=R;
+            }
+            for (int cx=left;cx<right;cx++) {
+                if (tower->grid[floor_to_index(f)][cx].type!=ITEM_NONE) continue;
+                if (tower->grid[support][cx].type==ITEM_NONE)
+                    REJECT("Cannot place items wider than supporting floor");
+            }
+        }
+    }
     
     return 1;
 }
@@ -1117,7 +1132,7 @@ static uint16_t place_item(Tower *tower, ItemType type, int floor, int x, int pr
                    tower_item_name(type), floor, x);
         return 0;
     }
-    if (tower->tenant_count >= MAX_TENANTS) return 0;
+    if (tower->tenant_count >= MAX_TENANTS) { set_reject("Too many tenants"); return 0; }
 
     /* can_place promoted internally; mirror it here so the record and
      * grid overlay carry the tall span (rise = height - 1 from here on). */

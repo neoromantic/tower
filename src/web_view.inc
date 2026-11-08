@@ -18,87 +18,21 @@ EMSCRIPTEN_KEEPALIVE
 int ct_world_command(const char *action, int floor, int cell, int end_floor, int end_cell)
 {
     if (!strcmp(action, "preview-clear")) { web_ghost = 0; return 1; }
+    if (floor < TOWER_MIN_FLOOR) floor = TOWER_MIN_FLOOR;
+    if (floor > TOWER_TOP_FLOOR) floor = TOWER_TOP_FLOOR;
+    if (end_floor < TOWER_MIN_FLOOR) end_floor = TOWER_MIN_FLOOR;
+    if (end_floor > TOWER_TOP_FLOOR) end_floor = TOWER_TOP_FLOOR;
+    if (cell < 0) cell = 0;
+    if (cell >= TOWER_WIDTH) cell = TOWER_WIDTH-1;
+    if (end_cell < 0) end_cell = 0;
+    if (end_cell >= TOWER_WIDTH) end_cell = TOWER_WIDTH-1;
     game.mouse_floor = floor;
     game.mouse_cell = cell;
-    if (!strcmp(action, "preview")) {
-        static Tower proposed;
-        web_ghost=1; web_end_floor=end_floor; web_end_cell=end_cell;
-        web_ghost_valid=0; web_ghost_count=0; web_ghost_cost=0; web_ghost_reason[0]=0;
-        ItemType type=game.build_type;
-        if(type<=ITEM_NONE) return 1;
-        int start=build_origin_cell(cell), base=build_origin_floor(type,floor);
-        web_ghost_x=start; web_ghost_floor=base;
-        web_ghost_width=ITEM_WIDTH[type]; web_ghost_height=ITEM_HEIGHT[type];
-        if(type==ITEM_LOBBY && base==0 && game.tower.lobby_height>1) web_ghost_height=game.tower.lobby_height;
-        if(!item_unlocked(type) || game.sim.event.active || floor<TOWER_MIN_FLOOR || floor>TOWER_TOP_FLOOR ||
-           end_floor<TOWER_MIN_FLOOR || end_floor>TOWER_TOP_FLOOR || cell<0 || cell>=TOWER_WIDTH || end_cell<0 || end_cell>=TOWER_WIDTH) return 1;
-        proposed=game.tower;
-        if(!proposed.lobby_height) tower_choose_lobby_height(&proposed,1);
-        tower_preview=1;
-        int valid=1, count=0;
-        if(type==ITEM_FLOOR) {
-            int lo=start, hi=end_cell;
-            if(hi<lo) { lo=end_cell; hi=start; }
-            web_ghost_x=lo; web_ghost_width=hi-lo+1;
-            valid=tower_extend_deck(&proposed,base,lo,hi+1); count=valid;
-        } else if(item_is_elevator(type)) {
-            int x=elevator_snap_column_at(start,floor), step=1;
-            if(end_floor<base) step=-1;
-            web_ghost_x=x;
-            int lo=base, hi=end_floor; if(hi<lo) { lo=end_floor; hi=base; }
-            web_ghost_floor=lo; web_ghost_height=hi-lo+1;
-            for(int f=base;;f+=step) {
-                int existing=0;
-                for(int si=0;si<game.sim.people.shaft_count;si++) {
-                    ElevatorShaft *shaft=&game.sim.people.shafts[si];
-                    if(shaft->active && shaft->type==type && shaft->x==x && floor_to_index(f)>=shaft->lo && floor_to_index(f)<=shaft->hi) existing=1;
-                }
-                if(!existing) {
-                    if(tower_place(&proposed,type,f,x)) count++;
-                    else { valid=0; if(!web_ghost_reason[0]) snprintf(web_ghost_reason,sizeof web_ghost_reason,"%s",tower_reject_reason()); }
-                }
-                if(f==end_floor) break;
-            }
-            if(!count && valid) {
-                valid=elev_can_add_car_at(x,floor)==1;
-                if(valid) { count=1; proposed.money-=elv_car_cost(type); }
-                else {
-                    snprintf(web_ghost_reason,sizeof web_ghost_reason,"Cannot add a car here");
-                    for(int si=0;si<game.sim.people.shaft_count;si++) {
-                        ElevatorShaft *shaft=&game.sim.people.shafts[si];
-                        if(!shaft->active || shaft->type!=type || shaft->x!=x || floor_to_index(floor)<shaft->lo || floor_to_index(floor)>shaft->hi) continue;
-                        if(shaft->num_cars>=CARS_PER_SHAFT) snprintf(web_ghost_reason,sizeof web_ghost_reason,"%s",exe_str(0x3EB,23,"No more cars in this shaft"));
-                        else snprintf(web_ghost_reason,sizeof web_ghost_reason,"%s",exe_str(0x3EB,6,"Not enough money for construction"));
-                        break;
-                    }
-                }
-            }
-        } else {
-            int step=ITEM_WIDTH[type]; if(end_cell<start) step=-step;
-            int right=start+ITEM_WIDTH[type];
-            for(int x=start;x>=0 && x+ITEM_WIDTH[type]<=TOWER_WIDTH;x+=step) {
-                if(step>0 && x>end_cell) break;
-                if(step<0 && x<end_cell) break;
-                if(x<web_ghost_x) web_ghost_x=x;
-                if(x+ITEM_WIDTH[type]>right) right=x+ITEM_WIDTH[type];
-                int placed_floor=base;
-                int rise=tower_stair_rise(&proposed,type,&placed_floor);
-                if(rise>1) { web_ghost_height=rise+1; web_ghost_floor=placed_floor; }
-                if(tower_place(&proposed,type,base,x)) count++;
-                else { valid=0; if(!web_ghost_reason[0]) snprintf(web_ghost_reason,sizeof web_ghost_reason,"%s",tower_reject_reason()); }
-            }
-            web_ghost_width=right-web_ghost_x;
-        }
-        if(!web_ghost_reason[0]) snprintf(web_ghost_reason,sizeof web_ghost_reason,"%s",tower_reject_reason());
-        tower_preview=0;
-        web_ghost_valid=valid && count>0;
-        web_ghost_count=count;
-        web_ghost_cost=game.tower.money-proposed.money;
-        return 1;
-    }
     if (game.quit_confirm || game.route_confirm || game.notice_modal || game.disaster_modal ||
-        game.find_open || game.name_edit_open || game.movie_dlg_open || game.elv_edit_mode || game.sim.event.active) return 0;
-    if (floor < TOWER_MIN_FLOOR || floor > TOWER_TOP_FLOOR || cell < 0 || cell >= TOWER_WIDTH) return 0;
+        game.find_open || game.name_edit_open || game.movie_dlg_open || game.elv_edit_mode || game.sim.event.active) {
+        if(web_ghost) { web_ghost_valid=0; snprintf(web_ghost_reason,sizeof web_ghost_reason,"Close the active dialog or event first"); }
+        return 0;
+    }
     if (!strcmp(action, "delete") || (!strcmp(action, "activate") && game.demolish_mode)) {
         demolish_click_grid(floor, cell); return 1;
     }
@@ -115,38 +49,135 @@ int ct_world_command(const char *action, int floor, int cell, int end_floor, int
         game.mouse_floor=end_floor; cap_drag_track();
         game.cap_drag=game.dragging=0; game.build_type=saved; return 1;
     }
-    if (strcmp(action, "place") && strcmp(action, "drag") && strcmp(action, "activate")) return 0;
-    if (game.build_type <= ITEM_NONE || !item_unlocked(game.build_type)) return 0;
-    if(!game.tower.lobby_height) {
-        if(game.tower.money==2000000L && !game.tower.tenant_count && floor==TOWER_MIN_FLOOR && cell==0) {
-            game.tower.money*=2; play_snd(SND_CASH); return 1;
+    int preview = !strcmp(action, "preview");
+    if (!preview && strcmp(action, "place") && strcmp(action, "drag")) return 0;
+    ItemType type = game.build_type;
+    if (type <= ITEM_NONE || !item_unlocked(type)) {
+        web_ghost_valid=0; snprintf(web_ghost_reason,sizeof web_ghost_reason,"Build tool unavailable"); return 0;
+    }
+    int base = build_origin_floor(type, floor), x = build_origin_cell(cell);
+    int last = build_origin_cell(end_cell), step = 1;
+    if (!item_is_elevator(type)) end_floor = floor;
+    if (preview) {
+        web_ghost=1; web_ghost_valid=0; web_ghost_count=0; web_ghost_cost=0;
+        web_skipped_count=0; web_add_car=0; web_ghost_reason[0]=0;
+        web_type=type; web_start_floor=floor; web_start_cell=cell;
+        web_end_floor=end_floor; web_end_cell=end_cell;
+        web_before=game.tower;
+    } else if (!web_ghost || !web_ghost_valid || type!=web_type ||
+               floor!=web_start_floor || cell!=web_start_cell ||
+               end_floor!=web_end_floor || end_cell!=web_end_cell) return 0;
+    static Tower trial;
+    trial=game.tower;
+    if (preview && item_is_elevator(type)) x=elevator_snap_column_at(x,floor);
+    if (preview) {
+        web_ghost_x=x; web_ghost_floor=base;
+        web_ghost_width=ITEM_WIDTH[type]; web_ghost_height=ITEM_HEIGHT[type];
+    }
+    if (item_is_elevator(type)) {
+        last=end_floor;
+        if (last<base) step=-1;
+    } else if (last<x) { int swap=x; x=last; last=swap; }
+    tower_preview=1;
+    int attempted=0, blocked=0, n=0;
+    for (int cursor=x, f=base; ; ) {
+        if (!preview) {
+            if (n==web_ghost_count) break;
+            cursor=web_ops[n].x; f=web_ops[n].floor;
         }
-        tower_choose_lobby_height(&game.tower,1);
+        long money=trial.money;
+        int success=0, noop=0;
+        if (preview && item_is_elevator(type) && trial.grid[floor_to_index(f)][cursor].type==type) noop=1;
+        else if (preview && type==ITEM_FLOOR && trial.grid[floor_to_index(f)][cursor].type!=ITEM_NONE) noop=1;
+        else if (preview && item_is_elevator(type) && blocked) {
+            snprintf(web_ghost_reason,sizeof web_ghost_reason,"Shaft extension is disconnected");
+        } else if (!preview && web_add_car) {
+            success=elev_can_add_car_at(cursor,f)==1 &&
+                    game.sim.people.shafts[web_car_shaft].num_cars==web_car_count;
+            if (success) trial.money-=elv_car_cost(type);
+        } else {
+            attempted++;
+            success=tower_preview_place(&trial,type,f,cursor)!=0;
+            if (!success) snprintf(web_ghost_reason,sizeof web_ghost_reason,"%s",tower_reject_reason());
+        }
+        if (success) {
+            if (preview) {
+                web_ops[n].x=cursor; web_ops[n].floor=f;
+                web_ops[n].cost=money-trial.money;
+                n++; web_ghost_count=n;
+            } else {
+                if (money-trial.money!=web_ops[n].cost) break;
+                n++;
+            }
+        } else if (!preview) break;
+        else if (!noop) {
+            web_skipped[web_skipped_count].x=cursor;
+            web_skipped[web_skipped_count].floor=f;
+            snprintf(web_skipped[web_skipped_count++].reason,160,"%s",web_ghost_reason);
+            if (item_is_elevator(type)) blocked=1;
+        }
+        if (!preview) continue;
+        if (item_is_elevator(type)) {
+            if (f==last) break;
+            f+=step;
+        } else {
+            int advance=1;
+            if (success && type!=ITEM_FLOOR) advance=ITEM_WIDTH[type];
+            cursor+=advance;
+            if (cursor>last) break;
+        }
     }
-    if(!ct_world_command("preview",floor,cell,end_floor,end_cell) || !web_ghost_valid) {
-        add_event_message(web_ghost_reason); return 0;
+    tower_preview=0;
+    if (preview) {
+        if (item_is_elevator(type) && !attempted && !blocked && !n) {
+            if (elev_can_add_car_at(x,floor)==1) {
+                web_add_car=1; web_ghost_count=1;
+                web_ops[0].x=x; web_ops[0].floor=floor;
+                web_ops[0].cost=elv_car_cost(type); trial.money-=web_ops[0].cost;
+                for (int si=0;si<game.sim.people.shaft_count;si++) {
+                    ElevatorShaft *shaft=&game.sim.people.shafts[si];
+                    if (shaft->active && shaft->type==type && shaft->x==x &&
+                        floor_to_index(floor)>=shaft->lo && floor_to_index(floor)<=shaft->hi) {
+                        web_car_shaft=si; web_car_count=shaft->num_cars; break;
+                    }
+                }
+            } else {
+                snprintf(web_ghost_reason,sizeof web_ghost_reason,"Cannot add a car here");
+                for(int si=0;si<game.sim.people.shaft_count;si++) {
+                    ElevatorShaft *shaft=&game.sim.people.shafts[si];
+                    if(!shaft->active || shaft->type!=type || shaft->x!=x || floor_to_index(floor)<shaft->lo || floor_to_index(floor)>shaft->hi) continue;
+                    snprintf(web_ghost_reason,sizeof web_ghost_reason,"Not enough money for construction");
+                    if(shaft->num_cars>=CARS_PER_SHAFT) snprintf(web_ghost_reason,sizeof web_ghost_reason,"No more cars in this shaft");
+                    break;
+                }
+            }
+        }
+        web_ghost_valid=web_ghost_count>0;
+        web_ghost_cost=game.tower.money-trial.money;
+        web_plan=trial;
+        if (web_skipped_count) snprintf(web_ghost_reason,sizeof web_ghost_reason,"%d skipped: %.130s",web_skipped_count,web_skipped[0].reason);
+        return 1;
     }
-    game.drag_start_floor = floor;
-    game.drag_start_cell = build_origin_cell(cell);
-    if (!strcmp(action, "drag")) {
-        if (end_floor < TOWER_MIN_FLOOR || end_floor > TOWER_TOP_FLOOR || end_cell < 0 || end_cell >= TOWER_WIDTH) return 0;
-        game.mouse_floor = end_floor;
-        game.mouse_cell = end_cell;
-        long money=game.tower.money; int count=game.tower.tenant_count;
-        drag_place_units(); return game.tower.money!=money || game.tower.tenant_count!=count;
+    int same=n==web_ghost_count && game.tower.money-trial.money==web_ghost_cost &&
+             trial.tenant_count==web_plan.tenant_count && trial.lobby_height==web_plan.lobby_height &&
+             !memcmp(trial.grid,web_plan.grid,sizeof trial.grid);
+    for (int i=0;same && i<trial.tenant_count;i++) {
+        Tenant *a=&trial.tenants[i], *b=&web_plan.tenants[i];
+        same=a->id==b->id && a->type==b->type && a->x==b->x && a->floor==b->floor && a->width==b->width && a->height==b->height;
     }
-    int x = game.drag_start_cell;
-    if (item_is_elevator(game.build_type)) {
-        x = elevator_snap_column_at(x, floor);
-        if (elev_can_add_car_at(x,floor)<0) { elev_add_car_at(x,floor); return 0; }
-        if (elev_add_car_at(x, floor)) return 1;
+    if (!same) {
+        web_ghost_valid=0;
+        snprintf(web_ghost_reason,sizeof web_ghost_reason,"Plan changed; adjust preview");
+        return 0;
     }
-    if (!tower_place(&game.tower, game.build_type, build_origin_floor(game.build_type, floor), x)) {
-        add_event_message(tower_reject_reason()); play_snd(SND_BUILD_TOOL); return 0;
+    if (web_add_car) elev_add_car_at(web_ops[0].x,web_ops[0].floor);
+    else {
+        for (int i=0;i<web_ghost_count;i++) tower_place(&game.tower,type,web_ops[i].floor,web_ops[i].x);
+        metro_seed_evening_aux();
+        game_notify_built(&game.sim,&game.tower);
+        play_snd(SND_BUILD_PLACE);
     }
-    metro_seed_evening_aux();
-    game_notify_built(&game.sim, &game.tower);
-    play_snd(SND_BUILD_PLACE);
+    web_ghost=0;
     return 1;
 }
 
@@ -508,7 +539,7 @@ const char *ct_world_state(void)
         Tenant *t=tower_tenant(&game.tower,person->home_tenant);
         if(t && t->type==ITEM_CONDO && person->cur_floor==floor_to_index(t->floor)) condo_lit[t-game.tower.tenants]=1;
     }
-    J("{\"mapMode\":%d,\"debug\":%s,\"frame\":%d,\"camera\":{\"x\":%.3f,\"y\":%.3f,\"zoom\":%.3f},\"time\":{\"hour\":%d,\"minute\":%d},\"bounds\":{\"width\":%d,\"minFloor\":%d,\"maxFloor\":%d},\"rooms\":[",game.map_mode,BOOL(game.show_debug),game.sim.frame,game.cam_fx,-game.cam_fy,game.zoom,game.sim.hour,game.sim.minute,TOWER_WIDTH,TOWER_MIN_FLOOR,TOWER_TOP_FLOOR);
+    J("{\"paused\":%s,\"mapMode\":%d,\"debug\":%s,\"frame\":%d,\"camera\":{\"x\":%.3f,\"y\":%.3f,\"zoom\":%.3f},\"time\":{\"hour\":%d,\"minute\":%d},\"bounds\":{\"width\":%d,\"minFloor\":%d,\"maxFloor\":%d},\"rooms\":[",BOOL(game.sim.speed==SPEED_PAUSED),game.map_mode,BOOL(game.show_debug),game.sim.frame,game.cam_fx,-game.cam_fy,game.zoom,game.sim.hour,game.sim.minute,TOWER_WIDTH,TOWER_MIN_FLOOR,TOWER_TOP_FLOOR);
     for(int i=0;i<game.tower.tenant_count;i++) {
         Tenant *t=&game.tower.tenants[i]; if(t->type==ITEM_NONE) continue;
         int lit=game.sim.hour>=7 && game.sim.hour<22;
@@ -516,6 +547,10 @@ const char *ct_world_state(void)
         if(t->type==ITEM_CONDO && (game.sim.time_of_day==TOD_EVENING || game.sim.time_of_day==TOD_NIGHT)) lit=condo_lit[i];
         int variant=twr_tenant_variant(&game.tower,t);
         SEP(); J("{\"id\":%d,\"type\":%d,\"x\":%d,\"floor\":%d,\"width\":%d,\"height\":%d,\"state\":%d,\"occupied\":%s,\"lit\":%s,\"construction\":%d,\"burned\":%s,\"style\":%d,\"variant\":%d,\"rent\":%d,\"condition\":%d,\"venueState\":%d,\"fill\":%d,\"patrons\":%d,\"customers\":%d,\"retailOpen\":%s,\"evaluation\":%d,\"demand\":%d,\"population\":%d}",t->id,t->type,t->x,t->floor,t->width,t->height,t->state,BOOL(t->state>=TENANT_OCCUPIED && t->state!=TENANT_ABANDONED),BOOL(lit),t->construction,BOOL(t->burned),t->style,variant,t->rent_class,t->condition,t->venue_state,t->fill_state,t->patrons_now,t->customers_today,BOOL(t->retail_open),game_tenant_eval_metric(&game.sim,&game.tower,t),t->demand_category,t->population);
+        p--; /* append optional authoritative type fields before the room's closing brace */
+        if(t->type==ITEM_OFFICE) J(",\"workers\":%d",people_office_workers(&game.tower,t));
+        if(t->type==ITEM_PARKING) J(",\"spaceUsable\":%s,\"spaceOrdinal\":%d,\"parked\":%s",BOOL(t->space_usable),t->space_ordinal,BOOL(t->space_usable && t->space_ordinal<game.tower.cars_office+game.tower.cars_suite));
+        J("}");
     }
     J("],\"floors\":["); n=0;
     for(int fi=0;fi<TOWER_FLOOR_COUNT;fi++) for(int x=0;x<TOWER_WIDTH;) {
@@ -529,7 +564,13 @@ const char *ct_world_state(void)
             Tenant *t=&game.tower.tenants[i]; TenantOccupants *o=&game.sim.occupants[i];
             if(t->type==ITEM_NONE) continue;
             if(t->type==ITEM_CONDO && !condo_lit[i] && (game.sim.time_of_day==TOD_NIGHT || game.sim.time_of_day==TOD_EVENING)) continue;
-            for(int k=0;k<o->count;k++) {
+            int count=o->count;
+            if(t->type==ITEM_OFFICE) {
+                count=people_office_workers(&game.tower,t);
+                if(t->state<TENANT_OCCUPIED || t->state==TENANT_ABANDONED || t->construction || t->burned) count=0;
+                if(count>o->count) count=o->count;
+            }
+            for(int k=0;k<count;k++) {
                 SEP(); J("{\"id\":%d,\"tenant\":%d,\"x\":%d,\"y\":%d,\"width\":16,\"height\":24,\"frame\":%d,\"kind\":\"occupant\",\"state\":5,\"vip\":false}",MAX_PEOPLE+i*OCCUPANTS_MAX+k,t->id,(t->x+o->x[k])*CELL_W,(t->floor-1)*CELL_H,o->frame[k]);
             }
         }
@@ -547,7 +588,16 @@ const char *ct_world_state(void)
                         Person *person=&ps->people[id-1]; Tenant *home=tower_tenant(&game.tower,person->home_tenant);
                         int fig=(id*7)%30; if(fig>=25) fig+=10;
                         if(home && home->type==ITEM_HOUSEKEEPING && person->service) fig=25+id%3;
-                        SEP(); J("{\"id\":%d,\"x\":%d,\"y\":%d,\"width\":16,\"height\":36,\"frame\":%d,\"kind\":\"queue\",\"state\":%d,\"vip\":%s,\"stress\":%d}",id,x,(index_to_floor(f)-1)*CELL_H,fig,person->state,BOOL(people_vip_is(id-1)),person->wait_accum+game.sim.frame-person->wait_start);
+                        int wait=game.sim.frame-person->wait_start, band=0, bar=150;
+                        if(wait<0) wait=0;
+                        if(game.tower.star_rating>=4) bar=200;
+                        int stress=person->wait_accum+wait;
+                        if(game.queue_hot && !(home && home->type==ITEM_HOUSEKEEPING && person->service)) {
+                            if(stress>=80) band=1;
+                            if(stress>=bar) band=2;
+                        }
+                        int direction=1; if(d) direction=-1;
+                        SEP(); J("{\"id\":%d,\"x\":%d,\"y\":%d,\"width\":16,\"height\":36,\"frame\":%d,\"kind\":\"queue\",\"state\":%d,\"vip\":%s,\"stress\":%d,\"waitFrames\":%d,\"waitBand\":%d,\"shaft\":%d,\"direction\":%d,\"order\":%d,\"home\":%d,\"currentFloor\":%d,\"destination\":%d,\"legFloor\":%d}",id,x,(index_to_floor(f)-1)*CELL_H,fig,person->state,BOOL(people_vip_is(id-1)),stress,wait,band,si,direction,k,person->home_tenant,index_to_floor(person->cur_floor),index_to_floor(person->dest_floor),index_to_floor(person->leg_floor));
                     }
                 }
             }
@@ -568,6 +618,22 @@ const char *ct_world_state(void)
             SEP(); J("{\"id\":%d,\"x\":%d,\"y\":%d,\"width\":16,\"height\":24,\"frame\":%d,\"kind\":\"cleaner\",\"state\":5,\"vip\":false}",MAX_PEOPLE+MAX_TENANTS*OCCUPANTS_MAX+i,(marks[i].x+offset)*CELL_W,(index_to_floor(marks[i].fidx)-1)*CELL_H,0x60+(int)(h%3));
         }
     }
+    J("],\"queues\":["); n=0;
+    for(int si=0;si<ps->shaft_count;si++) {
+        ElevatorShaft *shaft=&ps->shafts[si]; if(!shaft->active) continue;
+        for(int f=shaft->lo;f<=shaft->hi;f++) for(int d=0;d<2;d++) {
+            ElevatorStop *st=&shaft->stop[f];
+            int count=st->up_count, head=st->up_head, direction=1, wait=0;
+            uint16_t *ring=st->up_ring;
+            if(d) { count=st->down_count; head=st->down_head; ring=st->down_ring; direction=-1; }
+            for(int k=0;k<count;k++) {
+                int id=ring[(head+k)%QUEUE_CAP]; if(!id) continue;
+                int elapsed=game.sim.frame-ps->people[id-1].wait_start;
+                if(elapsed>wait) wait=elapsed;
+            }
+            SEP(); J("{\"shaft\":%d,\"floor\":%d,\"direction\":%d,\"count\":%d,\"maxCount\":%d,\"waitFrames\":%d}",si,index_to_floor(f),direction,count,QUEUE_CAP,wait);
+        }
+    }
     J("],\"shafts\":["); n=0;
     for(int si=0;si<ps->shaft_count;si++) {
         ElevatorShaft *s=&ps->shafts[si]; if(!s->active) continue;
@@ -578,12 +644,15 @@ const char *ct_world_state(void)
         ElevatorShaft *s=&ps->shafts[si]; if(!s->active) continue;
         for(int ci=0;ci<s->num_cars;ci++) {
             ElevatorCar *c=&s->car[ci]; if(!c->active) continue;
-            double y=(index_to_floor(c->floor)-1)*CELL_H;
-            if(c->target!=c->floor && c->move_total) {
-                double delta=(double)(c->move_total-c->move_timer)/c->move_total*CELL_H;
-                if(!c->dir) delta=-delta; y+=delta;
-            }
-            SEP(); J("{\"id\":%d,\"shaft\":%d,\"x\":%d,\"y\":%.3f,\"width\":%d,\"height\":36,\"occupancy\":%d,\"capacity\":%d,\"doors\":%d,\"target\":%d,\"moveTimer\":%d,\"moveTotal\":%d}",si*CARS_PER_SHAFT+ci,si,s->x*CELL_W,y,ITEM_WIDTH[s->type]*CELL_W,c->passengers,s->capacity,c->door_timer,index_to_floor(c->target),c->move_timer,c->move_total);
+            double position; int stride;
+            people_car_motion(s,c,&stride,&position);
+            double y=(position+TOWER_MIN_FLOOR-1)*CELL_H;
+            SEP(); J("{\"id\":%d,\"shaft\":%d,\"x\":%d,\"y\":%.3f,\"width\":%d,\"height\":36,\"occupancy\":%d,\"capacity\":%d,\"doors\":%d,\"target\":%d,\"moveTimer\":%d,\"moveTotal\":%d}",si*CARS_PER_SHAFT+ci,si,s->x*CELL_W,y,ITEM_WIDTH[s->type]*CELL_W,c->passengers,s->capacity,c->door_timer,index_to_floor(c->target),c->move_timer,c->move_total & 63);
+            p--;
+            int direction=0;
+            if(c->target>c->floor) direction=1;
+            if(c->target<c->floor) direction=-1;
+            J(",\"floor\":%d,\"direction\":%d,\"legStart\":%d,\"holdTimer\":%d}",index_to_floor(c->floor),direction,index_to_floor(c->leg_start),c->hold_timer);
         }
     }
     J("],\"effects\":["); n=0;
@@ -636,6 +705,35 @@ const char *ct_world_state(void)
 #undef EFFECT
     int type=game.build_type;
     J("],\"ghost\":{\"active\":%s,\"type\":%d,\"x\":%d,\"floor\":%d,\"width\":%d,\"height\":%d,\"valid\":%s,\"endFloor\":%d,\"endCell\":%d,\"count\":%d,\"cost\":%ld,\"reason\":",BOOL(web_ghost && type>0),type,web_ghost_x,web_ghost_floor,web_ghost_width,web_ghost_height,BOOL(web_ghost_valid),web_end_floor,web_end_cell,web_ghost_count,web_ghost_cost); Q(web_ghost_reason);
+    J(",\"operation\":"); if(web_add_car) Q("add-car"); else Q("build");
+    J(",\"rects\":["); n=0;
+    if(web_ghost && !web_add_car) {
+        for(int i=0;i<web_plan.tenant_count;i++) {
+            Tenant *t=&web_plan.tenants[i];
+            if(t->type==ITEM_NONE) continue;
+            const Tenant *old=NULL;
+            for(int k=0;k<web_before.tenant_count;k++) if(web_before.tenants[k].id==t->id) { old=&web_before.tenants[k]; break; }
+            if(old && t->type!=ITEM_LOBBY) continue;
+            for(int x=t->x;x<t->x+t->width;) {
+                if(old && x>=old->x && x<old->x+old->width) { x=old->x+old->width; continue; }
+                int end=t->x+t->width;
+                if(old && x<old->x) end=old->x;
+                SEP(); J("{\"type\":%d,\"x\":%d,\"floor\":%d,\"width\":%d,\"height\":%d}",t->type,x,t->floor,end-x,t->height);
+                x=end;
+            }
+        }
+        for(int fi=0;fi<TOWER_FLOOR_COUNT;fi++) for(int x=0;x<TOWER_WIDTH;) {
+            if(web_plan.grid[fi][x].type!=ITEM_FLOOR || web_before.grid[fi][x].type!=ITEM_NONE) { x++; continue; }
+            int start=x++;
+            while(x<TOWER_WIDTH && web_plan.grid[fi][x].type==ITEM_FLOOR && web_before.grid[fi][x].type==ITEM_NONE) x++;
+            SEP(); J("{\"type\":%d,\"x\":%d,\"floor\":%d,\"width\":%d,\"height\":1}",ITEM_FLOOR,start,index_to_floor(fi),x-start);
+        }
+    }
+    J("],\"skipped\":["); n=0;
+    if(web_ghost) for(int i=0;i<web_skipped_count;i++) {
+        SEP(); J("{\"x\":%d,\"floor\":%d,\"reason\":",web_skipped[i].x,web_skipped[i].floor); Q(web_skipped[i].reason); J("}");
+    }
+    J("]");
     J("},\"weather\":{\"rain\":%s,\"night\":%s},\"event\":{\"active\":%s,\"type\":%d,\"pending\":%s},\"animation\":{\"people\":%s,\"effects\":%s},\"edit\":{\"active\":%s,\"shaft\":%d}}",BOOL(game.rainy_day && game.sim.hour>=8 && game.sim.hour<16),BOOL(game.sim.time_of_day==TOD_NIGHT),BOOL(game.sim.event.active),game.sim.event.type,BOOL(game.sim.event.pending),BOOL(game.anim_people),BOOL(game.anim_effects),BOOL(game.elv_edit_mode),elv_dialog_shaft());
     return state;
 }
